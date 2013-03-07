@@ -1,0 +1,12 @@
+# Subfolders to ignore
+logs/
+
+# Files to ignore 
+Thumbs.db
+thumbs.db
+*.log
+test-data/tonga/*.sql
+test-data/tonga/tonga.7z
+
+#Ingore temporary vpp files
+*.vpp~*
