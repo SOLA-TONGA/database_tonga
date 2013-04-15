@@ -1,4 +1,73 @@
+-- Configure Tongan Language Translations for Code Reference values
+DELETE FROM system.language; 
+INSERT INTO system.language (code, display_value, active, is_default, item_order)
+VALUES ('en', 'English::::Fakapalagi', TRUE, TRUE, 1);
+INSERT INTO system.language (code, display_value, active, is_default, item_order)
+VALUES ('to', 'Tongan::::Fakatonga', TRUE, FALSE, 2);
 
+-- Service types for SOLA Tonga
+INSERT INTO application.request_category_type (code, display_value, description, status)
+SELECT 'applicationServices', 'Application Services', 'Services used to support applicatin processing', 'c' WHERE 'applicationServices' NOT IN 
+(SELECT code FROM application.request_category_type); 
+
+-- Defalt existing request types (a.k.a. service types) to disabled then enable those
+-- used for Tonga. 
+UPDATE application.request_type SET status = 'x';
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('checklist','applicationServices','Checklist::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Checklist Service applicable for different types of applications');
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('siteInspection','applicationServices','Site Inspection::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Indicates the application will require a site inspection');
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('ministerBriefing','applicationServices','Ministerial Briefing::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Briefing for the Minister of Lands to gain approval for the application');
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('cabinetSubmission','applicationServices','Cabinet Submission::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Submission to cabinet for thier approval of the application. Includes notifying application
+	of the cabinet decision');	
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('survey','applicationServices','Survey::::TONGAN','c',90,0.00,0.00,0.00,0,
+	null,null,null,'Ministry to conduct survey of the lease or allotment area');
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('draftDeed','applicationServices','Draft Deed::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Draft Deed of Grant or Deed of Lease including a diagram of the allotment or lease');
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('signDeed','applicationServices','Sign Deed::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Organise individuals to attend and sign the lease with the minister and initial payment
+	of registration fee and annual rental');
+	
+UPDATE 	application.request_type 
+SET 	display_value = 'Reigster Lease::::TONGAN',
+		status = 'c',
+		description = 'Register the new lease details',
+		base_fee = 0,
+		nr_days_to_complete = 5
+WHERE   code = 'registerLease';
+	
+	
+	
 -- Revise the list of document types for SOLA Tonga
 DELETE FROM application.request_type_requires_source_type;
 DELETE FROM source.administrative_source_type; 

@@ -58,6 +58,8 @@ echo Loading Spatial Config... >> build.log 2>&1
 %psql_path% --host=%host% --port=5432 --username=%username% --dbname=%dbname% --file=%extensionPath%spatial_config.sql >> build.log 2>&1
 echo Loading Tonga Business Rules... >> build.log 2>&1
 %psql_path% --host=%host% --port=5432 --username=%username% --dbname=%dbname% --file=%extensionPath%business_rules.sql >> build.log 2>&1
+echo Loading User Roles... >> build.log 2>&1
+%psql_path% --host=%host% --port=5432 --username=%username% --dbname=%dbname% --file=%extensionPath%user_roles.sql >> build.log 2>&1
 
 
 echo Extracting Tonga data files...
