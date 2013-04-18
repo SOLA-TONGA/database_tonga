@@ -42,6 +42,13 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description)
+    VALUES ('itemNumber','applicationServices','Issue Item Number::::TONGAN','c',2,0.00,0.00,0.00,0,
+	null,null,null,'Issues an item number to track teh application as is progresses through the Mapping and Survey 
+	department.');	
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
     VALUES ('survey','applicationServices','Survey::::TONGAN','c',90,0.00,0.00,0.00,0,
 	null,null,null,'Ministry to conduct survey of the lease or allotment area');
 INSERT INTO application.request_type(code, request_category_code, display_value, 

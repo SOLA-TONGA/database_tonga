@@ -68,7 +68,7 @@ CREATE TABLE application.service_checklist_item
 (
   service_id character varying(40) NOT NULL,
   checklist_item_code character varying(20) NOT NULL,
-  result character varying(250) NOT NULL,
+  result character(1),
   comment character varying(555),
   rowidentifier character varying(40) NOT NULL DEFAULT uuid_generate_v1(),
   rowversion integer NOT NULL DEFAULT 0,
@@ -126,7 +126,7 @@ CREATE TABLE application.service_checklist_item_historic
 (
   service_id character varying(40) NOT NULL,
   checklist_item_code character varying(20) NOT NULL,
-  result character varying(250) NOT NULL,
+  result character(1),
   comment character varying(555),
   rowidentifier character varying(40) NOT NULL DEFAULT uuid_generate_v1(),
   rowversion integer NOT NULL DEFAULT 0,
