@@ -66,7 +66,7 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
 	of registration fee and annual rental');
 	
 UPDATE 	application.request_type 
-SET 	display_value = 'Reigster Lease::::TONGAN',
+SET 	display_value = 'Register Lease::::TONGAN',
 		status = 'c',
 		description = 'Register the new lease details',
 		base_fee = 0,
