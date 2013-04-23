@@ -1,3 +1,5 @@
+-- Script run time: 90 seconds approx.
+
 
 -- Function that can be used to return a default value (e.g. null) if it cannot
 -- be cast to the anyelement type.
@@ -40,13 +42,6 @@ UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(lease_town, ',.*|V
 SELECT lease_town, SUBSTRING(UPPER(lease_town), 1, 1) || SUBSTRING(LOWER(lease_town),2, LENGTH(lease_town)) from lease.lease_detail   
 WHERE (UPPER(lease_town) = lease_town OR lease_town = LOWER(lease_town));
  
--- Alter firstpart of town name
-DROP VIEW IF EXISTS  application.systematic_registration_certificates;
-DROP VIEW IF EXISTS administrative.sys_reg_owner_name;
-DROP VIEW IF EXISTS administrative.systematic_registration_listing;
-DROP VIEW IF EXISTS administrative.sys_reg_state_land;
-ALTER TABLE administrative.ba_unit ALTER COLUMN name_firstpart TYPE VARCHAR(50);
-
 -- Load Towns as BA Units
 DROP TABLE IF EXISTS lease.town;
 CREATE TABLE lease.town
@@ -169,8 +164,8 @@ WHERE lease_area LIKE '%ha';
 --...
 
 DELETE FROM administrative.ba_unit_area; 
-INSERT INTO administrative.ba_unit_area (id, ba_unit_id, type_code, size)
-SELECT uuid_generate_v1(), d.sola_ba_unit_id, 'officialArea', l.sola_area
+INSERT INTO administrative.ba_unit_area (id, ba_unit_id, type_code, size, change_user)
+SELECT uuid_generate_v1(), d.sola_ba_unit_id, 'officialArea', l.sola_area, 'migration'
 FROM lease.lease_detail d, lease.lease_location l
 WHERE d."ID" = l.lease_id
 AND sola_area IS NOT NULL;

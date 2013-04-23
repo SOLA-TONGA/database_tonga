@@ -1,3 +1,10 @@
+-- Increase the size of the name_firstpart for village names
+DROP VIEW IF EXISTS  application.systematic_registration_certificates;
+DROP VIEW IF EXISTS administrative.sys_reg_owner_name;
+DROP VIEW IF EXISTS administrative.systematic_registration_listing;
+DROP VIEW IF EXISTS administrative.sys_reg_state_land;
+ALTER TABLE administrative.ba_unit ALTER COLUMN name_firstpart TYPE VARCHAR(50);
+ALTER TABLE administrative.ba_unit_historic ALTER COLUMN name_firstpart TYPE VARCHAR(50);
 
 -- Checklist Group Table
 DROP TABLE IF EXISTS application.checklist_group;

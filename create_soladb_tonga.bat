@@ -26,7 +26,7 @@ REM choose the Store Password option. This will avoid a password prompt for ever
 REM that is loaded. 
 REM set /p password= DB Password [%password%] :
 
-REM set /p archive_password= Test Data Archive Password [%archive_password%] :
+set /p archive_password= Test Data Archive Password [%archive_password%] :
 
 echo
 echo
@@ -65,7 +65,7 @@ echo Loading User Roles... >> build.log 2>&1
 echo Extracting Tonga data files...
 echo Extracting Tonga data files... >> build.log 2>&1
 %utilitiesPath%\7z.exe e -y -o%testDataPath% %testDataPath%tongaDev.7z >> build.log 2>&1
-REM %utilitiesPath%\7z.exe e -y -p%archive_password% -o%testDataPath% %testDataPath%tonga.7z >> build.log 2>&1
+%utilitiesPath%\7z.exe e -y -p%archive_password% -o%testDataPath% %testDataPath%tonga.7z >> build.log 2>&1
 
 REM Load the Tonga test data. 
 REM Direct standard output to NUL, but capture any errors in the build.log
