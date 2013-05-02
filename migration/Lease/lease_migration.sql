@@ -34,13 +34,26 @@ SELECT id, null, name , 'Island', 'administrativeUnit', 'current', 'migration'
 FROM lease.island;
 
 -- Clean the Town Names
-UPDATE lease.lease_detail SET sola_town = TRIM(lease_town); 
-UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(lease_town, '"', '''', 'g'));
-UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(lease_town, 'Is|Is.|Island', 'Island', 'g'));
-UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(lease_town, ',.*|Vv|/.*|\(.*', '', 'g'));
-
-SELECT lease_town, SUBSTRING(UPPER(lease_town), 1, 1) || SUBSTRING(LOWER(lease_town),2, LENGTH(lease_town)) from lease.lease_detail   
-WHERE (UPPER(lease_town) = lease_town OR lease_town = LOWER(lease_town));
+-- Initialize town staging area from lease_town and remove any extra spaces 
+UPDATE lease.lease_detail SET sola_town = TRIM(lease_town);
+-- Remove any double qoutes and replace with single qoutes
+UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(sola_town, '"', '''', 'g'))
+WHERE TRIM(regexp_replace(sola_town, '"', '''', 'g')) != sola_town;
+-- Standardize Island text
+UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(sola_town, 'Is|Is.', 'Island', 'g'))
+WHERE TRIM(regexp_replace(sola_town, 'Is|Is.|Island', 'Island', 'g')) != sola_town;
+-- Remove common island prefixes
+UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(sola_town, ',.*|Vv|/.*|\(.*', '', 'g'))
+WHERE TRIM(regexp_replace(sola_town, ',.*|Vv|/.*|\(.*', '', 'g')) != sola_town;
+-- Reset case on town name
+UPDATE lease.lease_detail SET sola_town = SUBSTRING(UPPER(sola_town), 1, 1) || SUBSTRING(LOWER(sola_town),2, LENGTH(sola_town))   
+WHERE (UPPER(sola_town) = sola_town OR  sola_town = LOWER(sola_town));
+-- Fix invalid names
+UPDATE lease.lease_detail SET sola_town = '''Utulau' WHERE sola_town = '''utulau';
+UPDATE lease.lease_detail SET sola_town = 'Haveluloto' WHERE sola_town = 'Havelulloto';
+UPDATE lease.lease_detail SET sola_town = 'Neiafu' WHERE sola_town = 'Neiafu tt';
+UPDATE lease.lease_detail SET sola_town = 'Nga''unoho' WHERE sola_town = 'NGa''unoho';
+UPDATE lease.lease_detail SET sola_town = 'Nualei Kolofo''ou' WHERE sola_town = 'Nualei - Kolofo''ou';
  
 -- Load Towns as BA Units
 DROP TABLE IF EXISTS lease.town;
