@@ -17,7 +17,7 @@ end; $$;
 -- Clean the Island Names
 UPDATE lease.lease_detail SET sola_island = TRIM(lease_island); 
 UPDATE lease.lease_detail SET sola_island = 'Tongatapu' WHERE lease_island = 'tongatapu'; 
-UPDATE lease.lease_detail SET sola_island = 'NiuaFo''ou' WHERE lease_island = 'Niuafo''ou'; 
+UPDATE lease.lease_detail SET sola_island = 'Niuafo''ou' WHERE lease_island = 'NiuaFo''ou'; 
 
 -- Load Islands as BA Units
 DROP TABLE IF EXISTS lease.island;
