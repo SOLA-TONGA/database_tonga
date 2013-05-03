@@ -108,3 +108,80 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('savingram','Savingram','c','FALSE', '');
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('templateForm','Template Form','c','FALSE', 'Template for an official form such as an application form' );
+
+
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE ci.code = 'contact' 
+OR ci.code = 'id' 
+OR ci.code = 'powerOfAttorney'
+OR ci.code = 'existingLease'
+OR ci.code = 'termAndCondition'
+OR ci.code = 'environmentImpact';
+
+-- Load Checklist_item_in_group
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'visa';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'fund';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'permit';
+
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'residential' AND ci.code = 'visa';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'residential' AND ci.code = 'permit';
+
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessLicense';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessName';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'visa';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'foreignInvestment';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'fund';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'permit';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessPlan';
+
+-- Load Checklist Group
+INSERT INTO application.checklist_group(code, display_value, description, status)
+VALUES ('agricultural', 'Agricultural', 'Land used for farming and raising livestock.', 'c');
+INSERT INTO application.checklist_group(code, display_value, description, status)
+VALUES ('residential', 'Residential', 'Land used for residence.', 'c');
+INSERT INTO application.checklist_group(code, display_value, description, status)
+VALUES ('commercial', 'Commercial', 'Land or buildings used to generate a profit.', 'c');
+INSERT INTO application.checklist_group(code, display_value, description, status)
+VALUES ('government', 'Government Ministries', 'Land used by Government Ministries.', 'c');
+
+DELETE FROM application.checklist_group WHERE code = 'agriculture';
+
+-- Load Checklist Items
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('contact', 'Contact Detail', 'Telephone, Mobile, Residential Address, Mailing Address, Email.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('id', 'Identification', 'National Identification Card, Passport, Driver License', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('powerOfAttorney', 'Power of Attorney', 'If person other than the landowner.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('businessName', 'Business Registration and Business Name', 'Registered business.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('businessLicense', 'Business License', 'License of the registered business.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('foreignInvestment', 'Foreign Investment', 'Foreign investment.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('businessPlan', 'Business Plan', 'Business plan for commercial applications only.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('fund', 'Proof of Funds', 'Letter from Bank, Bank Statements, etc.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('existingLease', 'Existing Leases', 'Natural Name and Business.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('permit', 'Permit to Hold, Reside or Occupy Land', 'Permit to hold, reside or occupy land.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('termAndCondition', 'Terms and Conditions of Lease or Supplementary agreements (if any)', 'Terms and conditions agreement.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('environmentImpact', 'Environment Impact Assessment', 'Impact of application on enviroment.', 'c');
+INSERT INTO application.checklist_item(code, display_value, description, status)
+VALUES ('visa', 'Visa', 'Resident, Work Visa, Business Visa, etc. This only applies to Foreigners', 'c');
