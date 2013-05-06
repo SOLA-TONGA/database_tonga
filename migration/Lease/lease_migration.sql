@@ -34,13 +34,26 @@ SELECT id, null, name , 'Island', 'administrativeUnit', 'current', 'migration'
 FROM lease.island;
 
 -- Clean the Town Names
-UPDATE lease.lease_detail SET sola_town = TRIM(lease_town); 
-UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(lease_town, '"', '''', 'g'));
-UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(lease_town, 'Is|Is.|Island', 'Island', 'g'));
-UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(lease_town, ',.*|Vv|/.*|\(.*', '', 'g'));
-
-SELECT lease_town, SUBSTRING(UPPER(lease_town), 1, 1) || SUBSTRING(LOWER(lease_town),2, LENGTH(lease_town)) from lease.lease_detail   
-WHERE (UPPER(lease_town) = lease_town OR lease_town = LOWER(lease_town));
+-- Initialize town staging area from lease_town and remove any extra spaces 
+UPDATE lease.lease_detail SET sola_town = TRIM(lease_town);
+-- Remove any double qoutes and replace with single qoutes
+UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(sola_town, '"', '''', 'g'))
+WHERE TRIM(regexp_replace(sola_town, '"', '''', 'g')) != sola_town;
+-- Standardize Island text
+UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(sola_town, 'Is|Is.', 'Island', 'g'))
+WHERE TRIM(regexp_replace(sola_town, 'Is|Is.', 'Island', 'g')) != sola_town;
+-- Remove common island prefixes
+UPDATE lease.lease_detail SET sola_town = TRIM(regexp_replace(sola_town, ',.*|Vv|/.*|\(.*', '', 'g'))
+WHERE TRIM(regexp_replace(sola_town, ',.*|Vv|/.*|\(.*', '', 'g')) != sola_town;
+-- Reset case on town name
+UPDATE lease.lease_detail SET sola_town = SUBSTRING(UPPER(sola_town), 1, 1) || SUBSTRING(LOWER(sola_town),2, LENGTH(sola_town))   
+WHERE (UPPER(sola_town) = sola_town OR  sola_town = LOWER(sola_town));
+-- Fix invalid names
+UPDATE lease.lease_detail SET sola_town = '''Utulau' WHERE sola_town = '''utulau';
+UPDATE lease.lease_detail SET sola_town = 'Haveluloto' WHERE sola_town = 'Havelulloto';
+UPDATE lease.lease_detail SET sola_town = 'Neiafu' WHERE sola_town = 'Neiafu tt';
+UPDATE lease.lease_detail SET sola_town = 'Nga''unoho' WHERE sola_town = 'NGa''unoho';
+UPDATE lease.lease_detail SET sola_town = 'Nualei Kolofo''ou' WHERE sola_town = 'Nualei - Kolofo''ou';
  
 -- Load Towns as BA Units
 DROP TABLE IF EXISTS lease.town;
@@ -160,8 +173,69 @@ UPDATE lease.lease_location
 SET sola_area = safe_cast(TRIM(regexp_replace(lease_area, 'ha', '', 'g')), null::NUMERIC(19,2))*10000
 WHERE lease_area LIKE '%ha'; 
 
--- Cast Imperial Area to metres
---...
+
+
+-- *** Cast Imperial Area to metres
+UPDATE lease.lease_location
+SET imperial = lower(lease_area)
+WHERE lease_area NOT LIKE '%msq' AND lease_area NOT LIKE '%ha';
+
+-- Replace all pa and pp with p to indicate perches
+UPDATE lease.lease_location SET imperial = TRIM(regexp_replace(imperial, 'pa|pp', 'p', 'g'))
+WHERE TRIM(regexp_replace(imperial, 'pa|pp', 'p', 'g')) != imperial;
+
+-- Extract the acreage - make those fields with invalid imperial measure with -1
+UPDATE lease.lease_location
+SET acre = safe_cast(TRIM(substring(imperial from '#"%#"a%' for '#')), -1::INT)
+WHERE imperial IS NOT NULL AND imperial LIKE '%a%'; 
+
+-- Extract the roods where an acre measure is given
+UPDATE lease.lease_location
+SET rood = safe_cast(TRIM(substring(imperial from '%a ?#"%#"r%' for '#')), -1::INT)
+WHERE imperial IS NOT NULL AND imperial LIKE '%a%r%'; 
+
+-- Extract the roods where no acre measure is given
+UPDATE lease.lease_location
+SET rood = safe_cast(TRIM(substring(imperial from '#"%#"r%' for '#')), -1::INT)
+WHERE imperial IS NOT NULL AND imperial LIKE '%r%' AND imperial NOT LIKE '%a%'; 
+
+-- Extract the perches where roods is specified
+UPDATE lease.lease_location
+SET perch = safe_cast(TRIM(substring(imperial from '%r ?#"%#"p' for '#')), -1::NUMERIC(19,2))
+WHERE imperial IS NOT NULL AND imperial LIKE '%r%p%';
+
+-- Extract the perches where acres are specified
+UPDATE lease.lease_location
+SET perch = safe_cast(TRIM(substring(imperial from '%a ?#"%#"p' for '#')), -1::NUMERIC(19,2))
+WHERE imperial IS NOT NULL AND imperial LIKE '%a%p%' AND imperial NOT LIKE '%r%';
+
+-- Extract the perches where no roods or acres are specified
+UPDATE lease.lease_location
+SET perch = safe_cast(TRIM(substring(imperial from '#"%#"p' for '#')), -1::NUMERIC(19,2))
+WHERE imperial IS NOT NULL AND imperial LIKE '%p%' 
+AND imperial NOT LIKE '%r%' AND imperial NOT LIKE '%a%'; 
+
+-- Blank out any invalid imperial areas
+UPDATE lease.lease_location
+SET acre = NULL, 
+rood = NULL,
+perch = NULL
+WHERE acre = -1 OR rood = -1 OR perch = -1
+OR rood >= 4 OR perch >= 40;  
+
+-- Set the new lease area
+UPDATE lease.lease_location
+SET sola_area = ROUND((ISNULL(acre, 0) * 4046.8564) -- 1 arce = 4046.8564 square metres
+                   + (ISNULL(rood, 0) * 1011.7141) -- 4 roods in an acre
+				   + (ISNULL(perch, 0) * 25.2929)) -- 40 perches in a rood
+WHERE imperial IS NOT NULL; 
+
+-- Remove any 0 areas
+UPDATE lease.lease_location
+SET sola_area = NULL
+WHERE sola_area = 0; 
+
+
 
 DELETE FROM administrative.ba_unit_area; 
 INSERT INTO administrative.ba_unit_area (id, ba_unit_id, type_code, size, change_user)

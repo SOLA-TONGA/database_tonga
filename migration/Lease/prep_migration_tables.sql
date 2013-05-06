@@ -11,7 +11,11 @@ DROP COLUMN IF EXISTS sola_owner_rrr_id;
 ALTER TABLE lease.lease_location 
 DROP COLUMN IF EXISTS sola_area,
 DROP COLUMN IF EXISTS dup,
-DROP COLUMN IF EXISTS sola_co_id;
+DROP COLUMN IF EXISTS sola_co_id,
+DROP COLUMN IF EXISTS acre,
+DROP COLUMN IF EXISTS rood,
+DROP COLUMN IF EXISTS perch
+DROP COLUMN IF EXISTS imperial;
 
 
 -- Add the sequence number on the title estate table to use for the primary rrrs
@@ -27,4 +31,8 @@ ADD sola_owner_rrr_id VARCHAR(40) DEFAULT uuid_generate_v1();
 ALTER TABLE lease.lease_location
 ADD sola_area NUMERIC(19,2),
 ADD dup BOOLEAN DEFAULT FALSE, 
-ADD sola_co_id VARCHAR(40) DEFAULT uuid_generate_v1();
+ADD sola_co_id VARCHAR(40) DEFAULT uuid_generate_v1(),
+ADD acre INT,
+ADD rood INT,
+ADD perch NUMERIC(19,2),
+ADD imperial character varying(255); 
