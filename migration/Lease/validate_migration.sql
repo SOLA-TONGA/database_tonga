@@ -14,8 +14,38 @@ INSERT INTO lease.validation (code, message)
 SELECT 'INVALID ISLAND COUNT', 'Should be 6 islands - check all islands are valid and none are missing.'
 WHERE (SELECT COUNT(*) FROM lease.island) != 6;
 
+-- Check for towns that are not correctly specified
 INSERT INTO lease.validation (code, message, item_num)
 SELECT 'INVALID TOWN', 'Town name ' || sola_town || ' is not a valid town name and must be fixed', "ID"
-FROM lease.lease_detail WHERE sola_town in ('Expire', 'Invalid', 'Residential', 'Resort', 'Valid');
+FROM lease.lease_detail WHERE sola_town in ('Expire', 'Invalid', 'Residential', 'Resort', 'Valid', '');
 
+-- Check of leases with invalid or missing lease registration dates
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'INVALID LEASE REGISTRATION DATE', 'Lease ' || l.lease_number || ' has an invalid or missing lease registration date of "' || l.lease_reg_date || '"', l."ID"
+FROM lease.lease_detail l, administrative.rrr r
+WHERE l.sola_rrr_id = r.id AND r.registration_date IS NULL;
+
+-- Check of leases with invalid or missing lease expiry dates
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'INVALID LEASE EXPIRE DATE', 'Lease ' || l.lease_number || ' has an invalid or missing lease expiry date', l."ID"
+FROM lease.lease_detail l, administrative.rrr r
+WHERE l.sola_rrr_id = r.id AND r.expiration_date IS NULL;
+
+-- Verify the rental amounts are valid numbers
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'INVALID LEASE RENTAL AMOUNT', 'Lease ' || l.lease_number || ' has an invalid or missing rental amount of "' || l.lease_rental || '"', l."ID"
+FROM lease.lease_detail l, administrative.rrr r
+WHERE l.sola_rrr_id = r.id AND r.amount IS NULL;
+
+-- Verify the next payment date for rental is valid and not significantly in the past
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'INVALID DUE DATE', 'Lease ' || l.lease_number || ' has an invalid or missing lease payment date of "' || l.lease_payment_date || '"', l."ID"
+FROM lease.lease_detail l, administrative.rrr r
+WHERE l.sola_rrr_id = r.id AND (r.due_date IS NULL OR r.due_date < '1990-01-01');
+
+-- Checks if the area for the lot is valid
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'INVALID LEASE AREA', 'Lease ' || l.lease_number || ' has an invalid or missing area. "' || l.lease_area || '"', l.lease_id
+FROM lease.lease_location l
+WHERE sola_area IS NULL;
 
