@@ -1,4 +1,4 @@
-
+-- Script run time <1s
 -- Create table to hold validation messages
 DROP TABLE IF EXISTS lease.validation;
 CREATE TABLE lease.validation
@@ -48,4 +48,12 @@ INSERT INTO lease.validation (code, message, item_num)
 SELECT 'INVALID LEASE AREA', 'Lease ' || l.lease_number || ' has an invalid or missing area. "' || l.lease_area || '"', l.lease_id
 FROM lease.lease_location l
 WHERE sola_area IS NULL;
+
+-- Identifies duplicate lot/plans
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'DUPLICATE LOT/PLAN', 'The same lot and plan is used for multiple leases. Check the leases to ensure the lot and plan reference is correct. "' || 
+l.lease_lot || '/' || l.lease_plan || '" duplicated on leases "' || string_agg(l.lease_id::VARCHAR(40), ', ') || '"', null
+FROM lease.lease_location l
+WHERE dup = true
+GROUP BY l.lease_lot, l.lease_plan;
 

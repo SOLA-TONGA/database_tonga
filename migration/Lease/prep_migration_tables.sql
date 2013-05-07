@@ -1,3 +1,5 @@
+-- Run time 35 seconds
+
 -- Remove columns if already exist on the lrs.title estate table. 
 ALTER TABLE lease.lease_detail 
 DROP COLUMN IF EXISTS sola_rrr_id,
@@ -14,7 +16,7 @@ DROP COLUMN IF EXISTS dup,
 DROP COLUMN IF EXISTS sola_co_id,
 DROP COLUMN IF EXISTS acre,
 DROP COLUMN IF EXISTS rood,
-DROP COLUMN IF EXISTS perch
+DROP COLUMN IF EXISTS perch,
 DROP COLUMN IF EXISTS imperial;
 
 
