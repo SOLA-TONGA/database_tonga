@@ -125,31 +125,31 @@ DELETE FROM application.checklist_group WHERE code = 'agriculture';
 
 -- Load Checklist Items
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('contact', 'Contact Detail', 'Telephone, Mobile, Residential Address, Mailing Address, Email.', 'c');
+VALUES ('contact', 'Contact Detail', 'Telephone, Mobile, Residential Address, Mailing Address, Email', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
 VALUES ('id', 'Identification', 'National Identification Card, Passport, Driver License', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('powerOfAttorney', 'Power of Attorney', 'If person other than the landowner.', 'c');
+VALUES ('powerOfAttorney', 'Power of Attorney', 'If person other than the Landowner', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('businessName', 'Business Registration and Business Name', 'Registered business.', 'c');
+VALUES ('businessName', 'Business Registration and Business Name', 'Registered Business', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('businessLicense', 'Business License', 'License of the registered business.', 'c');
+VALUES ('businessLicense', 'Business License', 'License of the Registered Business', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('foreignInvestment', 'Foreign Investment', 'Foreign investment.', 'c');
+VALUES ('foreignInvestment', 'Foreign Investment', 'Foreign Investment', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('businessPlan', 'Business Plan', 'Business plan for commercial applications only.', 'c');
+VALUES ('businessPlan', 'Business Plan', 'Business plan for commercial applications only', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
 VALUES ('fund', 'Proof of Funds', 'Letter from Bank, Bank Statements, etc.', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('existingLease', 'Existing Leases', 'Natural Name and Business.', 'c');
+VALUES ('existingLease', 'Existing Leases', 'Natural Name and Business', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('permit', 'Permit to Hold, Reside or Occupy Land', 'Permit to hold, reside or occupy land.', 'c');
+VALUES ('permit', 'Permit to Hold, Reside or Occupy Land', 'Permit to Hold, Reside or Occupy Land', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('termAndCondition', 'Terms and Conditions of Lease or Supplementary agreements (if any)', 'Terms and conditions agreement.', 'c');
+VALUES ('termAndCondition', 'Terms and Conditions of Lease or Supplementary agreements (if any)', 'Terms and Conditions Agreement', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('environmentImpact', 'Environment Impact Assessment', 'Impact of application on enviroment.', 'c');
+VALUES ('environmentImpact', 'Environment Impact Assessment', 'Impact of Application on Enviroment', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
-VALUES ('visa', 'Visa', 'Resident, Work Visa, Business Visa, etc. This only applies to Foreigners', 'c');
+VALUES ('visa', 'Visa (Foreigners only)', 'Resident, Work Visa, Business Visa, etc. This only applies to Foreigners', 'c');
 
 
 
