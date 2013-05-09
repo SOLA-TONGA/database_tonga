@@ -110,41 +110,6 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('templateForm','Template Form','c','FALSE', 'Template for an official form such as an application form' );
 
 
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE ci.code = 'contact' 
-OR ci.code = 'id' 
-OR ci.code = 'powerOfAttorney'
-OR ci.code = 'existingLease'
-OR ci.code = 'termAndCondition'
-OR ci.code = 'environmentImpact';
-
--- Load Checklist_item_in_group
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'visa';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'fund';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'permit';
-
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'residential' AND ci.code = 'visa';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'residential' AND ci.code = 'permit';
-
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessLicense';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessName';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'visa';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'foreignInvestment';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'fund';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'permit';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessPlan';
 
 -- Load Checklist Group
 INSERT INTO application.checklist_group(code, display_value, description, status)
@@ -185,3 +150,42 @@ INSERT INTO application.checklist_item(code, display_value, description, status)
 VALUES ('environmentImpact', 'Environment Impact Assessment', 'Impact of application on enviroment.', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
 VALUES ('visa', 'Visa', 'Resident, Work Visa, Business Visa, etc. This only applies to Foreigners', 'c');
+
+
+
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE ci.code = 'contact' 
+OR ci.code = 'id' 
+OR ci.code = 'powerOfAttorney'
+OR ci.code = 'existingLease'
+OR ci.code = 'termAndCondition'
+OR ci.code = 'environmentImpact';
+
+-- Load Checklist_item_in_group
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'visa';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'fund';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'permit';
+
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'residential' AND ci.code = 'visa';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'residential' AND ci.code = 'permit';
+
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessLicense';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessName';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'visa';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'foreignInvestment';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'fund';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'permit';
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessPlan';
+
