@@ -8,7 +8,8 @@ DROP COLUMN IF EXISTS sola_island,
 DROP COLUMN IF EXISTS sola_ba_unit_id,
 DROP COLUMN IF EXISTS sola_lessee_id,
 DROP COLUMN IF EXISTS sola_lessor_id,
-DROP COLUMN IF EXISTS sola_owner_rrr_id;
+DROP COLUMN IF EXISTS sola_owner_rrr_id,
+DROP COLUMN IF EXISTS dup;
 
 ALTER TABLE lease.lease_location 
 DROP COLUMN IF EXISTS sola_area,
@@ -28,7 +29,8 @@ ADD sola_town VARCHAR(255),
 ADD sola_island VARCHAR(255),
 ADD sola_lessee_id VARCHAR (40) DEFAULT uuid_generate_v1(),
 ADD sola_lessor_id VARCHAR(40) DEFAULT uuid_generate_v1(),
-ADD sola_owner_rrr_id VARCHAR(40) DEFAULT uuid_generate_v1();
+ADD sola_owner_rrr_id VARCHAR(40) DEFAULT uuid_generate_v1(),
+ADD dup BOOLEAN DEFAULT FALSE;
 
 ALTER TABLE lease.lease_location
 ADD sola_area NUMERIC(19,2),

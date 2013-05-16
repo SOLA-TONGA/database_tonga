@@ -49,6 +49,14 @@ SELECT 'INVALID LEASE AREA', 'Lease ' || l.lease_number || ' has an invalid or m
 FROM lease.lease_location l
 WHERE sola_area IS NULL;
 
+-- Identifies duplicate leases
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'DUPLICATE LEASE', 'The lease number is duplicated. Check the leases and remove any duplicates. Lease Number "' || 
+l.lease_number || '" duplicated on lease records "' || string_agg(l."ID"::VARCHAR(40), ', ') || '"', null
+FROM lease.lease_detail l
+WHERE dup = true
+GROUP BY l.lease_number;
+
 -- Identifies duplicate lot/plans
 INSERT INTO lease.validation (code, message, item_num)
 SELECT 'DUPLICATE LOT/PLAN', 'The same lot and plan is used for multiple leases. Check the leases to ensure the lot and plan reference is correct. "' || 
