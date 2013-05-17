@@ -79,12 +79,26 @@ UPDATE mortgage.mortgage SET dup = TRUE
 WHERE mortgage_number in (
 SELECT mortgage_number from mortgage.mortgage GROUP BY mortgage_number having count(*) > 1);
 
+-- Clean term, mortgage amont and interest rate
+UPDATE mortgage.mortgage_variation 
+SET term = period::INT, 
+    mort_amount = safe_cast(mortgage_total_amt, NULL::NUMERIC(29,2)),
+    int_rate = CASE WHEN interest > 50 THEN NULL ELSE interest::NUMERIC(5,2) END;
+	
+-- Flag duplicate mortgage_variation records
+UPDATE mortgage.mortgage_variation SET dup = TRUE
+WHERE mortgage_variation_num in (
+SELECT mortgage_variation_num from mortgage.mortgage_variation GROUP BY mortgage_variation_num having count(*) > 1);
 
--- Create the Mortgage RRRs for the leases
+
+
+-- *** Create the Mortgage RRRs for the leases
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
-transaction_id, registration_date, amount, mortgage_interest_rate, change_user)
-SELECT m.sola_rrr_id, l.sola_ba_unit_id, m.mortgage_number, 'mortgage', 'current', 
-'migration', m.mortgage_reg_date, mort_amount, int_rate, 'migration'
+transaction_id, registration_date, amount, mortgage_interest_rate, change_user, expiration_date)
+SELECT m.sola_rrr_id, l.sola_ba_unit_id, m.mortgage_number, 'mortgage', 
+CASE WHEN m.mortgage_dateof_discharge > '01 JAN 1900' THEN 'historic' ELSE 'current' END, 
+'migration', m.mortgage_reg_date, mort_amount, int_rate, 'migration',
+CASE WHEN m.mortgage_dateof_discharge > '01 JAN 1900' THEN m.mortgage_dateof_discharge ELSE NULL END,
 FROM mortgage.mortgage m, lease.lease_detail l
 WHERE m.deed_number = l.lease_number
 AND l.dup = FALSE
@@ -107,10 +121,36 @@ FROM mortgage.mortgage m, administrative.rrr r
 WHERE m.sola_rrr_id = r.id; 
 
 
+-- *** Create Mortgage Variation Records
+INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
+transaction_id, registration_date, amount, mortgage_interest_rate, change_user, expiration_date)
+SELECT mv.sola_rrr_id, l.sola_ba_unit_id, mv.mortgage_variation_num, 'mortgage', 
+CASE WHEN mv.dateof_discharge > '01 JAN 1900' THEN 'historic' ELSE 'current' END, 
+'migration', mv.mortgage_variation_date, mv.mort_amount, mv.int_rate, 'migration',
+CASE WHEN mv.dateof_discharge > '01 JAN 1900' THEN mv.dateof_discharge ELSE NULL END,
+FROM mortgage.mortgage_variation mv, mortgage.mortgage m, lease.lease_detail l
+WHERE m.deed_number = l.lease_number
+AND mv.mortgage_number = m.mortgage_number
+AND l.dup = FALSE
+AND m.dup = FALSE
+AND mv.dup = FALSE
+AND m.deed_type = 'lease'
+AND mortgage_bank IN ('TDB', 'ANZ', 'GOV', 'WBOT', 'MBF', 'NRB'); 
 
+-- Create notations to record the purpose of the mortgage variations
+INSERT INTO administrative.notation (id, rrr_id, transaction_id, reference_nr, notation_text, notation_date, 
+status_code, change_user)
+SELECT mv.sola_notation_id, mv.sola_rrr_id, 'migration', mv.mortgage_variation_num, 
+mv.mortgage_remarks,  mv.mortgage_variation_date,
+'current', 'migration'
+FROM mortgage.mortgage_variation mv, administrative.rrr r
+WHERE mv.sola_rrr_id = r.id; 
 
-
-
+-- Link the mortgage variations  to the appropriate bank
+INSERT INTO administrative.party_for_rrr(rrr_id, party_id)
+SELECT mv.sola_rrr_id, mv.mortgage_bank
+FROM mortgage.mortgage_variation mv, administrative.rrr r
+WHERE mv.sola_rrr_id = r.id; 
 
 
 

@@ -25,6 +25,14 @@ FROM mortgage.mortgage
 WHERE dup = true
 GROUP BY mortgage_number;
 
+-- Mortgage Variation duplicated 
+INSERT INTO mortgage.validation (code, message, item_num)
+SELECT 'DUPLICATE MORTGAGE VARIATION', 'Mortgage variation has duplicate mortgage variation number. Check the mortgage variation details to ensure they are correct. Mortgage Variation "' || 
+mortgage_variation_num || '" duplicated on mortgage variation records "' || string_agg(mort_variation_id::VARCHAR(40), ', ') || '"', null
+FROM mortgage.mortgage_variation
+WHERE dup = true
+GROUP BY mortgage_variation_num;
+
 
 
 
