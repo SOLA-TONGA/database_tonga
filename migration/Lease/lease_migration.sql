@@ -1,4 +1,4 @@
--- Script run time: 90 seconds approx.
+-- Script run time: 150 seconds approx.
 
 
 -- Function that can be used to return a default value (e.g. null) if it cannot
@@ -78,19 +78,19 @@ SELECT DISTINCT i.id, t.id, 'island', 'migration' FROM lease.island i, lease.tow
 WHERE i.name = d.sola_island AND t.name = d.sola_town;
 
 -- Load lease
-UPDATE lease.lease_detail SET lease_exp_date = NULL WHERE lease_exp_date = 'dd/mm/yyyy';
-UPDATE lease.lease_detail SET lease_exp_date = '1/03/2058' WHERE lease_exp_date = '29/02/2058';
-UPDATE lease.lease_detail SET lease_exp_date = '20/05/2042' WHERE lease_exp_date = '205/2042';
-UPDATE lease.lease_detail SET lease_exp_date = '16/09/2052' WHERE lease_exp_date = '16/019/2052';
-UPDATE lease.lease_detail SET lease_exp_date = '3/01/2024' WHERE lease_exp_date = '31/4/2024';
-UPDATE lease.lease_detail SET lease_exp_date = '13/10/2031' WHERE lease_exp_date = '13/10/13/1'; --Check with Sione Lease 7656
-UPDATE lease.lease_detail SET lease_exp_date = '30/11/2029' WHERE lease_exp_date = '31/11/2029';
+--UPDATE lease.lease_detail SET lease_exp_date = NULL WHERE lease_exp_date = 'dd/mm/yyyy';
+--UPDATE lease.lease_detail SET lease_exp_date = '1/03/2058' WHERE lease_exp_date = '29/02/2058';
+--UPDATE lease.lease_detail SET lease_exp_date = '20/05/2042' WHERE lease_exp_date = '205/2042';
+--UPDATE lease.lease_detail SET lease_exp_date = '16/09/2052' WHERE lease_exp_date = '16/019/2052';
+--UPDATE lease.lease_detail SET lease_exp_date = '3/01/2024' WHERE lease_exp_date = '31/4/2024';
+--UPDATE lease.lease_detail SET lease_exp_date = '13/10/2031' WHERE lease_exp_date = '13/10/13/1'; --Check with Sione Lease 7656
+--UPDATE lease.lease_detail SET lease_exp_date = '30/11/2029' WHERE lease_exp_date = '31/11/2029';
 
 -- Compare dates to determine current and expire lease.
 DELETE FROM administrative.ba_unit WHERE type_code = 'leasedUnit';
 INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user)
 SELECT sola_ba_unit_id, lease_for, lease_number, '', 'leasedUnit', 
-	(SELECT (CASE WHEN lease_exp_date IS NULL OR now() > CAST(lease_exp_date AS DATE) THEN 'historic' ELSE 'current' END)), 'migration'
+	(SELECT (CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END)), 'migration'
 FROM lease.lease_detail;
 
 -- Create relationship between towns and lease
@@ -105,7 +105,7 @@ WHERE t.name = d.sola_town;
 
 -- Add kings and nobles party type
 -- party type: natural = Other, non-natural = Government
-DELETE FROM party.party;
+DELETE FROM party.party WHERE NOT EXISTS (SELECT id FROM application.application WHERE agent_id = party.party.id OR contact_person_id = party.party.id);
 INSERT INTO party.party_type (code, display_value, status)
 SELECT 'noble', 'Noble', 'c' WHERE NOT EXISTS (SELECT code FROM party.party_type where code = 'noble');
 INSERT INTO party.party_type (code, display_value, status)
@@ -135,7 +135,7 @@ DELETE FROM administrative.party_for_rrr;
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary,
 transaction_id, registration_date, expiration_date, amount, due_date, change_user)
 SELECT sola_rrr_id, sola_ba_unit_id, lease_number, 'lease', 
-CASE WHEN lease_exp_date IS NULL OR now() > CAST(lease_exp_date AS DATE) THEN 'historic' ELSE 'current' END, 
+CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END, 
 't', 'migration', safe_cast(lease_reg_date, null::date), safe_cast(lease_exp_date, null::date), 
 safe_cast(lease_rental, null::numeric(29,2)), safe_cast(lease_payment_date, null::date), 'migration'
 FROM lease.lease_detail;
@@ -224,10 +224,11 @@ WHERE acre = -1 OR rood = -1 OR perch = -1
 OR rood >= 4 OR perch >= 40;  
 
 -- Set the new lease area
+-- Set the new lease area
 UPDATE lease.lease_location
-SET sola_area = ROUND((ISNULL(acre, 0) * 4046.8564) -- 1 arce = 4046.8564 square metres
-                   + (ISNULL(rood, 0) * 1011.7141) -- 4 roods in an acre
-				   + (ISNULL(perch, 0) * 25.2929)) -- 40 perches in a rood
+SET sola_area = ROUND((COALESCE(acre, 0) * 4046.8564) -- 1 arce = 4046.8564 square metres
+                   + (COALESCE(rood, 0) * 1011.7141) -- 4 roods in an acre
+				   + (COALESCE(perch, 0) * 25.2929), 2) -- 40 perches in a rood
 WHERE imperial IS NOT NULL; 
 
 -- Remove any 0 areas
@@ -236,7 +237,7 @@ SET sola_area = NULL
 WHERE sola_area = 0; 
 
 
-
+-- Upload the areas for each BA Unit
 DELETE FROM administrative.ba_unit_area; 
 INSERT INTO administrative.ba_unit_area (id, ba_unit_id, type_code, size, change_user)
 SELECT uuid_generate_v1(), d.sola_ba_unit_id, 'officialArea', l.sola_area, 'migration'
