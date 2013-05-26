@@ -189,3 +189,75 @@ SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklis
 INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
 SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessPlan';
 
+
+-- BA Unit Types
+UPDATE administrative.ba_unit_type SET status = 'c'
+WHERE code IN ('leasedUnit'); 
+
+UPDATE administrative.ba_unit_type SET status = 'x'
+WHERE code NOT IN ('leasedUnit'); 
+
+INSERT INTO administrative.ba_unit_type(code, display_value, description, status)
+SELECT 'estateUnit','Noble Estate',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'estateUnit');
+
+INSERT INTO administrative.ba_unit_type(code, display_value, description, status)
+SELECT 'taxUnit','Tax Allotment',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'taxUnit');
+
+INSERT INTO administrative.ba_unit_type(code, display_value, description, status)
+SELECT 'townAllotmentUnit','Town Allotment',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'townAllotmentUnit');
+
+INSERT INTO administrative.ba_unit_type(code, display_value, description, status)
+SELECT 'islandUnit','Island',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'islandUnit');
+
+INSERT INTO administrative.ba_unit_type(code, display_value, description, status)
+SELECT 'townUnit','Town',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'townUnit');
+
+
+-- BA Unit Relationship Types
+INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
+SELECT 'island','Island',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'island');
+
+INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
+SELECT 'town','Town',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'town');
+
+INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
+SELECT 'estate','Estate',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'estate');
+
+INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
+SELECT 'allotment','Allotment',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'allotment');
+
+INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
+SELECT 'lease','Lease',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'lease');
+
+
+-- Party Role Types
+UPDATE party.party_role_type
+SET status = 'x'
+WHERE code NOT IN ('bank', 'lodgingAgent'); 
+
+INSERT INTO party.party_role_type (code, status, display_value)
+SELECT 'lawyer','c','Lawyer::::TONGAN'
+WHERE NOT EXISTS (SELECT code FROM party.party_role_type WHERE code = 'lawyer');
+
+INSERT INTO party.party_role_type (code, status, display_value)
+SELECT 'noble','c','Noble::::TONGAN'
+WHERE NOT EXISTS (SELECT code FROM party.party_role_type WHERE code = 'noble');
+
+INSERT INTO party.party_role_type (code, status, display_value)
+SELECT 'king','c','King::::TONGAN'
+WHERE NOT EXISTS (SELECT code FROM party.party_role_type WHERE code = 'king');
+
+
+-- RRR Types
+UPDATE administrative.rrr_type SET status = 'c'
+WHERE code IN ('lifeEstate'); 

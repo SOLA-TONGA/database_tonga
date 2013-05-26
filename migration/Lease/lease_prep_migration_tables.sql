@@ -40,3 +40,19 @@ ADD acre INT,
 ADD rood INT,
 ADD perch NUMERIC(19,2),
 ADD imperial character varying(255); 
+
+
+DROP TABLE IF EXISTS lease.island;
+CREATE TABLE lease.island
+(
+  id character varying(40),
+  name character varying(255)
+ );
+ 
+ 
+DROP TABLE IF EXISTS lease.town;
+CREATE TABLE lease.town
+(
+	id character varying(40) DEFAULT uuid_generate_v1(),
+	name character varying(255)
+);

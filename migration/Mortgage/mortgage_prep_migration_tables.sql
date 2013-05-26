@@ -1,10 +1,10 @@
--- Run time XX seconds
+-- Run time 45 seconds
 
 ALTER TABLE mortgage.mortgage
 DROP COLUMN IF EXISTS sola_rrr_id,
 DROP COLUMN IF EXISTS sola_notation_id, 
 DROP COLUMN IF EXISTS term, 
-DROP COLUMN IF EXISTS mort_amt, 
+DROP COLUMN IF EXISTS mort_amount, 
 DROP COLUMN IF EXISTS int_rate,
 DROP COLUMN IF EXISTS dup; 
 
@@ -13,7 +13,7 @@ DROP COLUMN IF EXISTS sola_rrr_id,
 DROP COLUMN IF EXISTS sola_notation_id, 
 DROP COLUMN IF EXISTS dup,
 DROP COLUMN IF EXISTS term, 
-DROP COLUMN IF EXISTS mort_amt, 
+DROP COLUMN IF EXISTS mort_amount, 
 DROP COLUMN IF EXISTS int_rate;
 
 
