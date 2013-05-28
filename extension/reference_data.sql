@@ -13,6 +13,8 @@ SELECT 'applicationServices', 'Application Services', 'Services used to support 
 -- Defalt existing request types (a.k.a. service types) to disabled then enable those
 -- used for Tonga. 
 UPDATE application.request_type SET status = 'x';
+
+-- Tongan application services
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
@@ -65,15 +67,101 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
 	null,null,null,'Organise individuals to attend and sign the lease with the minister and initial payment
 	of registration fee and annual rental');
 	
+-- Registration Services
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('registerSublease','registrationServices','Register Sublease::::TONGAN','c',5,10.50,0.00,0.00,0,
+	'Sublease of nn years to <name>','lease','new','Register new sublease details');
+	
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('varySublease','registrationServices','Transfer Sublease::::TONGAN','c',5,7.00,0.00,0.00,0,
+	'Transfer sublease of nn years to <name>','lease','vary','Transfer sublease');
+	
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('leaseDocument','registrationServices','Register Document Affecting Leasehold Title::::TONGAN','c',5,1.80,0.00,0.00,0,
+	'Register document','lease','vary','Register document affecting leasehold title');
+	
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('mortgageDocument','registrationServices','Register Document Affecting a Mortgage::::TONGAN','c',5,2.00,0.00,0.00,0,
+	'Register document','mortgage','vary','Register document affecting a Mortgage');
+	
 UPDATE 	application.request_type 
 SET 	display_value = 'Register Lease::::TONGAN',
 		status = 'c',
 		description = 'Register the new lease details',
-		base_fee = 0,
+		base_fee = 21.00,
+		value_base_fee = 0.00, 
+		area_base_fee = 0.00, 
 		nr_days_to_complete = 5
 WHERE   code = 'registerLease';
-	
-	
+
+UPDATE 	application.request_type 
+SET 	display_value = 'Transfer Lease::::TONGAN',
+		status = 'c',
+		description = 'Transfer lease details',
+		notation_template = 'Transfer lease of nn years to <name>',
+		base_fee = 14.00,
+		value_base_fee = 0.00, 
+		area_base_fee = 0.00, 
+		nr_days_to_complete = 5
+WHERE   code = 'varyLease';
+
+UPDATE 	application.request_type 
+SET 	display_value = 'Register Mortgage::::TONGAN',
+		status = 'c',
+		description = 'Register new mortgage details',
+		base_fee = 23.00,
+		value_base_fee = 0.00, 
+		area_base_fee = 0.00, 
+		nr_days_to_complete = 5
+WHERE   code = 'mortgage';
+
+UPDATE 	application.request_type 
+SET 	display_value = 'Variation of Mortgage::::TONGAN',
+		status = 'c',
+		description = 'Variation of mortgage',
+		notation_template = 'Variation of mortgage',
+		base_fee = 23.00,
+		value_base_fee = 0.00, 
+		area_base_fee = 0.00, 
+		nr_days_to_complete = 5
+WHERE   code = 'varyMortgage';
+
+UPDATE 	application.request_type 
+SET 	display_value = 'Variation of Mortgage::::TONGAN',
+		status = 'c',
+		description = 'Variation of mortgage',
+		notation_template = 'Variation of mortgage',
+		base_fee = 23.00,
+		value_base_fee = 0.00, 
+		area_base_fee = 0.00, 
+		nr_days_to_complete = 5
+WHERE   code = 'varyMortgage';	
+
+UPDATE 	application.request_type 
+SET 	display_value = 'Discharge of Mortgage::::TONGAN',
+		status = 'c',
+		description = 'Discharge of mortgage',
+		notation_template = 'Discharge',
+		rrr_type_code = 'mortgage',
+		type_action_code = 'cancel',
+		base_fee = 10.50,
+		value_base_fee = 0.00, 
+		area_base_fee = 0.00, 
+		nr_days_to_complete = 5
+WHERE   code = 'removeRestriction';	
+
 	
 -- Revise the list of document types for SOLA Tonga
 DELETE FROM application.request_type_requires_source_type;
