@@ -163,12 +163,12 @@ CREATE INDEX service_checklist_item_historic_index_on_rowidentifier
 ALTER TABLE application.application
 DROP COLUMN IF EXISTS expected_inspection_date, DROP COLUMN IF EXISTS inspection_completed;
 ALTER TABLE application.application
-ADD expected_inspection_date date NOT NULL DEFAULT now(), ADD inspection_completed boolean DEFAULT FALSE;
+ADD expected_inspection_date timestamp without time zone, ADD inspection_completed boolean NOT NULL DEFAULT FALSE;
 
 ALTER TABLE application.application_historic
 DROP COLUMN IF EXISTS expected_inspection_date, DROP COLUMN IF EXISTS inspection_completed;
 ALTER TABLE application.application_historic
-ADD expected_inspection_date date NOT NULL DEFAULT now(), ADD inspection_completed boolean DEFAULT FALSE;
+ADD expected_inspection_date timestamp without time zone, ADD inspection_completed boolean NOT NULL DEFAULT FALSE;
 
 -- Update Checklist Items for Government
 DELETE FROM application.checklist_item_in_group WHERE checklist_group_code = 'government' AND checklist_item_code = 'id';
