@@ -196,7 +196,8 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('savingram','Savingram','c','FALSE', '');
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('templateForm','Template Form','c','FALSE', 'Template for an official form such as an application form' );
-
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('siteInspectionForm','Site Inspection','c','FALSE', 'Document that details a site inspection that has been done' );
 
 
 -- Load Checklist Group
