@@ -103,7 +103,9 @@ SET 	display_value = 'Register Lease::::TONGAN',
 		base_fee = 21.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		rrr_type_code = null,
+		type_action_code = null
 WHERE   code = 'registerLease';
 
 UPDATE 	application.request_type 
