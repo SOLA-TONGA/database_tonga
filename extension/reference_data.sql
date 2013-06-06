@@ -202,7 +202,7 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('siteInspectionForm','Site Inspection','c','FALSE', 'Document that details a site inspection that has been done' );
 
 
--- Load Checklist Group
+-- *** Load Checklist Group
 INSERT INTO application.checklist_group(code, display_value, description, status)
 VALUES ('agricultural', 'Agricultural', 'Land used for farming and raising livestock.', 'c');
 INSERT INTO application.checklist_group(code, display_value, description, status)
@@ -212,9 +212,7 @@ VALUES ('commercial', 'Commercial', 'Land or buildings used to generate a profit
 INSERT INTO application.checklist_group(code, display_value, description, status)
 VALUES ('government', 'Government Ministries', 'Land used by Government Ministries.', 'c');
 
-DELETE FROM application.checklist_group WHERE code = 'agriculture';
-
--- Load Checklist Items
+-- *** Load Checklist Items
 INSERT INTO application.checklist_item(code, display_value, description, status)
 VALUES ('contact', 'Contact Detail', 'Telephone, Mobile, Residential Address, Mailing Address, Email', 'c');
 INSERT INTO application.checklist_item(code, display_value, description, status)
@@ -243,44 +241,46 @@ INSERT INTO application.checklist_item(code, display_value, description, status)
 VALUES ('visa', 'Visa (Foreigners only)', 'Resident, Work Visa, Business Visa, etc. This only applies to Foreigners', 'c');
 
 
+-- *** Load checklist_item_in_group
+-- Agricultural Group
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT 'agricultural', ci.code FROM application.checklist_item ci 
+WHERE ci.code IN ('id', 'powerOfAttorney', 'contact', 'existingLease', 'termAndCondition', 
+                  'environmentImpact', 'visa', 'fund', 'permit')
+AND NOT EXISTS (SELECT checklist_item_code FROM application.checklist_item_in_group
+                WHERE checklist_group_code = 'agricultural'
+				AND checklist_item_code = ci.code);  
+				
+-- Government Group
+INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
+SELECT 'government', ci.code FROM application.checklist_item ci 
+WHERE ci.code IN ('contact', 'existingLease', 'termAndCondition', 'environmentImpact')
+AND NOT EXISTS (SELECT checklist_item_code FROM application.checklist_item_in_group
+                WHERE checklist_group_code = 'government'
+				AND checklist_item_code = ci.code);  
 
+-- Residential Group
 INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE ci.code = 'contact' 
-OR ci.code = 'id' 
-OR ci.code = 'powerOfAttorney'
-OR ci.code = 'existingLease'
-OR ci.code = 'termAndCondition'
-OR ci.code = 'environmentImpact';
+SELECT 'residential', ci.code FROM application.checklist_item ci 
+WHERE ci.code IN ('id', 'powerOfAttorney', 'contact', 'existingLease', 'termAndCondition', 
+                  'environmentImpact', 'visa', 'permit')
+AND NOT EXISTS (SELECT checklist_item_code FROM application.checklist_item_in_group
+                WHERE checklist_group_code = 'residential'
+				AND checklist_item_code = ci.code);  
 
--- Load Checklist_item_in_group
+-- Commerical Group
 INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'visa';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'fund';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'agricultural' AND ci.code = 'permit';
-
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'residential' AND ci.code = 'visa';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'residential' AND ci.code = 'permit';
-
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessLicense';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessName';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'visa';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'foreignInvestment';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'fund';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'permit';
-INSERT INTO application.checklist_item_in_group(checklist_group_code, checklist_item_code)
-SELECT cg.code, ci.code FROM application.checklist_item ci, application.checklist_group cg WHERE cg.code = 'commercial' AND ci.code = 'businessPlan';
+SELECT 'commercial', ci.code FROM application.checklist_item ci 
+WHERE ci.code IN ('id', 'powerOfAttorney', 'contact', 'existingLease', 'termAndCondition', 
+                  'environmentImpact', 'visa', 'fund', 'permit','businessLicense', 
+				  'businessName', 'foreignInvestment', 'businessPlan')
+AND NOT EXISTS (SELECT checklist_item_code FROM application.checklist_item_in_group
+                WHERE checklist_group_code = 'commercial'
+				AND checklist_item_code = ci.code);  				
 
 
+				
+				
 -- BA Unit Types
 UPDATE administrative.ba_unit_type SET status = 'c'
 WHERE code IN ('leasedUnit'); 
