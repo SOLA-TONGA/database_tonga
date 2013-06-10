@@ -200,6 +200,8 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('templateForm','Template Form','c','FALSE', 'Template for an official form such as an application form' );
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('siteInspectionForm','Site Inspection','c','FALSE', 'Document that details a site inspection that has been done' );
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('ministerBriefing','Ministerial Briefing','c','FALSE', 'Document sent to the Minister detailing an application being lodged' );
 
 
 -- *** Load Checklist Group
