@@ -172,7 +172,8 @@ DELETE FROM source.administrative_source_type;
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('leaseApplication','Lease Application','c','FALSE', 'Application for lease of a tax or town allotment'); 
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
-VALUES ('cabinetSubmission','Cabinet Submission','c','FALSE', 'Submission to cabinet for thier approval of a lease or related land transaction');  INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('cabinetSubmission','Cabinet Submission','c','FALSE', 'Submission to cabinet for thier approval of a lease or related land transaction');  
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('cabinetDecision','Cabinet Decision','c','FALSE', 'Document summarising the decision by cabinet for a lease or related land transaction');  
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('caveat','Caveat','c','FALSE', 'Caveat registered on an allotment'); 
@@ -202,7 +203,10 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('siteInspectionForm','Site Inspection','c','FALSE', 'Document that details a site inspection that has been done' );
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('ministerBriefing','Ministerial Briefing','c','FALSE', 'Document sent to the Minister detailing an application being lodged' );
-
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('deedOfLease','Deed of Lease','c','FALSE', 'A scanned copy of the Deed of Lease' );
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('deedOfGrant','Deed of Grant','c','FALSE', 'A scanned copy of a Deed of Grant for an allotment' );
 
 -- *** Load Checklist Group
 INSERT INTO application.checklist_group(code, display_value, description, status)
