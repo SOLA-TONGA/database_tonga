@@ -163,7 +163,6 @@ CREATE INDEX service_checklist_item_historic_index_on_rowidentifier
   ON application.service_checklist_item_historic
   USING btree
   (rowidentifier COLLATE pg_catalog."default");
-
   
   
 -- Add new fields to the service table to support the workflow services for SOLA Tonga. 
@@ -190,6 +189,48 @@ ALTER TABLE application.service_historic
 ADD action_date timestamp without time zone, 
 ADD action_completed boolean NOT NULL DEFAULT FALSE,
 ALTER COLUMN action_notes TYPE VARCHAR(4000);
+
+-- Add columns to capture new lease application details
+ALTER TABLE application.application_property
+DROP COLUMN IF EXISTS lease_number,
+DROP COLUMN IF EXISTS lease_area, 
+DROP COLUMN IF EXISTS lease_term,
+DROP COLUMN IF EXISTS amount,
+DROP COLUMN IF EXISTS lessor_name,
+DROP COLUMN IF EXISTS district,
+DROP COLUMN IF EXISTS noble_estate,
+DROP COLUMN IF EXISTS description;
+
+ALTER TABLE application.application_property
+ADD lease_number VARCHAR(40),
+ADD lease_area NUMERIC(20,2) NOT NULL DEFAULT 0, 
+ADD lease_term NUMERIC(20,2) NOT NULL DEFAULT 0,
+ADD amount NUMERIC(20,2) NOT NULL DEFAULT 0,
+ADD lessor_name VARCHAR(255),
+ADD district VARCHAR(100),
+ADD noble_estate VARCHAR(100),
+ADD description VARCHAR(1000);
+
+ALTER TABLE application.application_property_historic
+DROP COLUMN IF EXISTS lease_number,
+DROP COLUMN IF EXISTS lease_area, 
+DROP COLUMN IF EXISTS lease_term,
+DROP COLUMN IF EXISTS amount,
+DROP COLUMN IF EXISTS lessor_name,
+DROP COLUMN IF EXISTS district,
+DROP COLUMN IF EXISTS noble_estate,
+DROP COLUMN IF EXISTS description;
+
+ALTER TABLE application.application_property_historic
+ADD lease_number VARCHAR(40),
+ADD lease_area NUMERIC(20,2), 
+ADD lease_term NUMERIC(20,2) ,
+ADD amount NUMERIC(20,2),
+ADD lessor_name VARCHAR(255),
+ADD district VARCHAR(100),
+ADD noble_estate VARCHAR(100),
+ADD description VARCHAR(1000);
+
 
 -- Replace the application.get_concatenated_name function as this does not work properly. It lists the
 -- application properties but should list the properites the service is associated with instead. 
