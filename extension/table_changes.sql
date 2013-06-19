@@ -191,7 +191,6 @@ ADD action_date timestamp without time zone,
 ADD action_completed boolean NOT NULL DEFAULT FALSE,
 ALTER COLUMN action_notes TYPE VARCHAR(4000);
 
-
 -- Replace the application.get_concatenated_name function as this does not work properly. It lists the
 -- application properties but should list the properites the service is associated with instead. 
 CREATE OR REPLACE FUNCTION application.get_concatenated_name(service_id character varying)
@@ -314,3 +313,15 @@ ALTER FUNCTION application.get_concatenated_name(character varying)
   OWNER TO postgres;
 COMMENT ON FUNCTION application.get_concatenated_name(character varying) IS 'Returns the list properties that have been changed due to the service and/or summary details about the service.';
 
+-- Add new field to the application table to support item number
+ALTER TABLE application.application
+DROP COLUMN IF EXISTS item_number;
+
+ALTER TABLE application.application
+ADD item_number character varying(40);
+
+ALTER TABLE application.application_historic
+DROP COLUMN IF EXISTS item_number;
+
+ALTER TABLE application.application_historic
+ADD item_number character varying(40);
