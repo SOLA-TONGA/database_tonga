@@ -203,6 +203,12 @@ DROP COLUMN IF EXISTS noble_estate,
 DROP COLUMN IF EXISTS description;
 
 ALTER TABLE application.application_property
+ALTER COLUMN name_firstpart  DROP NOT NULL,
+ALTER COLUMN name_lastpart DROP NOT NULL;
+
+ALTER TABLE application.application_property
+ALTER COLUMN name_firstpart TYPE VARCHAR(50),
+ALTER COLUMN name_lastpart TYPE VARCHAR(50),
 ADD lease_number VARCHAR(40),
 ADD lease_area NUMERIC(20,2) NOT NULL DEFAULT 0, 
 ADD lease_term NUMERIC(20,2) NOT NULL DEFAULT 0,
@@ -225,6 +231,8 @@ DROP COLUMN IF EXISTS noble_estate,
 DROP COLUMN IF EXISTS description;
 
 ALTER TABLE application.application_property_historic
+ALTER COLUMN name_firstpart TYPE VARCHAR(50),
+ALTER COLUMN name_lastpart TYPE VARCHAR(50),
 ADD lease_number VARCHAR(40),
 ADD lease_area NUMERIC(20,2), 
 ADD lease_term NUMERIC(20,2) ,
