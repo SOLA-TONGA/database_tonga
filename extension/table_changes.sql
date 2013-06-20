@@ -196,6 +196,7 @@ DROP COLUMN IF EXISTS lease_number,
 DROP COLUMN IF EXISTS lease_area, 
 DROP COLUMN IF EXISTS lease_term,
 DROP COLUMN IF EXISTS amount,
+DROP COLUMN IF EXISTS registration_date,
 DROP COLUMN IF EXISTS lessor_name,
 DROP COLUMN IF EXISTS district,
 DROP COLUMN IF EXISTS noble_estate,
@@ -206,6 +207,7 @@ ADD lease_number VARCHAR(40),
 ADD lease_area NUMERIC(20,2) NOT NULL DEFAULT 0, 
 ADD lease_term NUMERIC(20,2) NOT NULL DEFAULT 0,
 ADD amount NUMERIC(20,2) NOT NULL DEFAULT 0,
+ADD registration_date timestamp without time zone,
 ADD lessor_name VARCHAR(255),
 ADD district VARCHAR(100),
 ADD noble_estate VARCHAR(100),
@@ -216,6 +218,7 @@ DROP COLUMN IF EXISTS lease_number,
 DROP COLUMN IF EXISTS lease_area, 
 DROP COLUMN IF EXISTS lease_term,
 DROP COLUMN IF EXISTS amount,
+DROP COLUMN IF EXISTS registration_date,
 DROP COLUMN IF EXISTS lessor_name,
 DROP COLUMN IF EXISTS district,
 DROP COLUMN IF EXISTS noble_estate,
@@ -226,6 +229,7 @@ ADD lease_number VARCHAR(40),
 ADD lease_area NUMERIC(20,2), 
 ADD lease_term NUMERIC(20,2) ,
 ADD amount NUMERIC(20,2),
+ADD registration_date timestamp without time zone,
 ADD lessor_name VARCHAR(255),
 ADD district VARCHAR(100),
 ADD noble_estate VARCHAR(100),
@@ -355,14 +359,23 @@ ALTER FUNCTION application.get_concatenated_name(character varying)
 COMMENT ON FUNCTION application.get_concatenated_name(character varying) IS 'Returns the list properties that have been changed due to the service and/or summary details about the service.';
 
 -- Add new field to the application table to support item number
+-- and new lease registation details
 ALTER TABLE application.application
-DROP COLUMN IF EXISTS item_number;
+DROP COLUMN IF EXISTS item_number,
+DROP COLUMN IF EXISTS location_description,
+DROP COLUMN IF EXISTS purpose;
 
 ALTER TABLE application.application
-ADD item_number character varying(40);
+ADD item_number character varying(40),
+ADD location_description character varying(255),
+ADD purpose character varying(255);
 
 ALTER TABLE application.application_historic
-DROP COLUMN IF EXISTS item_number;
+DROP COLUMN IF EXISTS item_number,
+DROP COLUMN IF EXISTS location_description,
+DROP COLUMN IF EXISTS purpose;
 
 ALTER TABLE application.application_historic
-ADD item_number character varying(40);
+ADD item_number character varying(40),
+ADD location_description character varying(255),
+ADD purpose character varying(255);

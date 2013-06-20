@@ -273,7 +273,7 @@ DELETE FROM administrative.ba_unit_area;
 INSERT INTO administrative.ba_unit_area (id, ba_unit_id, type_code, size, change_user)
 SELECT uuid_generate_v1(), d.sola_ba_unit_id, 'officialArea', l.sola_area, 'migration'
 FROM lease.lease_detail d, lease.lease_location l
-WHERE d."ID" = l.lease_id
+WHERE d.lease_number = l.lease_number
 AND sola_area IS NOT NULL
 AND EXISTS (SELECT id FROM administrative.ba_unit WHERE id = d.sola_ba_unit_id)
 AND NOT EXISTS (SELECT id FROM administrative.ba_unit_area WHERE ba_unit_id = d.sola_ba_unit_id);
@@ -305,7 +305,7 @@ AND NOT EXISTS (SELECT id FROM cadastre.cadastre_object WHERE id = sola_co_id);
 INSERT INTO administrative.ba_unit_contains_spatial_unit (ba_unit_id, spatial_unit_id)
 SELECT d.sola_ba_unit_id, l.sola_co_id
 FROM lease.lease_detail d, lease.lease_location l
-WHERE d."ID" = l.lease_id AND l.dup = FALSE
+WHERE d.lease_number = l.lease_number AND l.dup = FALSE
 AND EXISTS (SELECT id FROM administrative.ba_unit WHERE id = d.sola_ba_unit_id)
 AND NOT EXISTS (SELECT ba_unit_id FROM administrative.ba_unit_contains_spatial_unit 
                 WHERE ba_unit_id = d.sola_ba_unit_id
