@@ -7,6 +7,7 @@ thumbs.db
 *.log
 test-data/tonga/*.sql
 test-data/tonga/tonga.7z
+test-data/tonga/tongaDocs.7z
 
 #Ingore temporary vpp files
 *.vpp~*

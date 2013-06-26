@@ -5,6 +5,8 @@ DROP VIEW IF EXISTS administrative.systematic_registration_listing;
 DROP VIEW IF EXISTS administrative.sys_reg_state_land;
 ALTER TABLE administrative.ba_unit ALTER COLUMN name_firstpart TYPE VARCHAR(50);
 ALTER TABLE administrative.ba_unit_historic ALTER COLUMN name_firstpart TYPE VARCHAR(50);
+ALTER TABLE cadastre.cadastre_object ALTER COLUMN name_firstpart TYPE VARCHAR(50);
+ALTER TABLE cadastre.cadastre_object_historic ALTER COLUMN name_firstpart TYPE VARCHAR(50);
 
 
 --- *** Checklist tables

@@ -1,4 +1,15 @@
--- Script run time: 540 seconds (9 mins) approx.
+﻿-- Script run time: 570 seconds (9 mins, 30s) approx.
+
+-- Run the migration scripts in the following order...
+-- 1) lands_prep_migration_tables.sql
+-- 2) lands_migration.sql
+-- 3) lands_validate_migration.sql
+-- 4) lease_prep_migration_tables.sql
+-- 5) lease_migration.sql
+-- 6) lease_validate_migration.sql
+-- 7) mortgage_prep_migration_tables.sql
+-- 8) mortgage_migration.sql
+-- 9) mortgage_validate_migration.sql
 
 -- Function that can be used to return a default value (e.g. null) if it cannot
 -- be cast to the anyelement type.
@@ -91,10 +102,11 @@ WHERE NOT EXISTS (SELECT from_ba_unit_id FROM administrative.required_relationsh
 
 -- *** Create BA Units for Tax and Town allotments
 -- Attempt to de-duplicate the deed grants as much as possible
-INSERT INTO lands.deed (id, deed_num, town, tax_lot, area_orig)
-SELECT min(id), d_num, Lower(dg_type), CASE WHEN dg_apname ~* 'TAX' THEN TRUE ELSE FALSE END, LOWER(dg_mpref)
+INSERT INTO lands.deed (id, deed_num, town, tax_lot, area_orig, plan_type, plan_num, lot_num)
+SELECT MIN(id), d_num, TRIM(LOWER(dg_type)), CASE WHEN dg_apname ~* 'TAX' THEN TRUE ELSE FALSE END, TRIM(LOWER(dg_mpref)),
+CASE WHEN TRIM(dg_pref) = '' THEN NULL ELSE TRIM(UPPER(dg_pref)) END, TRIM(UPPER(dg_mplot)), TRIM(UPPER(dg_island))
 FROM lands.reg_deed_grant
-GROUP BY d_num, dg_type, dg_apname, dg_mpref;
+GROUP BY 2, 3, 4, 5, 6, 7, 8;
 
 -- Some records have an area while others don't so remove the duplicates that do not have an area
 DELETE FROM lands.deed WHERE area_orig = '' 
@@ -118,9 +130,15 @@ UPDATE lands.deed
 SET part1 = TRIM((regexp_split_to_array (deed_num, '/'))[1]),
     part2 = TRIM((regexp_split_to_array (deed_num, '/'))[2]); 
 	
+-- Set the registration date for the deeds based on the date in the reg_qury table
+UPDATE lands.deed
+SET    reg_date = (SELECT MIN(safe_cast(TRIM(q.date), NULL::DATE))
+                   FROM  lands.reg_qury q
+                   WHERE deed_num = q.d_num);
+	
 -- Create the tax and town allotment BA Units. 
-INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user)
-SELECT sola_ba_unit_id, deed_num, part1, part2, CASE WHEN tax_lot THEN 'taxUnit' ELSE 'townAllotmentUnit' END, 'current', 'migation' 
+INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, creation_date, status_code, change_user)
+SELECT sola_ba_unit_id, deed_num, part1, part2, CASE WHEN tax_lot THEN 'taxUnit' ELSE 'townAllotmentUnit' END, reg_date, 'current', 'migation' 
 FROM lands.deed
 WHERE NOT EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id);
 
@@ -151,144 +169,111 @@ GROUP BY d_num, reg_first_name, reg_last_name, 5;
 UPDATE lands.holder SET holder_type = 'WIDOWER' WHERE holder_type = 'WIDOW';
 UPDATE lands.holder SET holder_type = 'REG' WHERE holder_type = '';
 
+-- Mark recods with duplicate Registered holders for later reporting
+UPDATE lands.holder
+SET dup = TRUE
+WHERE (SELECT count(*)
+       FROM lands.holder h
+       WHERE h.holder_type = 'REG'
+       AND h.deed_num = lands.holder.deed_num) > 1
+AND holder_type = 'REG';
+
+-- Mark records with duplicate Widowers for later reporting
+UPDATE lands.holder
+SET dup = TRUE
+WHERE (SELECT count(*)
+       FROM lands.holder h
+       WHERE h.holder_type = 'WIDOWER'
+       AND h.deed_num = lands.holder.deed_num) > 1
+AND holder_type = 'WIDOWER';
+
+-- Copy the registration date from the deed onto the Register Land Holders.
+-- Its not currently possible to determine when Hiers and Widows were registered. 
+UPDATE lands.holder
+SET reg_date = d.reg_date
+FROM lands.deed d
+WHERE d.deed_num = lands.holder.deed_num 
+AND lands.holder.holder_type = 'REG'
+AND lands.holder.dup = FALSE
+AND d.reg_date IS NOT NULL;
+
+-- Mark the registered land holders that are now deceased as there is a
+-- Widow or Heir
+UPDATE lands.holder
+SET status = 'h'
+WHERE lands.holder.holder_type = 'REG'
+AND lands.holder.dup = FALSE
+AND EXISTS (SELECT id FROM lands.holder h
+            WHERE h.holder_type NOT IN ('REG', 'WIDOWER')
+			AND dup = FALSE
+			AND h.deed_num = lands.holder.deed_num);
+
 -- Create the various land holders
 INSERT INTO party.party (id, type_code, name, last_name)
 SELECT sola_party_id, 'naturalPerson', fname, lname
-FROM lands.holder; 
-
-
-
--- *** Create RRRs for land holders, heirs and life estates (i.e. widows)
--- Set id for the RRR that will represent the person granted the allotment
-UPDATE lands.deed
-SET sola_reg_rrr_id = uuid_generate_v1()
-WHERE EXISTS (SELECT h.id
-              FROM lands.holder h
-			  WHERE h.holder_type = 'REG'
-			  AND h.deed_num = lands.deed.deed_num)
-AND sola_reg_rrr_id IS NULL; 
+FROM lands.holder
+WHERE dup = FALSE; 
+ 
 			  
--- Set id for the RRR that will represent a widowers life estate on the allotment
-UPDATE lands.deed
-SET sola_life_estate_rrr_id = uuid_generate_v1()
-WHERE EXISTS (SELECT h.id
-              FROM lands.holder h
-			  WHERE h.holder_type = 'WIDOWER'
-			  AND h.deed_num = lands.deed.deed_num)
-AND sola_life_estate_rrr_id IS NULL; 
-
--- Set the id for the RRR that will represent the heirs of the allotment
-UPDATE lands.deed
-SET sola_heir_rrr_id = uuid_generate_v1()
-WHERE EXISTS (SELECT h.id
-              FROM lands.holder h
-			  WHERE h.holder_type NOT IN ('REG', 'WIDOWER')
-			  AND h.deed_num = lands.deed.deed_num)
-AND sola_heir_rrr_id IS NULL; 
-			  
--- Create the RRRs for the person granted the allotment. Assume the record is historic if there are heirs 
--- recorded for the allotment  
-INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary, transaction_id, change_user)
-SELECT sola_reg_rrr_id, sola_ba_unit_id, deed_num, 'ownership', CASE WHEN sola_heir_rrr_id IS NULL THEN 'current' ELSE 'historic' END, 
-'t', 'migration', 'migration'
-FROM lands.deed
-WHERE NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = sola_reg_rrr_id)
-AND sola_reg_rrr_id IS NOT NULL;
-
--- Create the RRRs for the heirs of the allotment. Assume all heirs are current.  
-INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary, transaction_id, change_user)
-SELECT sola_heir_rrr_id, sola_ba_unit_id, deed_num || '-heir', 'ownership', 'current', 't', 'migration', 'migration'
-FROM lands.deed
-WHERE NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = sola_heir_rrr_id)
-AND sola_heir_rrr_id IS NOT NULL;
-
--- Create the RRRs for the heirs of the allotment. Assume the record is historic if there are heirs 
--- recorded for the allotment  
-INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary, transaction_id, change_user)
-SELECT sola_life_estate_rrr_id, sola_ba_unit_id, deed_num || '-wid', 'lifeEstate', 'current', 'f', 'migration', 'migration'
-FROM lands.deed
-WHERE NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = sola_life_estate_rrr_id)
-AND sola_life_estate_rrr_id IS NOT NULL;
+-- Create the RRRs representing the registered allotment holders, the heirs and the widows  
+INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary, registration_date, transaction_id, change_user)
+SELECT h.sola_rrr_id, d.sola_ba_unit_id, 
+ CASE WHEN h.holder_type = 'REG' THEN d.deed_num WHEN h.holder_type = 'WIDOWER' THEN d.deed_num || '-wid' ELSE d.deed_num || '-heir' END, 
+ CASE WHEN h.holder_type = 'WIDOWER' THEN 'lifeEstate' ELSE 'ownership' END, 
+ CASE WHEN h.status = 'c' THEN 'current' ELSE 'historic' END, 
+ CASE WHEN h.holder_type = 'WIDOWER' THEN FALSE ELSE TRUE END, h.reg_date, 'migration', 'migration'
+FROM lands.deed d, lands.holder h
+WHERE d.deed_num = h.deed_num
+AND h.dup = FALSE
+AND NOT EXISTS (SELECT r.id FROM administrative.rrr r WHERE r.id = h.sola_rrr_id);
 
 
 
 -- *** Create the Shares for the ownership RRRs
--- Create the shares for the ownership RRRs. Assume all shares are 1/1 
+-- Create the shares for the ownership RRRs (REG and HEIRs). Assume all shares are 1/1 
 INSERT INTO administrative.rrr_share (rrr_id, id, nominator, denominator)
-SELECT sola_reg_rrr_id, uuid_generate_v1(), 1, 1
-FROM lands.deed
-WHERE NOT EXISTS (SELECT id FROM administrative.rrr_share WHERE rrr_id = sola_reg_rrr_id)
-AND sola_reg_rrr_id IS NOT NULL;
-
-INSERT INTO administrative.rrr_share (rrr_id, id, nominator, denominator)
-SELECT sola_heir_rrr_id, uuid_generate_v1(), 1, 1
-FROM lands.deed
-WHERE NOT EXISTS (SELECT id FROM administrative.rrr_share WHERE rrr_id = sola_heir_rrr_id)
-AND sola_heir_rrr_id IS NOT NULL;
+SELECT h.sola_rrr_id, uuid_generate_v1(), 1, 1
+FROM lands.holder h
+WHERE NOT EXISTS (SELECT r.id FROM administrative.rrr_share r WHERE r.rrr_id = h.sola_rrr_id)
+AND h.holder_type != 'WIDOWER'
+AND h.dup = FALSE;
 
 
 -- *** Create the party for rrr records
 INSERT INTO administrative.party_for_rrr(rrr_id, party_id, share_id)
-SELECT d.sola_reg_rrr_id, h.sola_party_id, s.id
-FROM lands.deed d, lands.holder h, administrative.rrr_share s
-WHERE s.rrr_id = d.sola_reg_rrr_id
-AND h.deed_num = d.deed_num
-AND h.holder_type = 'REG'
-AND d.sola_reg_rrr_id IS NOT NULL
+SELECT h.sola_rrr_id, h.sola_party_id, s.id
+FROM lands.holder h, administrative.rrr_share s
+WHERE s.rrr_id = h.sola_rrr_id
+AND h.holder_type != 'WIDOWER'
+AND h.dup = FALSE
 AND NOT EXISTS  (SELECT rrr_id FROM administrative.party_for_rrr 
-                WHERE rrr_id = d.sola_reg_rrr_id
-				AND   party_id = h.sola_party_id );
-				
-INSERT INTO administrative.party_for_rrr(rrr_id, party_id, share_id)
-SELECT d.sola_heir_rrr_id, h.sola_party_id, s.id
-FROM lands.deed d, lands.holder h, administrative.rrr_share s
-WHERE s.rrr_id = d.sola_heir_rrr_id
-AND h.deed_num = d.deed_num
-AND h.holder_type NOT IN ('REG', 'WIDOWER')
-AND d.sola_heir_rrr_id IS NOT NULL
-AND NOT EXISTS  (SELECT rrr_id FROM administrative.party_for_rrr 
-                WHERE rrr_id = d.sola_heir_rrr_id
+                WHERE rrr_id = h.sola_rrr_id
 				AND   party_id = h.sola_party_id );
 
 -- Create the life estate parties.				
 INSERT INTO administrative.party_for_rrr(rrr_id, party_id, share_id)
-SELECT d.sola_life_estate_rrr_id, h.sola_party_id, null
-FROM lands.deed d, lands.holder h
-WHERE h.deed_num = d.deed_num
-AND h.holder_type = 'WIDOWER'
-AND d.sola_life_estate_rrr_id IS NOT NULL
+SELECT h.sola_rrr_id, h.sola_party_id, null
+FROM lands.holder h
+WHERE h.holder_type = 'WIDOWER'
+AND h.dup = FALSE
 AND NOT EXISTS  (SELECT rrr_id FROM administrative.party_for_rrr 
-                WHERE rrr_id = d.sola_life_estate_rrr_id
+                WHERE rrr_id = h.sola_rrr_id
 				AND   party_id = h.sola_party_id );
 	
 	
 	
 -- *** Create the Notation records for each RRR
 INSERT INTO administrative.notation (id, rrr_id, transaction_id, reference_nr, notation_text, status_code)
-SELECT uuid_generate_v1(), d.sola_reg_rrr_id, 'migration', d.deed_num, 'Registered Landholder', 'current'
-FROM lands.deed d
-WHERE d.sola_reg_rrr_id IS NOT NULL
+SELECT uuid_generate_v1(), h.sola_rrr_id, 'migration', 
+CASE WHEN h.holder_type = 'REG' THEN h.deed_num WHEN h.holder_type = 'WIDOWER' THEN SUBSTRING(h.deed_num FROM 1 FOR 10) || '-wid'
+     ELSE SUBSTRING(h.deed_num FROM 1 FOR 10)|| '-heir' END, 
+CASE WHEN h.holder_type = 'REG' THEN 'Registered Landholder' WHEN h.holder_type = 'WIDOWER' THEN 'Widower'
+     ELSE h.holder_type END, 'current'
+FROM lands.holder h
+WHERE h.dup = FALSE
 AND NOT EXISTS  (SELECT id FROM administrative.notation 
-                WHERE rrr_id = d.sola_reg_rrr_id);
+                WHERE rrr_id = h.sola_rrr_id);
 				
-INSERT INTO administrative.notation (id, rrr_id, transaction_id, reference_nr, notation_text, status_code)
-SELECT uuid_generate_v1(), d.sola_life_estate_rrr_id, 'migration', SUBSTRING(d.deed_num FROM 1 FOR 10) || '-wid', 'Widower', 'current'
-FROM lands.deed d
-WHERE d.sola_life_estate_rrr_id IS NOT NULL
-AND NOT EXISTS  (SELECT id FROM administrative.notation 
-                WHERE rrr_id = d.sola_life_estate_rrr_id);
-				
-				
-INSERT INTO administrative.notation (id, rrr_id, transaction_id, reference_nr, notation_text, status_code)
-SELECT uuid_generate_v1(), d.sola_heir_rrr_id, 'migration', SUBSTRING(d.deed_num FROM 1 FOR 10)|| '-heir', 
-(SELECT MAX(h.holder_type) FROM lands.holder h 
- WHERE h.deed_num = d.deed_num AND h.holder_type NOT IN ('REG', 'WIDOWER')), 'current'
-FROM lands.deed d
-WHERE d.sola_heir_rrr_id IS NOT NULL
-AND NOT EXISTS  (SELECT id FROM administrative.notation 
-                WHERE rrr_id = d.sola_heir_rrr_id);
-				
-
 
 -- *** Obtain official area for allotments
 -- Cast the msq to metres
@@ -381,7 +366,67 @@ SELECT uuid_generate_v1(), sola_ba_unit_id, 'officialArea', sola_area, 'migratio
 FROM lands.deed
 WHERE sola_area IS NOT NULL
 AND NOT EXISTS (SELECT id FROM administrative.ba_unit_area WHERE ba_unit_id = sola_ba_unit_id);
-				
 
+
+-- *** Clean the plan and lot numbers.
+-- Plan Type 
+UPDATE lands.deed 
+SET plan_type = NULL, 
+    plan_num = NULL,
+    lot_num = NULL
+WHERE plan_type IS NULL
+OR plan_type IN ('P/14', '16');
+				
+UPDATE lands.deed SET plan_type = 'BLK'
+WHERE TRIM(plan_type) IN ('OLD BLOCK', 'BLOCK SHEET');
+
+UPDATE lands.deed SET plan_type = 'SP'
+WHERE plan_type IN ('S/PL', 'SURVEY PLAN');
+
+UPDATE lands.deed SET plan_type = 'ROLL MAP'
+WHERE plan_type IN ('ROLL PLAN');
+
+-- Plan Number
+UPDATE lands.deed 
+SET plan_type = '-', 
+    plan_num = NULL,
+    lot_num = NULL
+WHERE plan_type IN ('SP', 'BLK', 'ROLL MAP')
+AND TRIM(plan_num) = ''; 
+
+-- Lot Number
+UPDATE lands.deed 
+SET lot_num = ''
+WHERE plan_type IN ('SP', 'BLK', 'ROLL MAP')
+AND lot_num = 'TONGATAPU'; 
+
+
+-- *** Create the Cadastre Objects for the Allotments
+INSERT INTO lands.plan (plan_type, plan_num, lot_num, tax_lot)
+SELECT  plan_type, plan_num, lot_num, MIN(tax_lot::VARCHAR)::BOOLEAN 
+FROM lands.deed
+WHERE plan_type IN ('SP', 'BLK', 'ROLL MAP')
+GROUP BY plan_type, plan_num, lot_num;
+
+INSERT INTO cadastre.spatial_unit (id, level_id)
+SELECT sola_co_id, CASE WHEN tax_lot THEN 'taxAllotment' ELSE 'townAllotment' END FROM lands.plan
+WHERE NOT EXISTS (SELECT id FROM cadastre.spatial_unit WHERE id = sola_co_id);  
+
+INSERT INTO cadastre.cadastre_object (id, name_firstpart, name_lastpart, status_code, transaction_id)
+SELECT sola_co_id, CASE WHEN lot_num = '' THEN lot_num ELSE 'Lot ' || lot_num END, 
+      TRIM(plan_type || ' ' || plan_num), 'current', 'migration' 
+FROM lands.plan
+WHERE NOT EXISTS (SELECT id FROM cadastre.cadastre_object WHERE id = sola_co_id); 
+
+INSERT INTO administrative.ba_unit_contains_spatial_unit (ba_unit_id, spatial_unit_id)
+SELECT d.sola_ba_unit_id, p.sola_co_id
+FROM lands.deed d, lands.plan p
+WHERE d.plan_type = p.plan_type
+AND d.plan_num = p.plan_num
+AND d.lot_num = p.lot_num
+AND EXISTS (SELECT id FROM administrative.ba_unit WHERE id = d.sola_ba_unit_id)
+AND NOT EXISTS (SELECT ba_unit_id FROM administrative.ba_unit_contains_spatial_unit 
+                WHERE ba_unit_id = d.sola_ba_unit_id
+				AND spatial_unit_id = p.sola_co_id); 
 
 

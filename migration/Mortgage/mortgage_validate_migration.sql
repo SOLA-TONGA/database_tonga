@@ -1,4 +1,16 @@
 -- Script run time <1s
+
+-- Run the migration scripts in the following order...
+-- 1) lands_prep_migration_tables.sql
+-- 2) lands_migration.sql
+-- 3) lands_validate_migration.sql
+-- 4) lease_prep_migration_tables.sql
+-- 5) lease_migration.sql
+-- 6) lease_validate_migration.sql
+-- 7) mortgage_prep_migration_tables.sql
+-- 8) mortgage_migration.sql
+-- 9) mortgage_validate_migration.sql
+
 -- Create table to hold validation messages
 DROP TABLE IF EXISTS mortgage.validation;
 CREATE TABLE mortgage.validation

@@ -1,10 +1,23 @@
--- Script run time <1s
+﻿-- Script run time <1s
+
+-- Run the migration scripts in the following order...
+-- 1) lands_prep_migration_tables.sql
+-- 2) lands_migration.sql
+-- 3) lands_validate_migration.sql
+-- 4) lease_prep_migration_tables.sql
+-- 5) lease_migration.sql
+-- 6) lease_validate_migration.sql
+-- 7) mortgage_prep_migration_tables.sql
+-- 8) mortgage_migration.sql
+-- 9) mortgage_validate_migration.sql
+
+
 -- Create table to hold validation messages
 DROP TABLE IF EXISTS lease.validation;
 CREATE TABLE lease.validation
 (
 	code character varying(40),
-	message character varying(255),
+	message character varying(4000),
 	item_num character varying(40)
 );
 
@@ -57,11 +70,34 @@ FROM lease.lease_detail l
 WHERE dup = true
 GROUP BY l.lease_number;
 
--- Identifies duplicate lot/plans
+-- Identifies duplicate lot/plans for the allotments
 INSERT INTO lease.validation (code, message, item_num)
-SELECT 'DUPLICATE LOT/PLAN', 'The same lot and plan is used for multiple leases. Check the leases to ensure the lot and plan reference is correct. "' || 
-l.lease_lot || '/' || l.lease_plan || '" duplicated on leases "' || string_agg(l.lease_id::VARCHAR(40), ', ') || '"', null
-FROM lease.lease_location l
-WHERE dup = true
-GROUP BY l.lease_lot, l.lease_plan;
+SELECT 'DUPLICATE LOT/PLAN DEED', 'The same lot and plan is used for multiple leases and/or allotments. Check the allotments to ensure the lot and plan reference is correct. "' || 
+co.name_firstpart || ' ' || co.name_lastpart || '" duplicated on allotments "' || string_agg(b.name, ', ') || '"', null
+FROM administrative.ba_unit_contains_spatial_unit bas, 
+     administrative.ba_unit b, 
+	 cadastre.cadastre_object co
+WHERE bas.spatial_unit_id = co.id
+AND   b.id = bas.ba_unit_id
+AND   b.type_code != 'leasedUnit'
+AND   (SELECT count(bas2.ba_unit_id)
+       FROM administrative.ba_unit_contains_spatial_unit bas2
+	   WHERE bas2.spatial_unit_id = co.id) > 1
+GROUP BY co.name_firstpart, co.name_lastpart;
+
+-- Identifies the duplicate lot/plans for the leases
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'DUPLICATE LOT/PLAN LEASE', 'The same lot and plan is used for multiple leases and/or allotments. Check the leases to ensure the lot and plan reference is correct. "' || 
+co.name_firstpart || ' ' || co.name_lastpart || '" duplicated on allotments "' || string_agg(b.name_firstpart, ', ') || '"', null
+FROM administrative.ba_unit_contains_spatial_unit bas, 
+     administrative.ba_unit b, 
+	 cadastre.cadastre_object co
+WHERE bas.spatial_unit_id = co.id
+AND   b.id = bas.ba_unit_id
+AND   b.type_code = 'leasedUnit'
+AND   (SELECT count(bas2.ba_unit_id)
+       FROM administrative.ba_unit_contains_spatial_unit bas2
+	   WHERE bas2.spatial_unit_id = co.id) > 1
+GROUP BY co.name_firstpart, co.name_lastpart;
+
 

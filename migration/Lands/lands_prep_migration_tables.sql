@@ -1,5 +1,16 @@
 -- Run time 1 seconds
 
+-- Run the migration scripts in the following order...
+-- 1) lands_prep_migration_tables.sql
+-- 2) lands_migration.sql
+-- 3) lands_validate_migration.sql
+-- 4) lease_prep_migration_tables.sql
+-- 5) lease_migration.sql
+-- 6) lease_validate_migration.sql
+-- 7) mortgage_prep_migration_tables.sql
+-- 8) mortgage_migration.sql
+-- 9) mortgage_validate_migration.sql
+
 ALTER TABLE lands.nobles
 DROP COLUMN IF EXISTS sola_party_id; 
 
@@ -26,16 +37,22 @@ id INTEGER,
 deed_num VARCHAR(40),
 part1 VARCHAR(50),
 part2 VARCHAR(50), 
+plan_type VARCHAR(40),
+plan_num VARCHAR(40),
+lot_num VARCHAR(40),
 town VARCHAR(255), 
+reg_date DATE, 
 area_orig VARCHAR(255), 
 sola_area NUMERIC(19,2),
 acre INT,
 rood INT,
 perch NUMERIC(19,2),
-tax_lot BOOLEAN DEFAULT FALSE, 
-sola_reg_rrr_id VARCHAR(40),
-sola_heir_rrr_id VARCHAR(40), 
-sola_life_estate_rrr_id VARCHAR(40)); 
+tax_lot BOOLEAN DEFAULT FALSE); 
+
+CREATE INDEX lands_deed_deed_num
+  ON lands.deed
+  USING btree
+  (deed_num);
 
 DROP TABLE IF EXISTS lands.holder;
 
@@ -45,7 +62,26 @@ id INTEGER,
 deed_num VARCHAR(40),
 fname VARCHAR(255),
 lname VARCHAR(50), 
-holder_type VARCHAR(20)); 
+holder_type VARCHAR(20),
+reg_date DATE, 
+dup BOOLEAN DEFAULT FALSE, 
+status VARCHAR(1) DEFAULT 'c',
+sola_rrr_id VARCHAR(40) DEFAULT uuid_generate_v1()); 
+
+CREATE INDEX lands_holder_deed_num
+  ON lands.holder
+  USING btree
+  (deed_num);
+ 
+ 
+DROP TABLE IF EXISTS lands.plan;
+
+CREATE TABLE lands.plan (
+sola_co_id VARCHAR(40) DEFAULT uuid_generate_v1(), 
+plan_type VARCHAR(40),
+plan_num VARCHAR(40),
+lot_num VARCHAR(40),
+tax_lot BOOLEAN); 
 
 
 ALTER TABLE lands.reg_deed_grant
