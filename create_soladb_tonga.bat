@@ -65,8 +65,8 @@ echo Loading User Roles... >> build.log 2>&1
 echo Extracting Tonga data files...
 echo Extracting Tonga data files... >> build.log 2>&1
 %utilitiesPath%\7z.exe e -y -o%testDataPath% %testDataPath%tongaDev.7z >> build.log 2>&1
-%utilitiesPath%\7z.exe e -y -o%testDataPath% %testDataPath%tongaDocs.7z >> build.log 2>&1
 %utilitiesPath%\7z.exe e -y -p%archive_password% -o%testDataPath% %testDataPath%tonga.7z >> build.log 2>&1
+%utilitiesPath%\7z.exe e -y -o%testDataPath% %testDataPath%tongaDocs.7z >> build.log 2>&1
 
 REM Load the Tonga test data. 
 REM Direct standard output to NUL, but capture any errors in the build.log
