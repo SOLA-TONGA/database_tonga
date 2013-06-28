@@ -1,4 +1,4 @@
-﻿-- Script run time: 570 seconds (9 mins, 30s) approx.
+﻿-- Script run time: 580 seconds (9 mins, 30s) approx.
 
 -- Run the migration scripts in the following order...
 -- 1) lands_prep_migration_tables.sql

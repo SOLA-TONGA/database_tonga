@@ -5,6 +5,8 @@ DROP VIEW IF EXISTS administrative.systematic_registration_listing;
 DROP VIEW IF EXISTS administrative.sys_reg_state_land;
 ALTER TABLE administrative.ba_unit ALTER COLUMN name_firstpart TYPE VARCHAR(50);
 ALTER TABLE administrative.ba_unit_historic ALTER COLUMN name_firstpart TYPE VARCHAR(50);
+ALTER TABLE administrative.notation ALTER COLUMN reference_nr TYPE VARCHAR(50);
+ALTER TABLE administrative.notation_historic ALTER COLUMN reference_nr TYPE VARCHAR(50);
 ALTER TABLE cadastre.cadastre_object ALTER COLUMN name_firstpart TYPE VARCHAR(50);
 ALTER TABLE cadastre.cadastre_object_historic ALTER COLUMN name_firstpart TYPE VARCHAR(50);
 
@@ -389,3 +391,36 @@ ALTER TABLE application.application_historic
 ADD item_number character varying(40),
 ADD location_description character varying(255),
 ADD purpose character varying(255);
+
+-- Add new fields to the RRR table to capture receipt and receipt date 
+-- details as well as the mortgage book / page information. These
+-- details are migrated from the Access Databases. 
+ALTER TABLE administrative.rrr
+DROP COLUMN IF EXISTS receipt_date,
+DROP COLUMN IF EXISTS receipt_reference,
+DROP COLUMN IF EXISTS book_ref,
+DROP COLUMN IF EXISTS page_ref,
+DROP COLUMN IF EXISTS mortgage_term;
+
+ALTER TABLE administrative.rrr
+ADD receipt_date timestamp without time zone,
+ADD receipt_reference character varying(255),
+ADD book_ref character varying(20),
+ADD page_ref character varying(20),
+ADD mortgage_term NUMERIC(8,2);
+
+ALTER TABLE administrative.rrr_historic
+DROP COLUMN IF EXISTS receipt_date,
+DROP COLUMN IF EXISTS receipt_reference,
+DROP COLUMN IF EXISTS book_ref,
+DROP COLUMN IF EXISTS page_ref,
+DROP COLUMN IF EXISTS mortgage_term;
+
+ALTER TABLE administrative.rrr_historic
+ADD receipt_date timestamp without time zone,
+ADD receipt_reference character varying(255),
+ADD book_ref character varying(20),
+ADD page_ref character varying(20),
+ADD mortgage_term NUMERIC(8,2);
+
+

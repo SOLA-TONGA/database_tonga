@@ -151,11 +151,13 @@ AND NOT EXISTS (SELECT id FROM party.party WHERE id = d.sola_lessor_id);
 
 -- *** Create the RRR for the lease and link this RRR to the lessor
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary,
-transaction_id, registration_date, expiration_date, amount, due_date, change_user)
+transaction_id, registration_date, expiration_date, amount, receipt_reference, 
+receipt_date, due_date, change_user)
 SELECT sola_rrr_id, sola_ba_unit_id, lease_number, 'lease', 
 CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END, 
 't', 'migration', safe_cast(lease_reg_date, null::date), safe_cast(lease_exp_date, null::date), 
-safe_cast(lease_rental, null::numeric(29,2)), safe_cast(lease_payment_date, null::date), 'migration'
+safe_cast(lease_rental, null::numeric(29,2)), payment_receipt_number, safe_cast(payment_upto_date, null::date), 
+safe_cast(lease_payment_date, null::date), 'migration'
 FROM lease.lease_detail
 WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
 AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = sola_rrr_id);

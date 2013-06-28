@@ -99,3 +99,18 @@ SELECT 'INVALID SURVEY DETAILS', 'Deed "' ||
 deed_num || '" does not have valid survey plan and/or lot information . reg_deed_grant id: "' || id::VARCHAR(40) || '"', null
 FROM lands.deed
 WHERE plan_type IN ('-', 'TOWNSHIP');
+
+-- Identifies duplicate lot/plans for the allotments
+INSERT INTO lease.validation (code, message, item_num)
+SELECT 'DUPLICATE LOT/PLAN DEED', 'The same lot and plan is used for multiple leases and/or allotments. Check the allotments to ensure the lot and plan reference is correct. "' || 
+co.name_firstpart || ' ' || co.name_lastpart || '" duplicated on allotments "' || string_agg(b.name, ', ') || '"', null
+FROM administrative.ba_unit_contains_spatial_unit bas, 
+     administrative.ba_unit b, 
+	 cadastre.cadastre_object co
+WHERE bas.spatial_unit_id = co.id
+AND   b.id = bas.ba_unit_id
+AND   b.type_code != 'leasedUnit'
+AND   (SELECT count(bas2.ba_unit_id)
+       FROM administrative.ba_unit_contains_spatial_unit bas2
+	   WHERE bas2.spatial_unit_id = co.id) > 1
+GROUP BY co.name_firstpart, co.name_lastpart;
