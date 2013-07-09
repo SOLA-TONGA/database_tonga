@@ -23,60 +23,62 @@ CREATE TABLE lease.validation
 );
 
 
--- Identifies duplicate leases
+-- 2. Identifies duplicate leases
 INSERT INTO lease.validation (code, message, item_num, id)
 SELECT 'DUPLICATE LEASE', 'The lease number is duplicated', l.lease_number, string_agg(l."ID"::VARCHAR(40), ', ')
 FROM lease.lease_detail l
 WHERE dup = true
 GROUP BY l.lease_number;
 
--- Check the number of islands is valid
-INSERT INTO lease.validation (code, message)
-SELECT 'INVALID ISLAND COUNT', 'Should be 6 islands - check all islands are valid and none are missing.'
-WHERE (SELECT COUNT(*) FROM lease.island) != 6;
-
--- Check for towns that are not correctly specified
+-- 3. Check for towns that are not correctly specified
 INSERT INTO lease.validation (code, message, item_num, id)
 SELECT 'INVALID TOWN', 'Town name (' || sola_town || ') is not valid', lease_number, "ID"
 FROM lease.lease_detail WHERE sola_town in ('Expire', 'Invalid', 'Residential', 'Resort', 'Valid', '');
 
--- Check of leases with invalid or missing lease registration dates
+-- 4. Check of leases with invalid or missing lease registration dates
 INSERT INTO lease.validation (code, message, item_num, id)
 SELECT 'INVALID LEASE REGISTRATION DATE', 'Invalid or missing lease registration date of ' || COALESCE(l.lease_reg_date, '-'), l.lease_number, l."ID"
 FROM lease.lease_detail l, administrative.rrr r
 WHERE l.sola_rrr_id = r.id AND r.registration_date IS NULL;
 
--- Check of leases with invalid or missing lease expiry dates
+-- 5. Check of leases with invalid or missing lease expiry dates
 INSERT INTO lease.validation (code, message, item_num, id)
 SELECT 'INVALID LEASE EXPIRE DATE', 'Invalid or missing lease expiry date of ' || COALESCE(l.lease_exp_date, '-'), l.lease_number, l."ID"
 FROM lease.lease_detail l, administrative.rrr r
 WHERE l.sola_rrr_id = r.id AND r.expiration_date IS NULL;
 
--- Verify the rental amounts are valid numbers
-INSERT INTO lease.validation (code, message, item_num, id)
-SELECT 'INVALID LEASE RENTAL AMOUNT', 'Invalid or missing rental amount of ' || COALESCE(l.lease_rental, '-'), l.lease_number, l."ID"
-FROM lease.lease_detail l, administrative.rrr r
-WHERE l.sola_rrr_id = r.id AND r.amount IS NULL;
 
--- Verify the next payment date for rental is valid and not significantly in the past
+-- 6. Verify the next payment date for rental is valid and not significantly in the past
 INSERT INTO lease.validation (code, message, item_num, id)
 SELECT 'INVALID DUE DATE', 'Invalid or missing lease payment date of "' || COALESCE(l.lease_payment_date, '-'), l.lease_number, l."ID"
 FROM lease.lease_detail l, administrative.rrr r
 WHERE l.sola_rrr_id = r.id AND (r.due_date IS NULL OR r.due_date < '1990-01-01');
 
--- Checks if the area for the lot is valid
+-- 7. Checks if the area for the lot is valid
 INSERT INTO lease.validation (code, message, item_num, id)
 SELECT 'INVALID LEASE AREA', 'Invalid or missing area of ' || COALESCE(l.lease_area, '-'), l.lease_number, l.lease_id
 FROM lease.lease_location l
 WHERE sola_area IS NULL;
 
-
--- Identifies the duplicate lot/plans for the leases
+-- 8. Identifies the duplicate lot/plans for the leases
 INSERT INTO lease.validation (code, message, item_num, id)
 SELECT 'DUPLICATE LOT/PLAN LEASE', 'The location ' || COALESCE(l.lease_lot, '-') || ' ' || COALESCE(l.lease_plan, '-') || ' has been used for multiple leases and/or allotments',  l.lease_number, l.lease_id
 FROM lease.lease_location l
 WHERE (SELECT count(bas.ba_unit_id)
        FROM administrative.ba_unit_contains_spatial_unit bas
 	   WHERE bas.spatial_unit_id = l.sola_co_id) > 1;
+
+
+	   
+-- Check the number of islands is valid
+INSERT INTO lease.validation (code, message)
+SELECT 'INVALID ISLAND COUNT', 'Should be 6 islands - check all islands are valid and none are missing.'
+WHERE (SELECT COUNT(*) FROM lease.island) != 6;
+
+-- Verify the rental amounts are valid numbers
+INSERT INTO lease.validation (code, message, item_num, id)
+SELECT 'INVALID LEASE RENTAL AMOUNT', 'Invalid or missing rental amount of ' || COALESCE(l.lease_rental, '-'), l.lease_number, l."ID"
+FROM lease.lease_detail l, administrative.rrr r
+WHERE l.sola_rrr_id = r.id AND r.amount IS NULL;
 
 
