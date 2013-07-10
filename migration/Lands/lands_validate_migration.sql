@@ -16,89 +16,87 @@ DROP TABLE IF EXISTS lands.validation;
 CREATE TABLE lands.validation
 (
 	code character varying(40),
-	message character varying(255),
-	item_num character varying(40)
+	message character varying(500),
+	item_num character varying(1000),
+	id character varying(1000)
 );
 
 
 
 -- Deed duplicated
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'DUPLICATE DEED', 'Deed has duplicate deed number. Check the deeds to ensure the details are correct. Deed "' || 
-d_num || '" duplicated by reg_deed_grant records "' || string_agg(id::VARCHAR(40), ', ') || '"', null
-FROM lands.reg_deed_grant
-WHERE dup = true
-GROUP BY d_num;
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'DUPLICATE DEED', 'Deed has duplicate deed number', d.d_num,  string_agg(d.id::VARCHAR(40), ', ')
+FROM lands.reg_deed_grant d
+WHERE d.dup = true
+GROUP BY d.d_num;
 
--- Allotements with an invalid deed number
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'INVALID DEED NUM', 'Deed number is not of the form <book>/<page>. Deed "' || 
-d_num || '", reg_deed_grant id: "' || id::VARCHAR(40) || '"', null
-FROM lands.reg_deed_grant
-WHERE array_length(regexp_split_to_array (d_num, '/'), 1) != 2;
+
+-- Allotments with an invalid deed number
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'INVALID DEED NUM', 'Deed number is not of the form <deed>/<folio> ' || COALESCE(d.d_num, '-')::VARCHAR(20), d.d_num, d.id
+FROM lands.reg_deed_grant d
+WHERE array_length(regexp_split_to_array (d.d_num, '/'), 1) != 2
+AND NOT d.dup;
+
 
 -- Allotments with no registration date
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'NO REG DATE', 'Registration date for deed "' || 
-deed_num || '" could not be determined. reg_deed_grant id: "' || id::VARCHAR(40) || '"', null
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'NO REG DATE', 'No registration date for deed', deed_num, id
 FROM lands.deed
 WHERE reg_date IS NULL;
 
 -- Allotments with no town
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'NO TOWN', 'Town for deed "' || 
-deed_num || '" could not be determined. reg_deed_grant id: "' || id::VARCHAR(40) || '"', null
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'NO TOWN', 'Town for deed could not be determined', deed_num, id
 FROM lands.deed d
 WHERE NOT EXISTS (SELECT from_ba_unit_id FROM administrative.required_relationship_baunit
 				  WHERE to_ba_unit_id = d.sola_ba_unit_id
 				  AND relation_code = 'town');
 				  
+
 				  
 -- Deed with more than one registered land holder
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'MULTIPLE REG LANDHOLDER', 'Deed "' || 
-deed_num || '" has multiple registered landholders. reg_landholder ids: "' || string_agg(id::VARCHAR(40), ', ') || '"', null
-FROM lands.holder
-WHERE dup AND holder_type = 'REG'
-GROUP BY deed_num;
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'MULTIPLE REG LANDHOLDER', 'Deed with multiple registered landholders', h.deed_num, string_agg(h.id::VARCHAR(40), ', ')
+FROM lands.holder h
+WHERE h.dup AND h.holder_type = 'REG'
+GROUP BY h.deed_num;
 
 -- Deed with more than one widower
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'MULTIPLE WIDOWERS', 'Deed "' || 
-deed_num || '" has multiple WIDOWERS. reg_landholder ids: "' || string_agg(id::VARCHAR(40), ', ') || '"', null
-FROM lands.holder
-WHERE dup AND holder_type = 'WIDOWER'
-GROUP BY deed_num;
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'MULTIPLE WIDOWERS', 'Deed with multiple Widowers', h.deed_num, string_agg(h.id::VARCHAR(40), ', ')
+FROM lands.holder h
+WHERE h.dup AND h.holder_type = 'WIDOWER'
+GROUP BY h.deed_num;
+
 
 -- No date for when the land holder was registered. 
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'NO REG DATE FOR HOLDER', 'Deed "' || 
-deed_num || '" has no date to indicate when the land holder(s) were registered . reg_landholder ids: "' || string_agg(id::VARCHAR(40), ', ') || '"', null
-FROM lands.holder
-WHERE dup = FALSE AND reg_date IS NULL
-GROUP BY deed_num;
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'NO REG DATE FOR HOLDER', 'There is no date to indicate when the land holder was registered ' h.deed_num, h.id
+FROM lands.holder h
+WHERE h.dup = FALSE AND h.reg_date IS NULL
+GROUP BY h.deed_num;
 
 -- Checks if the deed area is valid
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'NO DEED AREA', 'Deed "' || 
-deed_num || '" does not have a valid area . reg_landholder id: "' || id::VARCHAR(40) || '"', null
-FROM lands.deed
-WHERE sola_area IS NULL;
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'NO DEED AREA', 'Area for deed is not vaild ' || COALESCE(d.area_orig, '-'), d.deed_num, d.id
+FROM lands.deed d
+WHERE d.sola_area IS NULL;
 
 -- Deeds with no survey plan details
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'NO SURVEY DETAILS', 'Deed "' || 
-deed_num || '" does not have any survey plan and/or lot information . reg_deed_grant id: "' || id::VARCHAR(40) || '"', null
-FROM lands.deed
-WHERE plan_type IS NULL;
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'NO SURVEY DETAILS', 'Deed does not have any survey plan and/or lot information', d.deed_num, d.id
+FROM lands.deed d
+WHERE d.plan_type IS NULL;
 
 -- Deed with survey plan details that appear invalid. All Township plans are reported as it is not clear what should be used
 -- as the township name. 
-INSERT INTO lands.validation (code, message, item_num)
-SELECT 'INVALID SURVEY DETAILS', 'Deed "' || 
-deed_num || '" does not have valid survey plan and/or lot information . reg_deed_grant id: "' || id::VARCHAR(40) || '"', null
-FROM lands.deed
-WHERE plan_type IN ('-', 'TOWNSHIP');
+INSERT INTO lands.validation (code, message, item_num, id)
+SELECT 'INVALID SURVEY DETAILS', 'Deed does not have valid survey plan and/or lot information' , d.deed_num, d.id
+FROM lands.deed d
+WHERE d.plan_type IN ('-', 'TOWNSHIP');
+
+
 
 -- Identifies duplicate lot/plans for the allotments
 INSERT INTO lease.validation (code, message, item_num)

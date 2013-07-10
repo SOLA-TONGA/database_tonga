@@ -85,7 +85,7 @@ WHERE b.name_firstpart = sola_town
 AND b.type_code = 'townUnit'; 
 
 INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user)
-SELECT sola_town_id, sola_town, sola_town, 'Town', 'townUnit', 'current', 'migration'
+SELECT sola_town_id, sola_town, sola_town, island_name, 'townUnit', 'current', 'migration'
 FROM lands.island_township 
 WHERE NOT EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_town_id);
 
@@ -135,6 +135,10 @@ UPDATE lands.deed
 SET    reg_date = (SELECT MIN(safe_cast(TRIM(q.date), NULL::DATE))
                    FROM  lands.reg_qury q
                    WHERE deed_num = q.d_num);
+				   
+-- Fix any issues with the town names in the deed table
+UPDATE lands.deed SET town = '''atata'
+WHERE town = 'atata'; 
 	
 -- Create the tax and town allotment BA Units. 
 INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, creation_date, status_code, change_user)
@@ -149,6 +153,22 @@ SELECT town.id, d.sola_ba_unit_id, 'town', 'migration'
 FROM lands.deed d, administrative.ba_unit town
 WHERE town.type_code = 'townUnit'
 AND   d.town = LOWER(town.name_firstpart)
+AND   d.town NOT IN ('''ahau', 'houma', 'holonga', 'pangai') -- Exclude towns where the name of the town is used over multiple islands
+AND NOT EXISTS (SELECT from_ba_unit_id FROM administrative.required_relationship_baunit
+				  WHERE from_ba_unit_id = town.id 
+				  AND to_ba_unit_id = d.sola_ba_unit_id
+				  AND relation_code = 'town');
+
+				  
+-- Try to determine the correct town using the island name
+INSERT INTO administrative.required_relationship_baunit(from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+SELECT town.id, d.sola_ba_unit_id, 'town', 'migration' 
+FROM lands.deed d, administrative.ba_unit town, lands.reg_deed_grant g
+WHERE town.type_code = 'townUnit'
+AND   d.town = LOWER(town.name_firstpart)
+AND   d.id = g.id
+AND   LOWER(g.dg_island) = LOWER(town.name_lastpart)
+AND   d.town IN ('''ahau', 'houma', 'holonga', 'pangai')
 AND NOT EXISTS (SELECT from_ba_unit_id FROM administrative.required_relationship_baunit
 				  WHERE from_ba_unit_id = town.id 
 				  AND to_ba_unit_id = d.sola_ba_unit_id
