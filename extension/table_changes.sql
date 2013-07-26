@@ -423,4 +423,20 @@ ADD book_ref character varying(20),
 ADD page_ref character varying(20),
 ADD mortgage_term NUMERIC(8,2);
 
+-- Add columns to the service table to capture Date of Approval and
+-- Approval Number for the Cabinet Submission service.
+ALTER TABLE application.service
+DROP COLUMN IF EXISTS approval_date, 
+DROP COLUMN IF EXISTS approval_number;
 
+ALTER TABLE application.service
+ADD approval_date timestamp without time zone, 
+ADD approval_number character varying(40);
+
+ALTER TABLE application.service_historic
+DROP COLUMN IF EXISTS approval_date, 
+DROP COLUMN IF EXISTS approval_number;
+
+ALTER TABLE application.service_historic
+ADD approval_date timestamp without time zone, 
+ADD approval_number character varying(40);
