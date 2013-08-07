@@ -219,8 +219,8 @@ ADD lease_term NUMERIC(20,2) NOT NULL DEFAULT 0,
 ADD amount NUMERIC(20,2) NOT NULL DEFAULT 0,
 ADD registration_date timestamp without time zone,
 ADD lessor_name VARCHAR(255),
-ADD district VARCHAR(100),
-ADD noble_estate VARCHAR(100),
+ADD district VARCHAR(40),
+ADD noble_estate VARCHAR(40),
 ADD description VARCHAR(1000);
 
 ALTER TABLE application.application_property_historic
@@ -243,8 +243,8 @@ ADD lease_term NUMERIC(20,2) ,
 ADD amount NUMERIC(20,2),
 ADD registration_date timestamp without time zone,
 ADD lessor_name VARCHAR(255),
-ADD district VARCHAR(100),
-ADD noble_estate VARCHAR(100),
+ADD district VARCHAR(40),
+ADD noble_estate VARCHAR(40),
 ADD description VARCHAR(1000);
 
 
@@ -440,3 +440,23 @@ DROP COLUMN IF EXISTS approval_number;
 ALTER TABLE application.service_historic
 ADD approval_date timestamp without time zone, 
 ADD approval_number character varying(40);
+
+-- Add 'town' column to the application.application_property table to hold the town/location link.
+-- Reduce 'district' and 'noble_estate' fields from varchar(100) to varchar(40)
+ALTER TABLE application.application_property
+DROP COLUMN IF EXISTS town;
+
+ALTER TABLE application.application_property
+ADD town character varying(40),
+ALTER COLUMN district TYPE VARCHAR(40),
+ALTER COLUMN noble_estate TYPE VARCHAR(40);
+
+ALTER TABLE application.application_property_historic
+DROP COLUMN IF EXISTS town;
+
+ALTER TABLE application.application_property_historic
+ADD town character varying(40),
+ALTER COLUMN district TYPE VARCHAR(40),
+ALTER COLUMN noble_estate TYPE VARCHAR(40);
+
+
