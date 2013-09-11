@@ -231,14 +231,21 @@ CREATE OR REPLACE FUNCTION public.get_geometry_with_srid(
  geom geometry
 ) RETURNS geometry 
 AS $$
-BEGIN
-  return st_setsrid(geom, coalesce((select vl::integer from system.setting where name='map-srid'),-1));
-END;
-
+declare
+  srid_found integer;
+  x float;
+begin
+  if (select count(*) from system.crs) = 1 then
+    return geom;
+  end if;
+  x = st_x(st_transform(st_centroid(geom), 4326));
+  srid_found = (select srid from system.crs where x >= from_long and x < to_long );
+  return st_transform(geom, srid_found);
+end;
 $$ LANGUAGE plpgsql;
 COMMENT ON FUNCTION public.get_geometry_with_srid(
  geom geometry
-) IS 'This function assigns a srid found in the settings to the geometry passed as parameter.';
+) IS 'This function assigns a srid found in the settings to the geometry passed as parameter. The srid is chosen based in the longitude where the centroid of the geometry is.';
     
 -- Function public.get_translation --
 CREATE OR REPLACE FUNCTION public.get_translation(
@@ -2271,6 +2278,63 @@ inout geom_to_snap geometry
   ,out target_is_changed bool
 ) IS 'It snaps one geometry to the other. If points needs to be added they will be added.';
     
+-- Function cadastre.get_new_cadastre_object_identifier_last_part --
+CREATE OR REPLACE FUNCTION cadastre.get_new_cadastre_object_identifier_last_part(
+ geom geometry
+  , cadastre_object_type varchar
+) RETURNS varchar 
+AS $$
+begin
+  return cadastre_object_type;
+end;
+$$ LANGUAGE plpgsql;
+COMMENT ON FUNCTION cadastre.get_new_cadastre_object_identifier_last_part(
+ geom geometry
+  , cadastre_object_type varchar
+) IS 'This function generates the last part of the cadastre object identifier.
+It has to be overridden to apply the algorithm specific to the situation.';
+    
+-- Function cadastre.get_new_cadastre_object_identifier_first_part --
+CREATE OR REPLACE FUNCTION cadastre.get_new_cadastre_object_identifier_first_part(
+ last_part varchar
+  , cadastre_object_type varchar
+) RETURNS varchar 
+AS $$
+begin
+  return '1';
+end;
+$$ LANGUAGE plpgsql;
+COMMENT ON FUNCTION cadastre.get_new_cadastre_object_identifier_first_part(
+ last_part varchar
+  , cadastre_object_type varchar
+) IS 'This function generates the first part of the cadastre object identifier.
+It has to be overridden to apply the algorithm specific to the situation.';
+    
+-- Function cadastre.generate_spatial_unit_group_name --
+CREATE OR REPLACE FUNCTION cadastre.generate_spatial_unit_group_name(
+ geom_v geometry
+  , hierarchy_level_v integer
+  , label_v varchar
+) RETURNS varchar 
+AS $$
+declare
+  name_parent varchar;  
+BEGIN
+  if hierarchy_level_v = 0 then
+    return label_v;
+  end if;
+  name_parent =  coalesce( (select name 
+  from cadastre.spatial_unit_group 
+  where hierarchy_level = hierarchy_level_v - 1 and st_intersects(st_centroid(geom_v), geom)), '');
+  return name_parent || '/' || label_v;
+END;
+$$ LANGUAGE plpgsql;
+COMMENT ON FUNCTION cadastre.generate_spatial_unit_group_name(
+ geom_v geometry
+  , hierarchy_level_v integer
+  , label_v varchar
+) IS 'It generates the name of a new spatial unit group.';
+    
 -- Sequence application.application_nr_seq --
 DROP SEQUENCE IF EXISTS application.application_nr_seq;
 CREATE SEQUENCE application.application_nr_seq
@@ -2722,8 +2786,8 @@ declare
   query_name_v varchar;
   query_sql_template varchar;
 begin
-  query_sql_template = 'select id, label, st_asewkb(geom) as the_geom from cadastre.spatial_unit 
-where level_id = ''level_id_v'' and ST_Intersects(geom, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))';
+  query_sql_template = 'select id, label, st_asewkb(st_transform(geom, #{srid})) as the_geom from cadastre.spatial_unit 
+where level_id = ''level_id_v'' and ST_Intersects(st_transform(geom, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))';
   other_object_type = (select type_code 
     from bulk_operation.spatial_unit_temporary 
     where transaction_id = transaction_id_v limit 1);
@@ -6023,8 +6087,9 @@ CREATE TABLE cadastre.spatial_unit_group(
         CONSTRAINT enforce_dims_geom CHECK (st_ndims(geom) = 2),
         CONSTRAINT enforce_srid_geom CHECK (st_srid(geom) = 2193),
         CONSTRAINT enforce_valid_geom CHECK (st_isvalid(geom)),
-        CONSTRAINT enforce_geotype_geom CHECK (geometrytype(geom) = 'MULTIPOLYGON'::text OR geom IS NULL),
+        CONSTRAINT enforce_geotype_geom CHECK (geometrytype(geom) = 'POLYGON'::text OR geom IS NULL),
     found_in_spatial_unit_group_id varchar(40),
+    seq_nr integer,
     rowidentifier varchar(40) NOT NULL DEFAULT (uuid_generate_v1()),
     rowversion integer NOT NULL DEFAULT (0),
     change_action char(1) NOT NULL DEFAULT ('i'),
@@ -6077,8 +6142,9 @@ CREATE TABLE cadastre.spatial_unit_group_historic
         CONSTRAINT enforce_dims_geom CHECK (st_ndims(geom) = 2),
         CONSTRAINT enforce_srid_geom CHECK (st_srid(geom) = 2193),
         CONSTRAINT enforce_valid_geom CHECK (st_isvalid(geom)),
-        CONSTRAINT enforce_geotype_geom CHECK (geometrytype(geom) = 'MULTIPOLYGON'::text OR geom IS NULL),
+        CONSTRAINT enforce_geotype_geom CHECK (geometrytype(geom) = 'POLYGON'::text OR geom IS NULL),
     found_in_spatial_unit_group_id varchar(40),
+    seq_nr integer,
     rowidentifier varchar(40),
     rowversion integer,
     change_action char(1),
@@ -6793,7 +6859,6 @@ LADM Definition
 Not Applicable';
     
  -- Data for the table system.setting -- 
-insert into system.setting(name, vl, active, description) values('map-srid', '2193', true, 'The srid of the geographic data that are administered in the system.');
 insert into system.setting(name, vl, active, description) values('map-west', '1776400', true, 'The most west coordinate. It is used in the map control.');
 insert into system.setting(name, vl, active, description) values('map-south', '5919888', true, 'The most south coordinate. It is used in the map control.');
 insert into system.setting(name, vl, active, description) values('map-east', '1795771', true, 'The most east coordinate. It is used in the map control.');
@@ -6867,6 +6932,7 @@ CREATE TABLE system.config_map_layer(
     wms_layers varchar(500),
     wms_version varchar(10),
     wms_format varchar(15),
+    wms_data_source varchar(200),
     pojo_structure varchar(500),
     pojo_query_name varchar(100),
     pojo_query_name_for_select varchar(100),
@@ -6946,27 +7012,27 @@ CREATE TABLE system.query(
 comment on table system.query is 'It defines a query that can be executed by the search ejb.';
     
  -- Data for the table system.query -- 
-insert into system.query(name, sql) values('SpatialResult.getParcels', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as label,  st_asewkb(co.geom_polygon) as the_geom from cadastre.cadastre_object co where type_code= ''parcel'' and status_code= ''current'' and ST_Intersects(co.geom_polygon, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid})) and st_area(co.geom_polygon)> power(5 * #{pixel_res}, 2)');
-insert into system.query(name, sql) values('SpatialResult.getParcelsPending', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as label,  st_asewkb(co.geom_polygon) as the_geom  from cadastre.cadastre_object co  where type_code= ''parcel'' and status_code= ''pending''   and ST_Intersects(co.geom_polygon, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid})) union select co.id, co.name_firstpart || ''/'' || co.name_lastpart as label,  st_asewkb(co_t.geom_polygon) as the_geom  from cadastre.cadastre_object co inner join cadastre.cadastre_object_target co_t on co.id = co_t.cadastre_object_id and co_t.geom_polygon is not null where ST_Intersects(co_t.geom_polygon, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))       and co_t.transaction_id in (select id from transaction.transaction where status_code not in (''approved'')) ');
-insert into system.query(name, sql) values('SpatialResult.getSurveyControls', 'select id, label, st_asewkb(geom) as the_geom from cadastre.survey_control  where ST_Intersects(geom, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))');
-insert into system.query(name, sql) values('SpatialResult.getRoads', 'select id, label, st_asewkb(geom) as the_geom from cadastre.road where ST_Intersects(geom, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid})) and st_area(geom)> power(5 * #{pixel_res}, 2)');
-insert into system.query(name, sql) values('SpatialResult.getPlaceNames', 'select id, label, st_asewkb(geom) as the_geom from cadastre.place_name where ST_Intersects(geom, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))');
-insert into system.query(name, sql) values('SpatialResult.getApplications', 'select id, nr as label, st_asewkb(location) as the_geom from application.application where ST_Intersects(location, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))');
-insert into system.query(name, sql) values('dynamic.informationtool.get_parcel', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as parcel_nr,      (select string_agg(ba.name_firstpart || ''/'' || ba.name_lastpart, '','')      from administrative.ba_unit_contains_spatial_unit bas, administrative.ba_unit ba      where spatial_unit_id= co.id and bas.ba_unit_id= ba.id) as ba_units,      ( SELECT spatial_value_area.size FROM cadastre.spatial_value_area      WHERE spatial_value_area.type_code=''officialArea'' and spatial_value_area.spatial_unit_id = co.id) AS area_official_sqm,       st_asewkb(co.geom_polygon) as the_geom      from cadastre.cadastre_object co      where type_code= ''parcel'' and status_code= ''current''      and ST_Intersects(co.geom_polygon, ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
-insert into system.query(name, sql) values('dynamic.informationtool.get_parcel_pending', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as parcel_nr,       ( SELECT spatial_value_area.size FROM cadastre.spatial_value_area         WHERE spatial_value_area.type_code=''officialArea'' and spatial_value_area.spatial_unit_id = co.id) AS area_official_sqm,   st_asewkb(co.geom_polygon) as the_geom    from cadastre.cadastre_object co  where type_code= ''parcel'' and ((status_code= ''pending''    and ST_Intersects(co.geom_polygon, ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid})))   or (co.id in (select cadastre_object_id           from cadastre.cadastre_object_target co_t inner join transaction.transaction t on co_t.transaction_id=t.id           where ST_Intersects(co_t.geom_polygon, ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid})) and t.status_code not in (''approved''))))');
-insert into system.query(name, sql) values('dynamic.informationtool.get_place_name', 'select id, label,  st_asewkb(geom) as the_geom from cadastre.place_name where ST_Intersects(geom, ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
-insert into system.query(name, sql) values('dynamic.informationtool.get_road', 'select id, label,  st_asewkb(geom) as the_geom from cadastre.road where ST_Intersects(geom, ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
-insert into system.query(name, sql) values('dynamic.informationtool.get_application', 'select id, nr,  st_asewkb(location) as the_geom from application.application where ST_Intersects(location, ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
-insert into system.query(name, sql) values('dynamic.informationtool.get_survey_control', 'select id, label,  st_asewkb(geom) as the_geom from cadastre.survey_control where ST_Intersects(geom, ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
-insert into system.query(name, sql) values('SpatialResult.getParcelsHistoricWithCurrentBA', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as label,  st_asewkb(co.geom_polygon) as the_geom from cadastre.cadastre_object co inner join administrative.ba_unit_contains_spatial_unit ba_co on co.id = ba_co.spatial_unit_id   inner join administrative.ba_unit ba_unit on ba_unit.id= ba_co.ba_unit_id where co.type_code=''parcel'' and co.status_code= ''historic'' and ba_unit.status_code = ''current'' and ST_Intersects(co.geom_polygon, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))');
-insert into system.query(name, sql) values('dynamic.informationtool.get_parcel_historic_current_ba', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as parcel_nr,         (select string_agg(ba.name_firstpart || ''/'' || ba.name_lastpart, '','')           from administrative.ba_unit_contains_spatial_unit bas, administrative.ba_unit ba           where spatial_unit_id= co.id and bas.ba_unit_id= ba.id) as ba_units,         (SELECT spatial_value_area.size      FROM cadastre.spatial_value_area           WHERE spatial_value_area.type_code=''officialArea'' and spatial_value_area.spatial_unit_id = co.id) AS area_official_sqm,         st_asewkb(co.geom_polygon) as the_geom        from cadastre.cadastre_object co inner join administrative.ba_unit_contains_spatial_unit ba_co on co.id = ba_co.spatial_unit_id   inner join administrative.ba_unit ba_unit on ba_unit.id= ba_co.ba_unit_id where co.type_code=''parcel'' and co.status_code= ''historic'' and ba_unit.status_code = ''current''       and ST_Intersects(co.geom_polygon, ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
-insert into system.query(name, sql) values('map_search.cadastre_object_by_number', 'select id, name_firstpart || ''/ '' || name_lastpart as label, st_asewkb(geom_polygon) as the_geom  from cadastre.cadastre_object  where status_code= ''current'' and compare_strings(#{search_string}, name_firstpart || '' '' || name_lastpart) limit 30');
-insert into system.query(name, sql) values('map_search.cadastre_object_by_baunit', 'select distinct co.id,  ba_unit.name_firstpart || ''/ '' || ba_unit.name_lastpart || '' > '' || co.name_firstpart || ''/ '' || co.name_lastpart as label,  st_asewkb(geom_polygon) as the_geom from cadastre.cadastre_object  co    inner join administrative.ba_unit_contains_spatial_unit bas on co.id = bas.spatial_unit_id     inner join administrative.ba_unit on ba_unit.id = bas.ba_unit_id  where (co.status_code= ''current'' or ba_unit.status_code= ''current'')    and compare_strings(#{search_string}, ba_unit.name_firstpart || '' '' || ba_unit.name_lastpart) limit 30');
-insert into system.query(name, sql) values('map_search.cadastre_object_by_baunit_owner', 'select distinct co.id,  coalesce(party.name, '''') || '' '' || coalesce(party.last_name, '''') || '' > '' || co.name_firstpart || ''/ '' || co.name_lastpart as label,  st_asewkb(co.geom_polygon) as the_geom  from cadastre.cadastre_object  co     inner join administrative.ba_unit_contains_spatial_unit bas on co.id = bas.spatial_unit_id     inner join administrative.ba_unit on bas.ba_unit_id= ba_unit.id     inner join administrative.rrr on (ba_unit.id = rrr.ba_unit_id and rrr.status_code = ''current'' and rrr.type_code = ''ownership'')     inner join administrative.party_for_rrr pfr on rrr.id = pfr.rrr_id     inner join party.party on pfr.party_id= party.id where (co.status_code= ''current'' or ba_unit.status_code= ''current'')     and compare_strings(#{search_string}, coalesce(party.name, '''') || '' '' || coalesce(party.last_name, '''')) limit 30');
-insert into system.query(name, sql, description) values('system_search.cadastre_object_by_baunit_id', 'SELECT id,  name_firstpart || ''/ '' || name_lastpart as label, st_asewkb(geom_polygon) as the_geom  FROM cadastre.cadastre_object WHERE transaction_id IN (  SELECT cot.transaction_id FROM (administrative.ba_unit_contains_spatial_unit ba_su     INNER JOIN cadastre.cadastre_object co ON ba_su.spatial_unit_id = co.id)     INNER JOIN cadastre.cadastre_object_target cot ON co.id = cot.cadastre_object_id     WHERE ba_su.ba_unit_id = #{search_string})  AND (SELECT COUNT(1) FROM administrative.ba_unit_contains_spatial_unit WHERE spatial_unit_id = cadastre_object.id) = 0 AND status_code = ''current''', 'Query used by BaUnitBean.loadNewParcels');
-insert into system.query(name, sql) values('SpatialResult.getParcelNodes', 'select distinct st_astext(geom) as id, '''' as label, st_asewkb(geom) as the_geom from (select (ST_DumpPoints(geom_polygon)).* from cadastre.cadastre_object co  where type_code= ''parcel'' and status_code= ''current''  and ST_Intersects(co.geom_polygon, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))) tmp_table ');
-insert into system.query(name, sql, description) values('public_display.parcels', 'select co.id, co.name_firstpart as label,  st_asewkb(co.geom_polygon) as the_geom from cadastre.cadastre_object co where type_code= ''parcel'' and status_code= ''current'' and name_lastpart = #{name_lastpart} and ST_Intersects(co.geom_polygon, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))', 'Query is used from public display map. It retrieves parcels being of a certain area (name_lastpart).');
-insert into system.query(name, sql, description) values('public_display.parcels_next', 'SELECT co_next.id, co_next.name_firstpart as label,  st_asewkb(co_next.geom_polygon) as the_geom  from cadastre.cadastre_object co_next, cadastre.cadastre_object co where co.type_code= ''parcel'' and co.status_code= ''current'' and co_next.type_code= ''parcel'' and co_next.status_code= ''current'' and co.name_lastpart = #{name_lastpart} and co_next.name_lastpart != #{name_lastpart} and st_dwithin(co.geom_polygon, co_next.geom_polygon, 5) and ST_Intersects(co_next.geom_polygon, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))', ' Query is used from public display map. It retrieves parcels being near the parcels of the layer public-display-parcels.');
+insert into system.query(name, sql) values('SpatialResult.getParcels', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as label,  st_asewkb(st_transform(co.geom_polygon, #{srid})) as the_geom from cadastre.cadastre_object co where type_code= ''parcel'' and status_code= ''current'' and ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid})) and st_area(co.geom_polygon)> power(5 * #{pixel_res}, 2)');
+insert into system.query(name, sql) values('SpatialResult.getParcelsPending', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as label,  st_asewkb(st_transform(co.geom_polygon, #{srid})) as the_geom  from cadastre.cadastre_object co  where type_code= ''parcel'' and status_code= ''pending''   and ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid})) union select co.id, co.name_firstpart || ''/'' || co.name_lastpart as label,  st_asewkb(co_t.geom_polygon) as the_geom  from cadastre.cadastre_object co inner join cadastre.cadastre_object_target co_t on co.id = co_t.cadastre_object_id and co_t.geom_polygon is not null where ST_Intersects(co_t.geom_polygon, ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))       and co_t.transaction_id in (select id from transaction.transaction where status_code not in (''approved'')) ');
+insert into system.query(name, sql) values('SpatialResult.getSurveyControls', 'select id, label, st_asewkb(st_transform(geom, #{srid})) as the_geom from cadastre.survey_control  where ST_Intersects(st_transform(geom, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))');
+insert into system.query(name, sql) values('SpatialResult.getRoads', 'select id, label, st_asewkb(st_transform(geom, #{srid})) as the_geom from cadastre.road where ST_Intersects(st_transform(geom, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid})) and st_area(geom)> power(5 * #{pixel_res}, 2)');
+insert into system.query(name, sql) values('SpatialResult.getPlaceNames', 'select id, label, st_asewkb(st_transform(geom, #{srid})) as the_geom from cadastre.place_name where ST_Intersects(st_transform(geom, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))');
+insert into system.query(name, sql) values('SpatialResult.getApplications', 'select id, nr as label, st_asewkb(st_transform(location, #{srid})) as the_geom from application.application where ST_Intersects(st_transform(location, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))');
+insert into system.query(name, sql) values('dynamic.informationtool.get_parcel', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as parcel_nr,      (select string_agg(ba.name_firstpart || ''/'' || ba.name_lastpart, '','')      from administrative.ba_unit_contains_spatial_unit bas, administrative.ba_unit ba      where spatial_unit_id= co.id and bas.ba_unit_id= ba.id) as ba_units,      ( SELECT spatial_value_area.size FROM cadastre.spatial_value_area      WHERE spatial_value_area.type_code=''officialArea'' and spatial_value_area.spatial_unit_id = co.id) AS area_official_sqm,       st_asewkb(st_transform(co.geom_polygon, #{srid})) as the_geom      from cadastre.cadastre_object co      where type_code= ''parcel'' and status_code= ''current''      and ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
+insert into system.query(name, sql) values('dynamic.informationtool.get_parcel_pending', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as parcel_nr,       ( SELECT spatial_value_area.size FROM cadastre.spatial_value_area         WHERE spatial_value_area.type_code=''officialArea'' and spatial_value_area.spatial_unit_id = co.id) AS area_official_sqm,   st_asewkb(st_transform(co.geom_polygon, #{srid})) as the_geom    from cadastre.cadastre_object co  where type_code= ''parcel'' and ((status_code= ''pending''    and ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid})))   or (co.id in (select cadastre_object_id           from cadastre.cadastre_object_target co_t inner join transaction.transaction t on co_t.transaction_id=t.id           where ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid})) and t.status_code not in (''approved''))))');
+insert into system.query(name, sql) values('dynamic.informationtool.get_place_name', 'select id, label,  st_asewkb(st_transform(geom, #{srid})) as the_geom from cadastre.place_name where ST_Intersects(st_transform(geom, #{srid}), ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
+insert into system.query(name, sql) values('dynamic.informationtool.get_road', 'select id, label,  st_asewkb(st_transform(geom, #{srid})) as the_geom from cadastre.road where ST_Intersects(st_transform(geom, #{srid}), ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
+insert into system.query(name, sql) values('dynamic.informationtool.get_application', 'select id, nr,  st_asewkb(st_transform(location, #{srid})) as the_geom from application.application where ST_Intersects(st_transform(location, #{srid}), ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
+insert into system.query(name, sql) values('dynamic.informationtool.get_survey_control', 'select id, label,  st_asewkb(st_transform(geom, #{srid})) as the_geom from cadastre.survey_control where ST_Intersects(st_transform(geom, #{srid}), ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
+insert into system.query(name, sql) values('SpatialResult.getParcelsHistoricWithCurrentBA', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as label,  st_asewkb(st_transform(co.geom_polygon, #{srid})) as the_geom from cadastre.cadastre_object co inner join administrative.ba_unit_contains_spatial_unit ba_co on co.id = ba_co.spatial_unit_id   inner join administrative.ba_unit ba_unit on ba_unit.id= ba_co.ba_unit_id where co.type_code=''parcel'' and co.status_code= ''historic'' and ba_unit.status_code = ''current'' and ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))');
+insert into system.query(name, sql) values('dynamic.informationtool.get_parcel_historic_current_ba', 'select co.id, co.name_firstpart || ''/'' || co.name_lastpart as parcel_nr,         (select string_agg(ba.name_firstpart || ''/'' || ba.name_lastpart, '','')           from administrative.ba_unit_contains_spatial_unit bas, administrative.ba_unit ba           where spatial_unit_id= co.id and bas.ba_unit_id= ba.id) as ba_units,         (SELECT spatial_value_area.size      FROM cadastre.spatial_value_area           WHERE spatial_value_area.type_code=''officialArea'' and spatial_value_area.spatial_unit_id = co.id) AS area_official_sqm,         st_asewkb(st_transform(co.geom_polygon, #{srid})) as the_geom        from cadastre.cadastre_object co inner join administrative.ba_unit_contains_spatial_unit ba_co on co.id = ba_co.spatial_unit_id   inner join administrative.ba_unit ba_unit on ba_unit.id= ba_co.ba_unit_id where co.type_code=''parcel'' and co.status_code= ''historic'' and ba_unit.status_code = ''current''       and ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_GeomFromWKB(#{wkb_geom}), #{srid}))');
+insert into system.query(name, sql) values('map_search.cadastre_object_by_number', 'select id, name_firstpart || ''/ '' || name_lastpart as label, st_asewkb(st_transform(geom_polygon, #{srid})) as the_geom  from cadastre.cadastre_object  where status_code= ''current'' and compare_strings(#{search_string}, name_firstpart || '' '' || name_lastpart) limit 30');
+insert into system.query(name, sql) values('map_search.cadastre_object_by_baunit', 'select distinct co.id,  ba_unit.name_firstpart || ''/ '' || ba_unit.name_lastpart || '' > '' || co.name_firstpart || ''/ '' || co.name_lastpart as label,  st_asewkb(st_transform(geom_polygon, #{srid})) as the_geom from cadastre.cadastre_object  co    inner join administrative.ba_unit_contains_spatial_unit bas on co.id = bas.spatial_unit_id     inner join administrative.ba_unit on ba_unit.id = bas.ba_unit_id  where (co.status_code= ''current'' or ba_unit.status_code= ''current'')    and compare_strings(#{search_string}, ba_unit.name_firstpart || '' '' || ba_unit.name_lastpart) limit 30');
+insert into system.query(name, sql) values('map_search.cadastre_object_by_baunit_owner', 'select distinct co.id,  coalesce(party.name, '''') || '' '' || coalesce(party.last_name, '''') || '' > '' || co.name_firstpart || ''/ '' || co.name_lastpart as label,  st_asewkb(st_transform(co.geom_polygon, #{srid})) as the_geom  from cadastre.cadastre_object  co     inner join administrative.ba_unit_contains_spatial_unit bas on co.id = bas.spatial_unit_id     inner join administrative.ba_unit on bas.ba_unit_id= ba_unit.id     inner join administrative.rrr on (ba_unit.id = rrr.ba_unit_id and rrr.status_code = ''current'' and rrr.type_code = ''ownership'')     inner join administrative.party_for_rrr pfr on rrr.id = pfr.rrr_id     inner join party.party on pfr.party_id= party.id where (co.status_code= ''current'' or ba_unit.status_code= ''current'')     and compare_strings(#{search_string}, coalesce(party.name, '''') || '' '' || coalesce(party.last_name, '''')) limit 30');
+insert into system.query(name, sql, description) values('system_search.cadastre_object_by_baunit_id', 'SELECT id,  name_firstpart || ''/ '' || name_lastpart as label, st_asewkb(st_transform(geom_polygon, #{srid})) as the_geom  FROM cadastre.cadastre_object WHERE transaction_id IN (  SELECT cot.transaction_id FROM (administrative.ba_unit_contains_spatial_unit ba_su     INNER JOIN cadastre.cadastre_object co ON ba_su.spatial_unit_id = co.id)     INNER JOIN cadastre.cadastre_object_target cot ON co.id = cot.cadastre_object_id     WHERE ba_su.ba_unit_id = #{search_string})  AND (SELECT COUNT(1) FROM administrative.ba_unit_contains_spatial_unit WHERE spatial_unit_id = cadastre_object.id) = 0 AND status_code = ''current''', 'Query used by BaUnitBean.loadNewParcels');
+insert into system.query(name, sql) values('SpatialResult.getParcelNodes', 'select distinct st_astext(st_transform(geom, #{srid})) as id, '''' as label, st_asewkb(st_transform(geom, #{srid})) as the_geom from (select (ST_DumpPoints(geom_polygon)).* from cadastre.cadastre_object co  where type_code= ''parcel'' and status_code= ''current''  and ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))) tmp_table ');
+insert into system.query(name, sql, description) values('public_display.parcels', 'select co.id, co.name_firstpart as label,  st_asewkb(st_transform(co.geom_polygon, #{srid})) as the_geom from cadastre.cadastre_object co where type_code= ''parcel'' and status_code= ''current'' and name_lastpart = #{name_lastpart} and ST_Intersects(st_transform(co.geom_polygon, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))', 'Query is used from public display map. It retrieves parcels being of a certain area (name_lastpart).');
+insert into system.query(name, sql, description) values('public_display.parcels_next', 'SELECT co_next.id, co_next.name_firstpart as label,  st_asewkb(st_transform(co_next.geom_polygon, #{srid})) as the_geom  from cadastre.cadastre_object co_next, cadastre.cadastre_object co where co.type_code= ''parcel'' and co.status_code= ''current'' and co_next.type_code= ''parcel'' and co_next.status_code= ''current'' and co.name_lastpart = #{name_lastpart} and co_next.name_lastpart != #{name_lastpart} and st_dwithin(st_transform(co.geom_polygon, #{srid}), st_transform(co_next.geom_polygon, #{srid}), 5) and ST_Intersects(st_transform(co_next.geom_polygon, #{srid}), ST_SetSRID(ST_MakeBox3D(ST_Point(#{minx}, #{miny}),ST_Point(#{maxx}, #{maxy})), #{srid}))', ' Query is used from public display map. It retrieves parcels being near the parcels of the layer public-display-parcels.');
 
 
 
@@ -7093,6 +7159,7 @@ insert into system.br_validation_target_type(code, display_value, status, descri
 insert into system.br_validation_target_type(code, display_value, status, description) values('cadastre_object', 'Cadastre Object::::Oggetto Catastale', 'c', 'The target of the validation is the transaction related with the cadastre change. It accepts one parameter {id} which is the transaction id.');
 insert into system.br_validation_target_type(code, display_value, status, description) values('bulkOperationSpatial', 'BUlk operation', 'c', 'The target of the validation is the transaction related with the bulk operations.');
 insert into system.br_validation_target_type(code, display_value, status, description) values('public_display', 'Public display', 'c', 'The target of the validation is the set of cadastre objects/ba units that belong to a certain last part. It accepts one parameter {lastPart} which is the last part.');
+insert into system.br_validation_target_type(code, display_value, status, description) values('spatial_unit_group', 'Spatial unit group', 'c', 'The target of the validation are the spatial unit groups');
 
 
 
@@ -7209,6 +7276,7 @@ insert into system.approle(code, display_value, status, description) values('sys
 insert into system.approle(code, display_value, status, description) values('systematicRegn', 'Systematic Registration', 'c', 'Allows to access Systematic Registration Service');
 insert into system.approle(code, display_value, status, description) values('lodgeObjection', 'Objection lodgment', 'c', 'Allows to access Lodge Objection Service');
 insert into system.approle(code, display_value, status, description) values('RightsExport', 'Export', 'c', 'Allows to export');
+insert into system.approle(code, display_value, status, description) values('editSpatialUnitGr', 'Edit spatial unit group', 'c', 'Allows the editing of spatial unit group');
 
 
 
@@ -7432,9 +7500,9 @@ CREATE TRIGGER __track_changes BEFORE UPDATE OR INSERT
    ON bulk_operation.spatial_unit_temporary FOR EACH ROW
    EXECUTE PROCEDURE f_for_trg_track_changes();
     
---Table administrative.lease_condition ----
-DROP TABLE IF EXISTS administrative.lease_condition CASCADE;
-CREATE TABLE administrative.lease_condition(
+--Table administrative.condition_type ----
+DROP TABLE IF EXISTS administrative.condition_type CASCADE;
+CREATE TABLE administrative.condition_type(
     code varchar(20) NOT NULL,
     display_value varchar(250) NOT NULL,
     description varchar(5000) NOT NULL,
@@ -7442,32 +7510,34 @@ CREATE TABLE administrative.lease_condition(
 
     -- Internal constraints
     
-    CONSTRAINT lease_condition_display_value_unique UNIQUE (display_value),
-    CONSTRAINT lease_condition_pkey PRIMARY KEY (code)
+    CONSTRAINT condition_type_display_value_unique UNIQUE (display_value),
+    CONSTRAINT condition_type_pkey PRIMARY KEY (code)
 );
 
 
-comment on table administrative.lease_condition is 'Reference Table / Code list for standard lease conditions
+comment on table administrative.condition_type is 'Reference Table / Code list for standard lease conditions
 LADM Definition
 Not Defined';
     
- -- Data for the table administrative.lease_condition -- 
-insert into administrative.lease_condition(code, display_value, description, status) values('c1', 'Condition 1', 'Unless the Minister directs otherwise the Lessee shall fence the boundaries of the land within 6 (six) months of the date of the grant and the Lessee shall maintain the fence to the satisfaction of the Commissioner.', 'c');
-insert into administrative.lease_condition(code, display_value, description, status) values('c2', 'Condition 2', 'Unless special written authority is given by the Commissioner, the Lessee shall commence development of the land within 5 years of the date of the granting of a lease. This shall also apply to further development of the land held under a lease during the term of the lease.', 'c');
-insert into administrative.lease_condition(code, display_value, description, status) values('c3', 'Condition 3', 'Within a period of the time to be fixed by the planning authority, the Lessee shall provide at his own expense main drainage or main sewerage connections from the building erected on the land as the planning authority may require.', 'c');
-insert into administrative.lease_condition(code, display_value, description, status) values('c4', 'Condtion 4', 'The Lessee shall use the land comprised in the lease only for the purpose specified in the lease or in any variation made to the original lease.', 'c');
-insert into administrative.lease_condition(code, display_value, description, status) values('c5', 'Condition 5', 'Save with the written authority of the planning authority, no electrical power or telephone pole or line or water, drainage or sewer pipe being upon or passing through, over or under the land and no replacement thereof, shall be moved or in any way be interfered with and reasonable access thereto shall be preserved to allow for inspection, maintenance, repair, renewal and replacement.', 'c');
-insert into administrative.lease_condition(code, display_value, description, status) values('c6', 'Condition 6', 'The interior and exterior of any building erected on the land and all building additions thereto and all other buildings at any time erected or standing on the land and walls, drains and other appurtenances, shall be kept by the Lessee in good repair and tenantable condition to the satisfaction of the planning authority.', 'c');
+ -- Data for the table administrative.condition_type -- 
+insert into administrative.condition_type(code, display_value, description, status) values('c1', 'Condition 1', 'Unless the Minister directs otherwise the Lessee shall fence the boundaries of the land within 6 (six) months of the date of the grant and the Lessee shall maintain the fence to the satisfaction of the Commissioner.', 'c');
+insert into administrative.condition_type(code, display_value, description, status) values('c2', 'Condition 2', 'Unless special written authority is given by the Commissioner, the Lessee shall commence development of the land within 5 years of the date of the granting of a lease. This shall also apply to further development of the land held under a lease during the term of the lease.', 'c');
+insert into administrative.condition_type(code, display_value, description, status) values('c3', 'Condition 3', 'Within a period of the time to be fixed by the planning authority, the Lessee shall provide at his own expense main drainage or main sewerage connections from the building erected on the land as the planning authority may require.', 'c');
+insert into administrative.condition_type(code, display_value, description, status) values('c4', 'Condtion 4', 'The Lessee shall use the land comprised in the lease only for the purpose specified in the lease or in any variation made to the original lease.', 'c');
+insert into administrative.condition_type(code, display_value, description, status) values('c5', 'Condition 5', 'Save with the written authority of the planning authority, no electrical power or telephone pole or line or water, drainage or sewer pipe being upon or passing through, over or under the land and no replacement thereof, shall be moved or in any way be interfered with and reasonable access thereto shall be preserved to allow for inspection, maintenance, repair, renewal and replacement.', 'c');
+insert into administrative.condition_type(code, display_value, description, status) values('c6', 'Condition 6', 'The interior and exterior of any building erected on the land and all building additions thereto and all other buildings at any time erected or standing on the land and walls, drains and other appurtenances, shall be kept by the Lessee in good repair and tenantable condition to the satisfaction of the planning authority.', 'c');
 
 
 
---Table administrative.lease_condition_for_rrr ----
-DROP TABLE IF EXISTS administrative.lease_condition_for_rrr CASCADE;
-CREATE TABLE administrative.lease_condition_for_rrr(
+--Table administrative.condition_for_rrr ----
+DROP TABLE IF EXISTS administrative.condition_for_rrr CASCADE;
+CREATE TABLE administrative.condition_for_rrr(
     id varchar(40) NOT NULL,
     rrr_id varchar(40) NOT NULL,
-    lease_condition_code varchar(20),
+    condition_code varchar(20),
     custom_condition_text varchar(500),
+    condition_quantity integer,
+    condition_unit varchar(15),
     rowidentifier varchar(40) NOT NULL DEFAULT (uuid_generate_v1()),
     rowversion integer NOT NULL DEFAULT (0),
     change_action char(1) NOT NULL DEFAULT ('i'),
@@ -7476,31 +7546,33 @@ CREATE TABLE administrative.lease_condition_for_rrr(
 
     -- Internal constraints
     
-    CONSTRAINT lease_condition_for_rrr_pkey PRIMARY KEY (id)
+    CONSTRAINT condition_for_rrr_pkey PRIMARY KEY (id)
 );
 
 
 
--- Index lease_condition_for_rrr_index_on_rowidentifier  --
-CREATE INDEX lease_condition_for_rrr_index_on_rowidentifier ON administrative.lease_condition_for_rrr (rowidentifier);
+-- Index condition_for_rrr_index_on_rowidentifier  --
+CREATE INDEX condition_for_rrr_index_on_rowidentifier ON administrative.condition_for_rrr (rowidentifier);
     
 
-comment on table administrative.lease_condition_for_rrr is 'Lease conditions, related to RRR of lease type';
+comment on table administrative.condition_for_rrr is 'Lease conditions, related to RRR of lease type';
     
-DROP TRIGGER IF EXISTS __track_changes ON administrative.lease_condition_for_rrr CASCADE;
+DROP TRIGGER IF EXISTS __track_changes ON administrative.condition_for_rrr CASCADE;
 CREATE TRIGGER __track_changes BEFORE UPDATE OR INSERT
-   ON administrative.lease_condition_for_rrr FOR EACH ROW
+   ON administrative.condition_for_rrr FOR EACH ROW
    EXECUTE PROCEDURE f_for_trg_track_changes();
     
 
-----Table administrative.lease_condition_for_rrr_historic used for the history of data of table administrative.lease_condition_for_rrr ---
-DROP TABLE IF EXISTS administrative.lease_condition_for_rrr_historic CASCADE;
-CREATE TABLE administrative.lease_condition_for_rrr_historic
+----Table administrative.condition_for_rrr_historic used for the history of data of table administrative.condition_for_rrr ---
+DROP TABLE IF EXISTS administrative.condition_for_rrr_historic CASCADE;
+CREATE TABLE administrative.condition_for_rrr_historic
 (
     id varchar(40),
     rrr_id varchar(40),
-    lease_condition_code varchar(20),
+    condition_code varchar(20),
     custom_condition_text varchar(500),
+    condition_quantity integer,
+    condition_unit varchar(15),
     rowidentifier varchar(40),
     rowversion integer,
     change_action char(1),
@@ -7510,56 +7582,118 @@ CREATE TABLE administrative.lease_condition_for_rrr_historic
 );
 
 
--- Index lease_condition_for_rrr_historic_index_on_rowidentifier  --
-CREATE INDEX lease_condition_for_rrr_historic_index_on_rowidentifier ON administrative.lease_condition_for_rrr_historic (rowidentifier);
+-- Index condition_for_rrr_historic_index_on_rowidentifier  --
+CREATE INDEX condition_for_rrr_historic_index_on_rowidentifier ON administrative.condition_for_rrr_historic (rowidentifier);
     
 
-DROP TRIGGER IF EXISTS __track_history ON administrative.lease_condition_for_rrr CASCADE;
+DROP TRIGGER IF EXISTS __track_history ON administrative.condition_for_rrr CASCADE;
 CREATE TRIGGER __track_history AFTER UPDATE OR DELETE
-   ON administrative.lease_condition_for_rrr FOR EACH ROW
+   ON administrative.condition_for_rrr FOR EACH ROW
    EXECUTE PROCEDURE f_for_trg_track_history();
-    
---Table application.application_ba_unit ----
-DROP TABLE IF EXISTS application.application_ba_unit CASCADE;
-CREATE TABLE application.application_ba_unit(
-    id varchar(40) NOT NULL,
-    application_id varchar(40) NOT NULL,
-    ba_unit_id varchar(40),
-    name_firstpart varchar(20),
-    name_lastpart varchar(20),
-    area numeric(20, 2) NOT NULL,
-    total_value numeric(20, 2) NOT NULL,
-
-    -- Internal constraints
-    
-    CONSTRAINT application_ba_unit_pkey PRIMARY KEY (id)
-);
-
-
-comment on table application.application_ba_unit is '';
     
 --Table application.application_spatial_unit ----
 DROP TABLE IF EXISTS application.application_spatial_unit CASCADE;
 CREATE TABLE application.application_spatial_unit(
-    id varchar(40) NOT NULL,
     application_id varchar(40) NOT NULL,
-    spatial_unit_id varchar(40),
-    name_firstpart varchar(20),
-    name_lastpart varchar(20),
-    survey_plan_number varchar(20),
-    area numeric(20, 2),
-    address_id varchar(40),
-    cadastre_object_type_code varchar(20),
-    land_use_code varchar(20) NOT NULL,
+    spatial_unit_id varchar(40) NOT NULL,
+    rowidentifier varchar(40) NOT NULL DEFAULT (uuid_generate_v1()),
+    rowversion integer NOT NULL DEFAULT (0),
+    change_action char(1) NOT NULL DEFAULT ('i'),
+    change_user varchar(50),
+    change_time timestamp NOT NULL DEFAULT (now()),
 
     -- Internal constraints
     
-    CONSTRAINT application_spatial_unit_pkey PRIMARY KEY (id)
+    CONSTRAINT application_spatial_unit_pkey PRIMARY KEY (application_id,spatial_unit_id)
 );
 
 
+
+-- Index application_spatial_unit_index_on_rowidentifier  --
+CREATE INDEX application_spatial_unit_index_on_rowidentifier ON application.application_spatial_unit (rowidentifier);
+    
+
 comment on table application.application_spatial_unit is '';
     
+DROP TRIGGER IF EXISTS __track_changes ON application.application_spatial_unit CASCADE;
+CREATE TRIGGER __track_changes BEFORE UPDATE OR INSERT
+   ON application.application_spatial_unit FOR EACH ROW
+   EXECUTE PROCEDURE f_for_trg_track_changes();
+    
+
+----Table application.application_spatial_unit_historic used for the history of data of table application.application_spatial_unit ---
+DROP TABLE IF EXISTS application.application_spatial_unit_historic CASCADE;
+CREATE TABLE application.application_spatial_unit_historic
+(
+    application_id varchar(40),
+    spatial_unit_id varchar(40),
+    rowidentifier varchar(40),
+    rowversion integer,
+    change_action char(1),
+    change_user varchar(50),
+    change_time timestamp,
+    change_time_valid_until TIMESTAMP NOT NULL default NOW()
+);
+
+
+-- Index application_spatial_unit_historic_index_on_rowidentifier  --
+CREATE INDEX application_spatial_unit_historic_index_on_rowidentifier ON application.application_spatial_unit_historic (rowidentifier);
+    
+
+DROP TRIGGER IF EXISTS __track_history ON application.application_spatial_unit CASCADE;
+CREATE TRIGGER __track_history AFTER UPDATE OR DELETE
+   ON application.application_spatial_unit FOR EACH ROW
+   EXECUTE PROCEDURE f_for_trg_track_history();
+    
+--Table system.crs ----
+DROP TABLE IF EXISTS system.crs CASCADE;
+CREATE TABLE system.crs(
+    srid integer NOT NULL,
+    from_long double precision,
+    to_long double precision,
+    item_order integer NOT NULL,
+
+    -- Internal constraints
+    
+    CONSTRAINT crs_pkey PRIMARY KEY (srid)
+);
+
+
+comment on table system.crs is 'In this table are given the coordinate reference systems (crs) that are applicable to the application.
+The one that is with the smallest item_order will be in the top of the list. Also the extent given in setting is within the context of this crs.
+from_long - to_long define the area in wgs84 that the crs is valid. This range can be used for different purposes like assigning/transforming a geometry before being stored in the database in the desired crs.';
+    
+ -- Data for the table system.crs -- 
+insert into system.crs(srid, from_long, to_long, item_order) values(2193, 0, 171805.085554442 , 1);
+
+
+
+--Table cadastre.hierarchy_level ----
+DROP TABLE IF EXISTS cadastre.hierarchy_level CASCADE;
+CREATE TABLE cadastre.hierarchy_level(
+    code varchar(20) NOT NULL,
+    display_value varchar(250) NOT NULL,
+    description varchar(555),
+    status char(1) NOT NULL DEFAULT ('t'),
+
+    -- Internal constraints
+    
+    CONSTRAINT hierarchy_level_display_value_unique UNIQUE (display_value),
+    CONSTRAINT hierarchy_level_pkey PRIMARY KEY (code)
+);
+
+
+comment on table cadastre.hierarchy_level is 'It maintains the list of hierarchies that is used together with spatial_unit_group.';
+    
+ -- Data for the table cadastre.hierarchy_level -- 
+insert into cadastre.hierarchy_level(code, display_value, status) values('0', 'Hierarchy 0', 'c');
+insert into cadastre.hierarchy_level(code, display_value, status) values('1', 'Hierarchy 1', 'c');
+insert into cadastre.hierarchy_level(code, display_value, status) values('2', 'Hierarchy 2', 'c');
+insert into cadastre.hierarchy_level(code, display_value, status) values('3', 'Hierarchy 3', 'c');
+insert into cadastre.hierarchy_level(code, display_value, status) values('4', 'Hierarchy 4', 'c');
+
+
+
 
 ALTER TABLE source.source ADD CONSTRAINT source_archive_id_fk0 
             FOREIGN KEY (archive_id) REFERENCES source.archive(id) ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -8081,41 +8215,21 @@ ALTER TABLE cadastre.spatial_unit ADD CONSTRAINT spatial_unit_transaction_id_fk1
             FOREIGN KEY (transaction_id) REFERENCES transaction.transaction(id) ON UPDATE CASCADE ON DELETE Cascade;
 CREATE INDEX spatial_unit_transaction_id_fk129_ind ON cadastre.spatial_unit (transaction_id);
 
-ALTER TABLE administrative.lease_condition_for_rrr ADD CONSTRAINT lease_condition_for_rrr_lease_condition_code_fk130 
-            FOREIGN KEY (lease_condition_code) REFERENCES administrative.lease_condition(code) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX lease_condition_for_rrr_lease_condition_code_fk130_ind ON administrative.lease_condition_for_rrr (lease_condition_code);
+ALTER TABLE administrative.condition_for_rrr ADD CONSTRAINT condition_for_rrr_condition_code_fk130 
+            FOREIGN KEY (condition_code) REFERENCES administrative.condition_type(code) ON UPDATE CASCADE ON DELETE RESTRICT;
+CREATE INDEX condition_for_rrr_condition_code_fk130_ind ON administrative.condition_for_rrr (condition_code);
 
-ALTER TABLE administrative.lease_condition_for_rrr ADD CONSTRAINT lease_condition_for_rrr_rrr_id_fk131 
+ALTER TABLE administrative.condition_for_rrr ADD CONSTRAINT condition_for_rrr_rrr_id_fk131 
             FOREIGN KEY (rrr_id) REFERENCES administrative.rrr(id) ON UPDATE CASCADE ON DELETE Cascade;
-CREATE INDEX lease_condition_for_rrr_rrr_id_fk131_ind ON administrative.lease_condition_for_rrr (rrr_id);
+CREATE INDEX condition_for_rrr_rrr_id_fk131_ind ON administrative.condition_for_rrr (rrr_id);
 
-ALTER TABLE application.application_ba_unit ADD CONSTRAINT application_ba_unit_ba_unit_id_fk132 
-            FOREIGN KEY (ba_unit_id) REFERENCES administrative.ba_unit(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX application_ba_unit_ba_unit_id_fk132_ind ON application.application_ba_unit (ba_unit_id);
+ALTER TABLE application.application_spatial_unit ADD CONSTRAINT application_spatial_unit_spatial_unit_id_fk132 
+            FOREIGN KEY (spatial_unit_id) REFERENCES cadastre.cadastre_object(id) ON UPDATE CASCADE ON DELETE CASCADE;
+CREATE INDEX application_spatial_unit_spatial_unit_id_fk132_ind ON application.application_spatial_unit (spatial_unit_id);
 
-ALTER TABLE application.application_ba_unit ADD CONSTRAINT application_ba_unit_application_id_fk133 
-            FOREIGN KEY (application_id) REFERENCES application.application(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX application_ba_unit_application_id_fk133_ind ON application.application_ba_unit (application_id);
-
-ALTER TABLE application.application_spatial_unit ADD CONSTRAINT application_spatial_unit_spatial_unit_id_fk134 
-            FOREIGN KEY (spatial_unit_id) REFERENCES cadastre.cadastre_object(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX application_spatial_unit_spatial_unit_id_fk134_ind ON application.application_spatial_unit (spatial_unit_id);
-
-ALTER TABLE application.application_spatial_unit ADD CONSTRAINT application_spatial_unit_application_id_fk135 
-            FOREIGN KEY (application_id) REFERENCES application.application(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX application_spatial_unit_application_id_fk135_ind ON application.application_spatial_unit (application_id);
-
-ALTER TABLE application.application_spatial_unit ADD CONSTRAINT application_spatial_unit_land_use_code_fk136 
-            FOREIGN KEY (land_use_code) REFERENCES cadastre.land_use_type(code) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX application_spatial_unit_land_use_code_fk136_ind ON application.application_spatial_unit (land_use_code);
-
-ALTER TABLE application.application_spatial_unit ADD CONSTRAINT application_spatial_unit_cadastre_object_type_code_fk137 
-            FOREIGN KEY (cadastre_object_type_code) REFERENCES cadastre.cadastre_object_type(code) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX application_spatial_unit_cadastre_object_type_code_fk137_ind ON application.application_spatial_unit (cadastre_object_type_code);
-
-ALTER TABLE application.application_spatial_unit ADD CONSTRAINT application_spatial_unit_address_id_fk138 
-            FOREIGN KEY (address_id) REFERENCES address.address(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX application_spatial_unit_address_id_fk138_ind ON application.application_spatial_unit (address_id);
+ALTER TABLE application.application_spatial_unit ADD CONSTRAINT application_spatial_unit_application_id_fk133 
+            FOREIGN KEY (application_id) REFERENCES application.application(id) ON UPDATE CASCADE ON DELETE CASCADE;
+CREATE INDEX application_spatial_unit_application_id_fk133_ind ON application.application_spatial_unit (application_id);
 --Generate triggers for tables --
 -- triggers for table source.source -- 
 
