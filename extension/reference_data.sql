@@ -96,6 +96,20 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
     VALUES ('mortgageDocument','registrationServices','Register Document Affecting a Mortgage::::TONGAN','c',5,2.00,0.00,0.00,0,
 	'Register document','mortgage','vary','Register document affecting a Mortgage');
 	
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('correctRegistry','registrationServices','Correct Registry::::TONGAN','c',1,2.00,0.00,0.00,0,
+	'Registry Correction', null, null, 'Allows corrections to the registered information to be made.');
+	
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description)
+    VALUES ('correctRegistryRem','registrationServices','Correct Registry (Remove Right)::::TONGAN','c',1,2.00,0.00,0.00,0,
+	'Registry Correction', null, null, 'Allows corrections to the registered information to be made by removing rights.');
+	
 UPDATE 	application.request_type 
 SET 	display_value = 'Register Lease::::TONGAN',
 		status = 'c',
