@@ -176,22 +176,32 @@ CREATE INDEX service_checklist_item_historic_index_on_rowidentifier
 -- has been performed (e.g. Site Inspection is complete, Survey is done, Deed Drafting is
 -- complete, etc). Extend the size of action_notes so that it can contain user
 -- entered data. 
+-- Also Add columns to the service table to capture Date of Approval and
+-- Approval Number for the Cabinet Submission service.
 ALTER TABLE application.service
 DROP COLUMN IF EXISTS action_date, 
-DROP COLUMN IF EXISTS action_completed;
+DROP COLUMN IF EXISTS action_completed,
+DROP COLUMN IF EXISTS approval_date, 
+DROP COLUMN IF EXISTS approval_number;
 
 ALTER TABLE application.service
 ADD action_date timestamp without time zone, 
 ADD action_completed boolean NOT NULL DEFAULT FALSE,
+ADD approval_date timestamp without time zone, 
+ADD approval_number VARCHAR(40),
 ALTER COLUMN action_notes TYPE VARCHAR(4000);
 
 ALTER TABLE application.service_historic
 DROP COLUMN IF EXISTS action_date, 
-DROP COLUMN IF EXISTS action_completed;
+DROP COLUMN IF EXISTS action_completed,
+DROP COLUMN IF EXISTS approval_date, 
+DROP COLUMN IF EXISTS approval_number;
 
 ALTER TABLE application.service_historic
 ADD action_date timestamp without time zone, 
 ADD action_completed boolean NOT NULL DEFAULT FALSE,
+ADD approval_date timestamp without time zone, 
+ADD approval_number VARCHAR(40),
 ALTER COLUMN action_notes TYPE VARCHAR(4000);
 
 -- Add columns to capture new lease application details
@@ -202,9 +212,13 @@ DROP COLUMN IF EXISTS lease_term,
 DROP COLUMN IF EXISTS amount,
 DROP COLUMN IF EXISTS registration_date,
 DROP COLUMN IF EXISTS lessor_name,
-DROP COLUMN IF EXISTS district,
-DROP COLUMN IF EXISTS noble_estate,
-DROP COLUMN IF EXISTS description;
+DROP COLUMN IF EXISTS island_id,
+DROP COLUMN IF EXISTS noble_estate_id,
+DROP COLUMN IF EXISTS description,
+DROP COLUMN IF EXISTS town_id,
+DROP COLUMN IF EXISTS lease_ba_unit_id,
+DROP COLUMN IF EXISTS lessee_name,
+DROP COLUMN IF EXISTS lease_linked;
 
 ALTER TABLE application.application_property
 ALTER COLUMN name_firstpart  DROP NOT NULL,
@@ -214,14 +228,18 @@ ALTER TABLE application.application_property
 ALTER COLUMN name_firstpart TYPE VARCHAR(50),
 ALTER COLUMN name_lastpart TYPE VARCHAR(50),
 ADD lease_number VARCHAR(40),
-ADD lease_area NUMERIC(20,2) NOT NULL DEFAULT 0, 
-ADD lease_term NUMERIC(20,2) NOT NULL DEFAULT 0,
-ADD amount NUMERIC(20,2) NOT NULL DEFAULT 0,
+ADD lease_area NUMERIC(20,2), 
+ADD lease_term NUMERIC(8,2),
+ADD amount NUMERIC(20,2),
 ADD registration_date timestamp without time zone,
 ADD lessor_name VARCHAR(255),
-ADD district VARCHAR(40),
-ADD noble_estate VARCHAR(40),
-ADD description VARCHAR(1000);
+ADD island_id VARCHAR(40),
+ADD noble_estate_id VARCHAR(40),
+ADD description VARCHAR(1000),
+ADD town_id VARCHAR(40),
+ADD lease_ba_unit_id VARCHAR(40),
+ADD lessee_name VARCHAR(255),
+ADD lease_linked BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE application.application_property_historic
 DROP COLUMN IF EXISTS lease_number,
@@ -230,22 +248,30 @@ DROP COLUMN IF EXISTS lease_term,
 DROP COLUMN IF EXISTS amount,
 DROP COLUMN IF EXISTS registration_date,
 DROP COLUMN IF EXISTS lessor_name,
-DROP COLUMN IF EXISTS district,
-DROP COLUMN IF EXISTS noble_estate,
-DROP COLUMN IF EXISTS description;
+DROP COLUMN IF EXISTS island_id,
+DROP COLUMN IF EXISTS noble_estate_id,
+DROP COLUMN IF EXISTS description,
+DROP COLUMN IF EXISTS town_id,
+DROP COLUMN IF EXISTS lease_ba_unit_id,
+DROP COLUMN IF EXISTS lessee_name,
+DROP COLUMN IF EXISTS lease_linked;
 
 ALTER TABLE application.application_property_historic
 ALTER COLUMN name_firstpart TYPE VARCHAR(50),
 ALTER COLUMN name_lastpart TYPE VARCHAR(50),
 ADD lease_number VARCHAR(40),
 ADD lease_area NUMERIC(20,2), 
-ADD lease_term NUMERIC(20,2) ,
+ADD lease_term NUMERIC(8,2) ,
 ADD amount NUMERIC(20,2),
 ADD registration_date timestamp without time zone,
 ADD lessor_name VARCHAR(255),
-ADD district VARCHAR(40),
-ADD noble_estate VARCHAR(40),
-ADD description VARCHAR(1000);
+ADD island_id VARCHAR(40),
+ADD noble_estate_id VARCHAR(40),
+ADD description VARCHAR(1000),
+ADD town_id VARCHAR(40),
+ADD lease_ba_unit_id VARCHAR(40),
+ADD lessee_name VARCHAR(255),
+ADD lease_linked BOOLEAN;
 
 
 -- Replace the application.get_concatenated_name function as this does not work properly. It lists the
@@ -400,63 +426,27 @@ DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
 DROP COLUMN IF EXISTS book_ref,
 DROP COLUMN IF EXISTS page_ref,
-DROP COLUMN IF EXISTS mortgage_term;
+DROP COLUMN IF EXISTS term;
 
 ALTER TABLE administrative.rrr
 ADD receipt_date timestamp without time zone,
 ADD receipt_reference character varying(255),
 ADD book_ref character varying(20),
 ADD page_ref character varying(20),
-ADD mortgage_term NUMERIC(8,2);
+ADD term NUMERIC(8,2);
 
 ALTER TABLE administrative.rrr_historic
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
 DROP COLUMN IF EXISTS book_ref,
 DROP COLUMN IF EXISTS page_ref,
-DROP COLUMN IF EXISTS mortgage_term;
+DROP COLUMN IF EXISTS term;
 
 ALTER TABLE administrative.rrr_historic
 ADD receipt_date timestamp without time zone,
 ADD receipt_reference character varying(255),
 ADD book_ref character varying(20),
 ADD page_ref character varying(20),
-ADD mortgage_term NUMERIC(8,2);
-
--- Add columns to the service table to capture Date of Approval and
--- Approval Number for the Cabinet Submission service.
-ALTER TABLE application.service
-DROP COLUMN IF EXISTS approval_date, 
-DROP COLUMN IF EXISTS approval_number;
-
-ALTER TABLE application.service
-ADD approval_date timestamp without time zone, 
-ADD approval_number character varying(40);
-
-ALTER TABLE application.service_historic
-DROP COLUMN IF EXISTS approval_date, 
-DROP COLUMN IF EXISTS approval_number;
-
-ALTER TABLE application.service_historic
-ADD approval_date timestamp without time zone, 
-ADD approval_number character varying(40);
-
--- Add 'town' column to the application.application_property table to hold the town/location link.
--- Reduce 'district' and 'noble_estate' fields from varchar(100) to varchar(40)
-ALTER TABLE application.application_property
-DROP COLUMN IF EXISTS town;
-
-ALTER TABLE application.application_property
-ADD town character varying(40),
-ALTER COLUMN district TYPE VARCHAR(40),
-ALTER COLUMN noble_estate TYPE VARCHAR(40);
-
-ALTER TABLE application.application_property_historic
-DROP COLUMN IF EXISTS town;
-
-ALTER TABLE application.application_property_historic
-ADD town character varying(40),
-ALTER COLUMN district TYPE VARCHAR(40),
-ALTER COLUMN noble_estate TYPE VARCHAR(40);
+ADD term NUMERIC(8,2);
 
 

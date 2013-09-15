@@ -124,7 +124,7 @@ SET status = CASE WHEN dateof_discharge > '01 JAN 1900' THEN 'h'
 -- *** Create the Mortgage RRRs for the leases
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
 transaction_id, registration_date, amount, receipt_reference, receipt_date,
-mortgage_interest_rate, mortgage_term, book_ref, page_ref, change_user, expiration_date)
+mortgage_interest_rate, term, book_ref, page_ref, change_user, expiration_date)
 SELECT m.sola_rrr_id, l.sola_ba_unit_id, m.mortgage_number, 'mortgage', 
 CASE WHEN status = 'h' THEN 'historic' WHEN status = 'p' THEN 'previous' ELSE 'current' END, 
 'migration', m.mortgage_reg_date, mort_amount, 
@@ -146,7 +146,7 @@ AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = m.sola_rrr_id);
 -- *** Create the Mortgage RRRs for the deeds
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
 transaction_id, registration_date, amount, receipt_reference, receipt_date, 
-mortgage_interest_rate, mortgage_term, book_ref, page_ref, change_user, expiration_date)
+mortgage_interest_rate, term, book_ref, page_ref, change_user, expiration_date)
 SELECT m.sola_rrr_id, d.sola_ba_unit_id, m.mortgage_number, 'mortgage', 
 CASE WHEN m.status = 'h' THEN 'historic' WHEN m.status = 'p' THEN 'previous' ELSE 'current' END,  
 'migration', m.mortgage_reg_date, m.mort_amount, 
@@ -210,7 +210,7 @@ AND COALESCE(mortgage_bank, 'TDB') IN ('TDB', 'ANZ', 'GOV', 'WBOT', 'MBF', 'NRB'
 -- *** Create Mortgage Variation Records
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
 transaction_id, registration_date, amount, receipt_reference, receipt_date, 
-mortgage_interest_rate, mortgage_term, book_ref, page_ref, change_user, expiration_date)
+mortgage_interest_rate, term, book_ref, page_ref, change_user, expiration_date)
 SELECT rmv.sola_rrr_id, rmv.sola_ba_unit_id, mv.mortgage_variation_num, 'mortgage', 
 CASE WHEN mv.status = 'h' THEN 'historic' WHEN mv.status = 'p' THEN 'previous' ELSE 'current' END,  
 'migration', mv.mortgage_variation_date, mv.mort_amount, 
