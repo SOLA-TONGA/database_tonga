@@ -99,6 +99,9 @@ echo Loading source schema... >> build.log 2>&1
 echo Loading transaction schema...
 echo Loading transaction schema... >> build.log 2>&1
 %psql_path% --host=%host% --port=5432 --username=%username% --dbname=%dbname% --file=%testDataPath%transaction.sql >NUL 2>>build.log
+echo Loading Noble Estates...
+echo Loading Noble Estates... >> build.log 2>&1
+%psql_path% --host=%host% --port=5432 --username=%username% --dbname=%dbname% --file=%extensionPath%noble_estates.sql >NUL 2>> build.log
 echo Applying data fixes...
 echo Applying data fixes... >> build.log 2>&1
 %psql_path% --host=%host% --port=5432 --username=%username% --dbname=%dbname% --file=%testDataPath%data-fixes.sql >> build.log 2>&1

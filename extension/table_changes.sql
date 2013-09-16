@@ -222,7 +222,8 @@ DROP COLUMN IF EXISTS lease_linked;
 
 ALTER TABLE application.application_property
 ALTER COLUMN name_firstpart  DROP NOT NULL,
-ALTER COLUMN name_lastpart DROP NOT NULL;
+ALTER COLUMN name_lastpart DROP NOT NULL,
+ALTER COLUMN area DROP NOT NULL;
 
 ALTER TABLE application.application_property
 ALTER COLUMN name_firstpart TYPE VARCHAR(50),

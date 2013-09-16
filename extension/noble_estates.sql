@@ -1974,3 +1974,710 @@ INSERT INTO administrative.ba_unit (id, name_firstpart, name_lastpart, name, typ
   INSERT INTO administrative.party_for_rrr (rrr_id, share_id, party_id)
   SELECT 'b1a0f932-e850-11e2-a88c-3b374f2c2f64', '0cfe0ae4-e852-11e2-8cbb-b32dedff0db2', 'veikune'
   WHERE NOT EXISTS (SELECT rrr_id FROM administrative.party_for_rrr WHERE rrr_id = 'b1a0f932-e850-11e2-a88c-3b374f2c2f64'); 
+
+-- Link the estates to the appropriate island
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19dc4d8-e850-11e2-93d0-23a84b74397c', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19dc4d8-e850-11e2-93d0-23a84b74397c'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b18692fe-e850-11e2-8b35-47d2539e612c', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18692fe-e850-11e2-8b35-47d2539e612c'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b170729e-e850-11e2-9e7a-73dc97c0c993', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b170729e-e850-11e2-9e7a-73dc97c0c993'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b195604a-e850-11e2-a047-ff44e5446d0f', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b195604a-e850-11e2-a047-ff44e5446d0f'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1849724-e850-11e2-8f85-07c3cf7a062e', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1849724-e850-11e2-8f85-07c3cf7a062e'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b16b908a-e850-11e2-a12c-e326e22db953', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16b908a-e850-11e2-a12c-e326e22db953'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b16a580a-e850-11e2-9e71-abdcdbfbbdfc', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16a580a-e850-11e2-9e71-abdcdbfbbdfc'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b16f8834-e850-11e2-b317-23c1ff6676bb', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16f8834-e850-11e2-b317-23c1ff6676bb'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b16b1b5a-e850-11e2-bf0e-e720a05329f2', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16b1b5a-e850-11e2-bf0e-e720a05329f2'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b18d49dc-e850-11e2-afe6-43668f03eb37', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18d49dc-e850-11e2-afe6-43668f03eb37'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1666056-e850-11e2-86d8-8b6f3a4f23b2', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1666056-e850-11e2-86d8-8b6f3a4f23b2'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19c3e2e-e850-11e2-8568-5f53f07eca11', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19c3e2e-e850-11e2-8568-5f53f07eca11'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b18c3862-e850-11e2-a00c-07105db7f1dc', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18c3862-e850-11e2-a00c-07105db7f1dc'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b1685c30-e850-11e2-b203-0b711d2d0e0d', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1685c30-e850-11e2-b203-0b711d2d0e0d'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b16f1304-e850-11e2-a5c9-23dcf1760afa', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16f1304-e850-11e2-a5c9-23dcf1760afa'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b168d160-e850-11e2-8d91-ff477ebf20a5', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b168d160-e850-11e2-8d91-ff477ebf20a5'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1a0d222-e850-11e2-865d-a7843c836fec', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1a0d222-e850-11e2-865d-a7843c836fec'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18162ca-e850-11e2-9dd5-6b4c94d95359', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18162ca-e850-11e2-9dd5-6b4c94d95359'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b16e28a4-e850-11e2-8eac-831d0b90fe9b', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16e28a4-e850-11e2-8eac-831d0b90fe9b'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b187cb88-e850-11e2-a6b2-af54fd4bbe24', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b187cb88-e850-11e2-a6b2-af54fd4bbe24'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b187564e-e850-11e2-b7b3-074f51f352b3', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b187564e-e850-11e2-b7b3-074f51f352b3'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b17b6f46-e850-11e2-8c0a-b78042ea039f', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17b6f46-e850-11e2-8c0a-b78042ea039f'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b1922be6-e850-11e2-b7cb-6b8ce5353984', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1922be6-e850-11e2-b7cb-6b8ce5353984'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18e825c-e850-11e2-baa5-0706d2506646', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18e825c-e850-11e2-baa5-0706d2506646'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1770262-e850-11e2-ad70-b31e3c6fccfe', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1770262-e850-11e2-ad70-b31e3c6fccfe'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19b53ce-e850-11e2-9d95-8f405e012299', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19b53ce-e850-11e2-9d95-8f405e012299'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1850c5e-e850-11e2-ac95-df9f1dbae58d', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1850c5e-e850-11e2-ac95-df9f1dbae58d'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1799a7c-e850-11e2-8555-d7df5f740174', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1799a7c-e850-11e2-8555-d7df5f740174'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b196239a-e850-11e2-9a54-73fed59cc83b', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b196239a-e850-11e2-9a54-73fed59cc83b'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b195ae6a-e850-11e2-9604-5bfa242e5036', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b195ae6a-e850-11e2-9604-5bfa242e5036'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b19a1b44-e850-11e2-a362-dffd121eb8ab', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19a1b44-e850-11e2-a362-dffd121eb8ab'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b16ca1fa-e850-11e2-b6ae-4b8fd975ce70', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16ca1fa-e850-11e2-b6ae-4b8fd975ce70'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1a05cf2-e850-11e2-b1f9-1bc47f412fe2', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1a05cf2-e850-11e2-b1f9-1bc47f412fe2'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b161cc62-e850-11e2-8c46-df5e0b296866', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b161cc62-e850-11e2-8c46-df5e0b296866'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18ef78c-e850-11e2-9d7e-176f4a5a5e2b', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18ef78c-e850-11e2-9d7e-176f4a5a5e2b'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19475e0-e850-11e2-a6c4-331a33518030', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19475e0-e850-11e2-a6c4-331a33518030'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b194eb1a-e850-11e2-9f78-8b3f2486d2d2', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b194eb1a-e850-11e2-9f78-8b3f2486d2d2'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b190f366-e850-11e2-96c3-4be474d09f54', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b190f366-e850-11e2-96c3-4be474d09f54'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b191b6b6-e850-11e2-8535-bf3d8e3c4d4e', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b191b6b6-e850-11e2-8535-bf3d8e3c4d4e'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b162dddc-e850-11e2-a17a-7776c68ce54f', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b162dddc-e850-11e2-a17a-7776c68ce54f'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b173ce08-e850-11e2-89a9-838e66cbc3f4', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b173ce08-e850-11e2-89a9-838e66cbc3f4'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b180ed9a-e850-11e2-95b5-aba2cf8a3519', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b180ed9a-e850-11e2-95b5-aba2cf8a3519'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1696da0-e850-11e2-888f-ab297ecf4aa0', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1696da0-e850-11e2-888f-ab297ecf4aa0'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19a907e-e850-11e2-87a1-ef68e931fda4', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19a907e-e850-11e2-87a1-ef68e931fda4'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b17d9230-e850-11e2-841c-3bd4f0435642', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17d9230-e850-11e2-841c-3bd4f0435642'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b186e11e-e850-11e2-8c25-a3710aa49735', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b186e11e-e850-11e2-8c25-a3710aa49735'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18e343c-e850-11e2-ae90-23648743b9ee', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18e343c-e850-11e2-ae90-23648743b9ee'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'eua', 'b18bc332-e850-11e2-b2ae-e78363bd2ca5', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18bc332-e850-11e2-b2ae-e78363bd2ca5'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19ade9e-e850-11e2-984d-878721971a2d', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19ade9e-e850-11e2-984d-878721971a2d'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b16db374-e850-11e2-8cc1-17687e9cdf89', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16db374-e850-11e2-8cc1-17687e9cdf89'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b17e5580-e850-11e2-891b-a3e0512dd61e', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17e5580-e850-11e2-891b-a3e0512dd61e'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19e12f8-e850-11e2-aa74-b742f68292d0', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19e12f8-e850-11e2-aa74-b742f68292d0'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b18819a8-e850-11e2-81f3-5f8661f364c9', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18819a8-e850-11e2-81f3-5f8661f364c9'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b181d7fa-e850-11e2-a544-379cbe0eeca3', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b181d7fa-e850-11e2-a544-379cbe0eeca3'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19fe7c2-e850-11e2-a33a-e36d506e4e17', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19fe7c2-e850-11e2-a33a-e36d506e4e17'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b16575f6-e850-11e2-81c8-c369f8a66734', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16575f6-e850-11e2-81c8-c369f8a66734'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1829b54-e850-11e2-811c-0f32f14c0e7e', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1829b54-e850-11e2-811c-0f32f14c0e7e'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b174b868-e850-11e2-9bcf-03b950868168', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b174b868-e850-11e2-9bcf-03b950868168'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'eua', 'b17813dc-e850-11e2-8fc4-7774f2dbf8c1', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17813dc-e850-11e2-8fc4-7774f2dbf8c1'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1761802-e850-11e2-9bef-e3cceadee359', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1761802-e850-11e2-9bef-e3cceadee359'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1752da2-e850-11e2-b79d-a315bfbeed27', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1752da2-e850-11e2-b79d-a315bfbeed27'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b175a2d2-e850-11e2-865d-1713a06c14f2', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b175a2d2-e850-11e2-865d-1713a06c14f2'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1768d32-e850-11e2-92ba-2708742450d5', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1768d32-e850-11e2-92ba-2708742450d5'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b17358d8-e850-11e2-bb28-9b9083583716', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17358d8-e850-11e2-bb28-9b9083583716'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b16d3e44-e850-11e2-8de4-670ef70a4b88', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16d3e44-e850-11e2-8de4-670ef70a4b88'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'eua', 'b1724768-e850-11e2-aa58-4f6e66cebef0', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1724768-e850-11e2-aa58-4f6e66cebef0'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19f2468-e850-11e2-8b1b-730b51aa0027', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19f2468-e850-11e2-8b1b-730b51aa0027'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19f99a2-e850-11e2-be04-d3abcbed3915', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19f99a2-e850-11e2-be04-d3abcbed3915'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19d0188-e850-11e2-b255-77e0fc61cf00', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19d0188-e850-11e2-b255-77e0fc61cf00'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b182e974-e850-11e2-b1a3-774a14aa37fa', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b182e974-e850-11e2-b1a3-774a14aa37fa'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b16e9dd4-e850-11e2-8c5b-db49f7b7fa28', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16e9dd4-e850-11e2-8c5b-db49f7b7fa28'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b16ffd6e-e850-11e2-a688-3743cb7d0b4b', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16ffd6e-e850-11e2-a688-3743cb7d0b4b'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b18cfbbc-e850-11e2-8d70-9f9599fa7603', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18cfbbc-e850-11e2-8d70-9f9599fa7603'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b18dbf0c-e850-11e2-a419-2f9d2dd8d9ef', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18dbf0c-e850-11e2-a419-2f9d2dd8d9ef'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b17b2126-e850-11e2-84d1-bf10c478e0c9', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17b2126-e850-11e2-84d1-bf10c478e0c9'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18affe2-e850-11e2-b1a1-27a94ae94b66', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18affe2-e850-11e2-b1a1-27a94ae94b66'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b18421f4-e850-11e2-8614-6b643ca4a922', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18421f4-e850-11e2-8614-6b643ca4a922'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b179254c-e850-11e2-a6cc-7b7b1923a507', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b179254c-e850-11e2-a6cc-7b7b1923a507'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b18c8682-e850-11e2-ab2d-9bc85c57f80e', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18c8682-e850-11e2-ab2d-9bc85c57f80e'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b197d154-e850-11e2-b140-9f4b13675f32', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b197d154-e850-11e2-b140-9f4b13675f32'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1970dfa-e850-11e2-ba5c-a3790a42bebb', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1970dfa-e850-11e2-ba5c-a3790a42bebb'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19d4fa8-e850-11e2-ac34-e32eb2efbefb', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19d4fa8-e850-11e2-ac34-e32eb2efbefb'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b190a546-e850-11e2-b960-db9667e74f63', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b190a546-e850-11e2-b960-db9667e74f63'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1674ab6-e850-11e2-9add-3bff938b2db8', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1674ab6-e850-11e2-9add-3bff938b2db8'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1981f74-e850-11e2-9f8f-cff842d26648', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1981f74-e850-11e2-9f8f-cff842d26648'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19894a4-e850-11e2-9e5f-4b29e28b351d', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19894a4-e850-11e2-9e5f-4b29e28b351d'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19957f4-e850-11e2-86ad-0f99b2642c30', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19957f4-e850-11e2-86ad-0f99b2642c30'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19909d4-e850-11e2-a83e-7f8a587554b9', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19909d4-e850-11e2-a83e-7f8a587554b9'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18fbae6-e850-11e2-9dda-fbcac9dc6cb9', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18fbae6-e850-11e2-9dda-fbcac9dc6cb9'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b17aabf6-e850-11e2-8373-a7f839ad2035', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17aabf6-e850-11e2-8373-a7f839ad2035'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b199cd24-e850-11e2-9adc-b7c64564068c', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b199cd24-e850-11e2-9adc-b7c64564068c'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b167e700-e850-11e2-bb6e-834c02b2024e', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b167e700-e850-11e2-bb6e-834c02b2024e'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'eua', 'b172bc98-e850-11e2-bd8d-fbd967a6b845', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b172bc98-e850-11e2-bd8d-fbd967a6b845'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'eua', 'b1715cfe-e850-11e2-8372-07c3c3026b2f', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1715cfe-e850-11e2-8372-07c3c3026b2f'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'eua', 'b171d22e-e850-11e2-88b2-03da922f2aa9', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b171d22e-e850-11e2-88b2-03da922f2aa9'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1855a7e-e850-11e2-9472-2b20bd0e1bcf', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1855a7e-e850-11e2-9472-2b20bd0e1bcf'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18b4e02-e850-11e2-bd59-4fd33729d1a7', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18b4e02-e850-11e2-bd59-4fd33729d1a7'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19698ca-e850-11e2-9c91-cf98d5596ea4', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19698ca-e850-11e2-9c91-cf98d5596ea4'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b192ef40-e850-11e2-ad36-8317711b8869', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b192ef40-e850-11e2-ad36-8317711b8869'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1936470-e850-11e2-8a1a-775e8b2cb24c', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1936470-e850-11e2-8a1a-775e8b2cb24c'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b16c2cca-e850-11e2-bc6a-d7a6d12eeaac', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b16c2cca-e850-11e2-bc6a-d7a6d12eeaac'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19e8828-e850-11e2-ab53-abe884afe65f', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19e8828-e850-11e2-ab53-abe884afe65f'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'eua', 'b19c8c4e-e850-11e2-acbc-27823ec003c9', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19c8c4e-e850-11e2-acbc-27823ec003c9'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b189c758-e850-11e2-9990-4f0e3cc3158f', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b189c758-e850-11e2-9990-4f0e3cc3158f'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18a8ab2-e850-11e2-9e9e-1711c0b59a00', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18a8ab2-e850-11e2-9e9e-1711c0b59a00'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b183d3d4-e850-11e2-872b-6f6a4c16e1c3', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b183d3d4-e850-11e2-872b-6f6a4c16e1c3'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b185cfae-e850-11e2-8054-43f35879b747', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b185cfae-e850-11e2-8054-43f35879b747'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b17a36c6-e850-11e2-a053-f3a3bcf2a2aa', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17a36c6-e850-11e2-a053-f3a3bcf2a2aa'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b19427c0-e850-11e2-9f25-cb59af6f40c8', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19427c0-e850-11e2-9f25-cb59af6f40c8'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1895228-e850-11e2-9cdb-df0fdeb7bed3', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1895228-e850-11e2-9cdb-df0fdeb7bed3'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b182261a-e850-11e2-bd82-133e4ee8b1e2', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b182261a-e850-11e2-bd82-133e4ee8b1e2'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b169e2d0-e850-11e2-adba-a331f2c41378', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b169e2d0-e850-11e2-adba-a331f2c41378'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18f45ac-e850-11e2-949e-e7346c062269', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18f45ac-e850-11e2-949e-e7346c062269'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1835ea4-e850-11e2-abb0-5bc0ddf54ebf', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1835ea4-e850-11e2-abb0-5bc0ddf54ebf'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19bc8fe-e850-11e2-8798-5b8015733a0f', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19bc8fe-e850-11e2-8798-5b8015733a0f'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1779eac-e850-11e2-a07d-d7433865ce31', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1779eac-e850-11e2-a07d-d7433865ce31'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b17f18d0-e850-11e2-85d1-b733c3a1177e', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17f18d0-e850-11e2-85d1-b733c3a1177e'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b178b01c-e850-11e2-9de3-e3fe2eb9eff6', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b178b01c-e850-11e2-9de3-e3fe2eb9eff6'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b19ed648-e850-11e2-b0cb-73e3bab3fefd', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b19ed648-e850-11e2-b0cb-73e3bab3fefd'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b192a120-e850-11e2-8cee-336b9369dc29', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b192a120-e850-11e2-8cee-336b9369dc29'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1888ed8-e850-11e2-9f32-03aa292b7798', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1888ed8-e850-11e2-9f32-03aa292b7798'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b170e7ce-e850-11e2-8a7b-47182afd1e2d', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b170e7ce-e850-11e2-8a7b-47182afd1e2d'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b18a1578-e850-11e2-b559-638cb5d07001', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b18a1578-e850-11e2-b559-638cb5d07001'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1648b8c-e850-11e2-aba9-cfc749df2745', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1648b8c-e850-11e2-aba9-cfc749df2745'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b17ea3a0-e850-11e2-a024-030ae55c5ab0', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17ea3a0-e850-11e2-a024-030ae55c5ab0'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b180786a-e850-11e2-8f12-fb00b87645db', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b180786a-e850-11e2-8f12-fb00b87645db'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b17be476-e850-11e2-b6c0-37cb9500e610', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17be476-e850-11e2-b6c0-37cb9500e610'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b17f8e0a-e850-11e2-a602-cb1157ff2099', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17f8e0a-e850-11e2-a602-cb1157ff2099'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b17c59a6-e850-11e2-b0af-6706aaacb376', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17c59a6-e850-11e2-b0af-6706aaacb376'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1744338-e850-11e2-8482-13d265211e16', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1744338-e850-11e2-8482-13d265211e16'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1861dce-e850-11e2-8350-db1059f95ff3', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1861dce-e850-11e2-8350-db1059f95ff3'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1903016-e850-11e2-b3da-c3b9f55056f9', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1903016-e850-11e2-b3da-c3b9f55056f9'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'haapai', 'b180033a-e850-11e2-9d78-eb395fe07498', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b180033a-e850-11e2-9d78-eb395fe07498'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b163c83c-e850-11e2-8649-bf3de5ab87ba', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b163c83c-e850-11e2-8649-bf3de5ab87ba'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1916896-e850-11e2-b9a5-53c10d342cb1', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1916896-e850-11e2-b9a5-53c10d342cb1'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b17ca7c6-e850-11e2-b0e7-1f552caf5ae5', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17ca7c6-e850-11e2-b0e7-1f552caf5ae5'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b17d1d00-e850-11e2-b8eb-97969a11e2b5', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17d1d00-e850-11e2-b8eb-97969a11e2b5'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'niuatoputapu', 'b17de050-e850-11e2-8a2e-4b81872d36c2', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b17de050-e850-11e2-8a2e-4b81872d36c2'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'tongatapu', 'b1975c1a-e850-11e2-bfa4-0b5d3351639c', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1975c1a-e850-11e2-bfa4-0b5d3351639c'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b193b290-e850-11e2-aded-2b2fb15b3ae6', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b193b290-e850-11e2-aded-2b2fb15b3ae6'
+					AND   relation_code = 'island');
+INSERT INTO administrative.required_relationship_baunit (from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
+  SELECT 'vavau', 'b1890408-e850-11e2-8535-4b6c46932235', 'island', 'migration'
+  WHERE NOT EXISTS (SELECT to_ba_unit_id FROM administrative.required_relationship_baunit 
+                    WHERE to_ba_unit_id = 'b1890408-e850-11e2-8535-4b6c46932235'
+					AND   relation_code = 'island');
