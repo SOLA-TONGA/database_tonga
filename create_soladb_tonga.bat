@@ -63,6 +63,7 @@ echo Loading Tonga Business Rules... >> build.log 2>&1
 echo Loading User Roles... >> build.log 2>&1
 %psql_path% --host=%host% --port=5432 --username=%username% --dbname=%dbname% --file=%extensionPath%user_roles.sql >> build.log 2>&1
 
+
 echo Extracting Tonga data files...
 echo Extracting Tonga data files... >> build.log 2>&1
 %utilitiesPath%\7z.exe e -y -o%testDataPath% %testDataPath%tongaDev.7z >> build.log 2>&1

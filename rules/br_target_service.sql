@@ -82,7 +82,7 @@ values('mortgage-value-check', 'sql', 'For the Register Mortgage service, the ne
 
 insert into system.br_definition(br_id, active_from, active_until, body) 
 values('mortgage-value-check', now(), 'infinity', 
-'SELECT (ap.total_value < rrr.mortgage_amount) AS vl 
+'SELECT (ap.total_value < rrr.amount) AS vl 
   from application.service s inner join application.application_property ap on s.application_id = ap.application_id 
  INNER JOIN administrative.ba_unit ba ON (ap.name_firstpart, ap.name_lastpart) = (ba.name_firstpart, ba.name_lastpart)
  INNER JOIN administrative.rrr ON rrr.ba_unit_id = ba.id

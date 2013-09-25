@@ -285,8 +285,7 @@ SET sola_area = NULL
 WHERE sola_area = 0; 
 
 
--- Upload the areas for each BA Unit
-DELETE FROM administrative.ba_unit_area; 
+-- Upload the areas for each BA Unit 
 INSERT INTO administrative.ba_unit_area (id, ba_unit_id, type_code, size, change_user)
 SELECT uuid_generate_v1(), d.sola_ba_unit_id, 'officialArea', l.sola_area, 'migration'
 FROM lease.lease_detail d, lease.lease_location l

@@ -32,7 +32,7 @@ SELECT 'migration', 'approved', now(), 'migration' WHERE NOT EXISTS
 UPDATE lands.nobles SET sola_party_id = LOWER(noble_name); 
 
 -- *** Process Nobles and the King *** 
-INSERT INTO party.party (id, type_code, name, change_user)
+/*INSERT INTO party.party (id, type_code, name, change_user)
 SELECT sola_party_id, 'naturalPerson', noble_name, 'migration'
 FROM lands.nobles
 WHERE NOT EXISTS (SELECT id FROM party.party WHERE sola_party_id = id); 
@@ -40,7 +40,7 @@ WHERE NOT EXISTS (SELECT id FROM party.party WHERE sola_party_id = id);
 INSERT INTO party.party_role (party_id, type_code, change_user)
 SELECT sola_party_id, 'noble', 'migration'
 FROM lands.nobles
-WHERE NOT EXISTS (SELECT id FROM party.party_role WHERE sola_party_id = party_id AND type_code = 'noble'); 
+WHERE NOT EXISTS (SELECT id FROM party.party_role WHERE sola_party_id = party_id AND type_code = 'noble'); */
 
 INSERT INTO party.party (id, type_code, name, change_user)
 SELECT 'king', 'naturalPerson', 'King', 'migration'
