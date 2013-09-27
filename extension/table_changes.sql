@@ -400,28 +400,48 @@ COMMENT ON FUNCTION application.get_concatenated_name(character varying) IS 'Ret
 -- Add new field to the application table to support item number
 -- and new lease registation details
 ALTER TABLE application.application
-DROP COLUMN IF EXISTS item_number,
-DROP COLUMN IF EXISTS location_description,
-DROP COLUMN IF EXISTS purpose;
+DROP COLUMN IF EXISTS item_number;
 
 ALTER TABLE application.application
-ADD item_number character varying(40),
-ADD location_description character varying(255),
-ADD purpose character varying(255);
+ADD item_number character varying(40);
 
 ALTER TABLE application.application_historic
-DROP COLUMN IF EXISTS item_number,
-DROP COLUMN IF EXISTS location_description,
-DROP COLUMN IF EXISTS purpose;
+DROP COLUMN IF EXISTS item_number;
 
 ALTER TABLE application.application_historic
-ADD item_number character varying(40),
-ADD location_description character varying(255),
-ADD purpose character varying(255);
+ADD item_number character varying(40);
 
 -- Add new fields to the RRR table to capture receipt and receipt date 
 -- details as well as the mortgage book / page information. These
 -- details are migrated from the Access Databases. 
+
+-- registered_name = Name provided for the parcel by the allotment holder when
+--                   they register thier new allotment (a.k.a. parcel name)
+-- land_use_code   = Code indicating the purpose for the land. Added to ba_unit
+--                   for Tonga is it is less applicable to the cadastre_object. 
+--                   Note that cadastre_object.land_use_code is not used. 
+ALTER TABLE administrative.ba_unit
+DROP COLUMN IF EXISTS registered_name,
+DROP COLUMN IF EXISTS land_use_code;
+
+ALTER TABLE administrative.ba_unit
+ADD registered_name character varying(255), 
+ADD land_use_code character varying(20) NOT NULL DEFAULT 'residential';
+
+ALTER TABLE administrative.ba_unit_historic
+DROP COLUMN IF EXISTS registered_name,
+DROP COLUMN IF EXISTS land_use_code;
+
+ALTER TABLE administrative.ba_unit_historic
+ADD registered_name character varying(255),
+ADD land_use_code character varying(20);
+
+ALTER TABLE administrative.ba_unit DROP CONSTRAINT IF EXISTS ba_unit_land_use_code_fk;
+ALTER TABLE administrative.ba_unit
+  ADD CONSTRAINT ba_unit_land_use_code_fk FOREIGN KEY (land_use_code)
+      REFERENCES cadastre.land_use_type (code) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT;
+
 ALTER TABLE administrative.rrr
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
