@@ -442,6 +442,11 @@ ALTER TABLE administrative.ba_unit
       REFERENCES cadastre.land_use_type (code) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE RESTRICT;
 
+-- Constraint to add following improvements to the source property data. 	  
+--ALTER TABLE administrative.ba_unit DROP CONSTRAINT IF EXISTS ba_unit_unique_name_parts;	
+--ALTER TABLE administrative.ba_unit
+--  ADD CONSTRAINT ba_unit_unique_name_parts UNIQUE(name_firstpart, name_lastpart);
+
 ALTER TABLE administrative.rrr
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,

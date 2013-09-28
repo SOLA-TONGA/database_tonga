@@ -302,14 +302,16 @@ AND NOT EXISTS (SELECT checklist_item_code FROM application.checklist_item_in_gr
 				
 				
 -- BA Unit Types
-UPDATE administrative.ba_unit_type SET status = 'c'
+UPDATE administrative.ba_unit_type 
+SET status = 'c',
+    display_value = 'Lease'
 WHERE code IN ('leasedUnit'); 
 
 UPDATE administrative.ba_unit_type SET status = 'x'
 WHERE code NOT IN ('leasedUnit'); 
 
 INSERT INTO administrative.ba_unit_type(code, display_value, description, status)
-SELECT 'estateUnit','Noble Estate',NULL,'c'
+SELECT 'estateUnit','Estate',NULL,'c'
 WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'estateUnit');
 
 INSERT INTO administrative.ba_unit_type(code, display_value, description, status)

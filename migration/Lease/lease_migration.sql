@@ -108,9 +108,9 @@ WHERE lease_number in (
 SELECT lease_number from lease.lease_detail GROUP BY lease_number having count(*) > 1);
 
 -- Compare dates to determine current and expire lease.
-INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user)
-SELECT sola_ba_unit_id, lease_for, lease_number, '', 'leasedUnit', 
-	(SELECT (CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END)), 'migration'
+INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user, land_use_code, registered_name)
+SELECT sola_ba_unit_id, lease_number, lease_number, 'Lease', 'leasedUnit', 
+	(SELECT (CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END)), 'migration', >>lease_for, NULL
 FROM lease.lease_detail
 WHERE dup = FALSE;
 

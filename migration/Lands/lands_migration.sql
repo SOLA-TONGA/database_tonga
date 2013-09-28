@@ -85,7 +85,7 @@ WHERE b.name_firstpart = sola_town
 AND b.type_code = 'townUnit'; 
 
 INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user)
-SELECT sola_town_id, sola_town, sola_town, island_name, 'townUnit', 'current', 'migration'
+SELECT sola_town_id, sola_town, sola_town, 'Town', 'townUnit', 'current', 'migration'
 FROM lands.island_township 
 WHERE NOT EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_town_id);
 
