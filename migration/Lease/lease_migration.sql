@@ -108,9 +108,9 @@ WHERE lease_number in (
 SELECT lease_number from lease.lease_detail GROUP BY lease_number having count(*) > 1);
 
 -- Compare dates to determine current and expire lease.
-INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user, land_use_code, registered_name)
+INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user, registered_name)
 SELECT sola_ba_unit_id, lease_number, lease_number, 'Lease', 'leasedUnit', 
-	(SELECT (CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END)), 'migration', >>lease_for, NULL
+	(SELECT (CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END)), 'migration', NULL
 FROM lease.lease_detail
 WHERE dup = FALSE;
 
@@ -155,12 +155,19 @@ transaction_id, registration_date, expiration_date, amount, receipt_reference,
 receipt_date, due_date, change_user)
 SELECT sola_rrr_id, sola_ba_unit_id, lease_number, 'lease', 
 CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END, 
-'t', 'migration', safe_cast(lease_reg_date, null::date), safe_cast(lease_exp_date, null::date), 
+'t', 'migration', safe_cast(lease_reg_date, null::date), safe_cast(lease_exp_date, null::date),  
 safe_cast(lease_rental, null::numeric(29,2)), payment_receipt_number, safe_cast(payment_upto_date, null::date), 
 safe_cast(lease_payment_date, null::date), 'migration'
 FROM lease.lease_detail
 WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
 AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = sola_rrr_id);
+
+-- Calculate the term of the lease in years
+UPDATE administrative.rrr 
+SET term = EXTRACT('year' FROM expiration_date) - EXTRACT('year' FROM registration_date) 
+WHERE registration_date IS NOT NULL
+AND expiration_date IS NOT NULL
+AND type_code = 'lease';
 
 -- Link the Lessee to the lease RRR
 INSERT INTO administrative.party_for_rrr(rrr_id, party_id)

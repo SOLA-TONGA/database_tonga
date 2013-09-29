@@ -47,7 +47,9 @@ sola_area NUMERIC(19,2),
 acre INT,
 rood INT,
 perch NUMERIC(19,2),
-tax_lot BOOLEAN DEFAULT FALSE); 
+tax_lot BOOLEAN DEFAULT FALSE,
+parcel_name VARCHAR(255),
+registry_book_ref VARCHAR(50)); 
 
 CREATE INDEX lands_deed_deed_num
   ON lands.deed

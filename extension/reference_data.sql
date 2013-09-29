@@ -374,3 +374,9 @@ WHERE NOT EXISTS (SELECT code FROM party.party_role_type WHERE code = 'king');
 -- RRR Types
 UPDATE administrative.rrr_type SET status = 'c'
 WHERE code IN ('lifeEstate'); 
+
+
+-- Land Use Codes
+UPDATE cadastre.land_use_type
+SET display_value = 'Residential::::''Api Kolo'
+WHERE code = 'residential';

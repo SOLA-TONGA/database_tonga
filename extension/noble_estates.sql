@@ -1,4 +1,8 @@
 ﻿-- Create the Nobles
+INSERT INTO transaction.transaction(id, status_code, approval_datetime, change_user) 
+SELECT 'migration', 'approved', now(), 'migration' WHERE NOT EXISTS 
+(SELECT id FROM transaction.transaction WHERE id = 'migration');
+
 INSERT INTO party.party (id, type_code, name, change_user)
  SELECT '''ahome''e', 'naturalPerson', '''Ahome''e', 'migration'
  WHERE NOT EXISTS (SELECT id FROM party.party WHERE id = '''ahome''e');

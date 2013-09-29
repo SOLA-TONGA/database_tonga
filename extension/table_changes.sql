@@ -426,7 +426,7 @@ DROP COLUMN IF EXISTS land_use_code;
 
 ALTER TABLE administrative.ba_unit
 ADD registered_name character varying(255), 
-ADD land_use_code character varying(20) NOT NULL DEFAULT 'residential';
+ADD land_use_code character varying(20);
 
 ALTER TABLE administrative.ba_unit_historic
 DROP COLUMN IF EXISTS registered_name,
@@ -450,29 +450,41 @@ ALTER TABLE administrative.ba_unit
 ALTER TABLE administrative.rrr
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
-DROP COLUMN IF EXISTS book_ref,
-DROP COLUMN IF EXISTS page_ref,
+DROP COLUMN IF EXISTS registry_book_ref,
 DROP COLUMN IF EXISTS term;
 
 ALTER TABLE administrative.rrr
 ADD receipt_date timestamp without time zone,
 ADD receipt_reference character varying(255),
-ADD book_ref character varying(20),
-ADD page_ref character varying(20),
+ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2);
 
 ALTER TABLE administrative.rrr_historic
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
-DROP COLUMN IF EXISTS book_ref,
-DROP COLUMN IF EXISTS page_ref,
+DROP COLUMN IF EXISTS registry_book_ref,
 DROP COLUMN IF EXISTS term;
 
 ALTER TABLE administrative.rrr_historic
 ADD receipt_date timestamp without time zone,
 ADD receipt_reference character varying(255),
-ADD book_ref character varying(20),
-ADD page_ref character varying(20),
+ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2);
 
+
+-- Temporary change to the new cadastre_object trigger
+CREATE OR REPLACE FUNCTION cadastre.f_for_tbl_cadastre_object_trg_new()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+  if (select count(*)=0 from cadastre.spatial_unit where id=new.id) then
+    insert into cadastre.spatial_unit(id, rowidentifier, level_id, change_user) 
+    values(new.id, new.rowidentifier, 'lease', new.change_user);
+  end if;
+  return new;
+END;
+
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
 

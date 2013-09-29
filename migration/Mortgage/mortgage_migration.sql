@@ -124,7 +124,7 @@ SET status = CASE WHEN dateof_discharge > '01 JAN 1900' THEN 'h'
 -- *** Create the Mortgage RRRs for the leases
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
 transaction_id, registration_date, amount, receipt_reference, receipt_date,
-mortgage_interest_rate, term, book_ref, page_ref, change_user, expiration_date)
+mortgage_interest_rate, term, registry_book_ref, change_user, expiration_date)
 SELECT m.sola_rrr_id, l.sola_ba_unit_id, m.mortgage_number, 'mortgage', 
 CASE WHEN status = 'h' THEN 'historic' WHEN status = 'p' THEN 'previous' ELSE 'current' END, 
 'migration', m.mortgage_reg_date, mort_amount, 
@@ -132,7 +132,7 @@ COALESCE(m.mortgage_rec_num || ', ' || m.mortgage_disch_rec_num, m.mortgage_rec_
 CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge 
      WHEN m.mortgage_dateof_rec > '01 JAN 1900' THEN  m.mortgage_dateof_rec
 	 ELSE NULL END,
-	 int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , m.mortgage_book, m.mortgage_page, 'migration',
+	 int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , m.mortgage_book || '/' || m.mortgage_page, 'migration',
 CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge ELSE NULL END
 FROM mortgage.mortgage m, lease.lease_detail l
 WHERE m.deed_number = l.lease_number
@@ -146,7 +146,7 @@ AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = m.sola_rrr_id);
 -- *** Create the Mortgage RRRs for the deeds
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
 transaction_id, registration_date, amount, receipt_reference, receipt_date, 
-mortgage_interest_rate, term, book_ref, page_ref, change_user, expiration_date)
+mortgage_interest_rate, term, registry_book_ref, change_user, expiration_date)
 SELECT m.sola_rrr_id, d.sola_ba_unit_id, m.mortgage_number, 'mortgage', 
 CASE WHEN m.status = 'h' THEN 'historic' WHEN m.status = 'p' THEN 'previous' ELSE 'current' END,  
 'migration', m.mortgage_reg_date, m.mort_amount, 
@@ -154,7 +154,7 @@ COALESCE(m.mortgage_rec_num || ', ' || m.mortgage_disch_rec_num, m.mortgage_rec_
 CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge 
      WHEN m.mortgage_dateof_rec > '01 JAN 1900' THEN  m.mortgage_dateof_rec
 	 ELSE NULL END,
-int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , m.mortgage_book, m.mortgage_page, 'migration',
+int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , m.mortgage_book || '/' || m.mortgage_page, 'migration',
 CASE WHEN m.status = 'h' THEN m.mortgage_dateof_discharge ELSE NULL END
 FROM mortgage.mortgage m, lands.deed d
 WHERE m.deed_number = d.deed_num
@@ -210,7 +210,7 @@ AND COALESCE(mortgage_bank, 'TDB') IN ('TDB', 'ANZ', 'GOV', 'WBOT', 'MBF', 'NRB'
 -- *** Create Mortgage Variation Records
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
 transaction_id, registration_date, amount, receipt_reference, receipt_date, 
-mortgage_interest_rate, term, book_ref, page_ref, change_user, expiration_date)
+mortgage_interest_rate, term, registry_book_ref, change_user, expiration_date)
 SELECT rmv.sola_rrr_id, rmv.sola_ba_unit_id, mv.mortgage_variation_num, 'mortgage', 
 CASE WHEN mv.status = 'h' THEN 'historic' WHEN mv.status = 'p' THEN 'previous' ELSE 'current' END,  
 'migration', mv.mortgage_variation_date, mv.mort_amount, 
@@ -218,7 +218,7 @@ COALESCE(mv.stamp_rec || ', ' || mv.receipt_num, mv.stamp_rec),
 CASE WHEN mv.status = 'h' THEN mv.dateof_discharge 
      WHEN mv.stamp_duty IS NOT NULL AND mv.stamp_duty > '01 JAN 1900' THEN  mv.stamp_duty
 	 ELSE NULL END,
-mv.int_rate, CASE WHEN mv.term > 0 AND mv.term <= 100 THEN mv.term ELSE NULL END , mv.bk_num, mv.bk_page, 'migration',
+mv.int_rate, CASE WHEN mv.term > 0 AND mv.term <= 100 THEN mv.term ELSE NULL END , mv.bk_num || '/' || mv.bk_page, 'migration',
 CASE WHEN mv.status = 'h' THEN mv.dateof_discharge ELSE NULL END
 FROM mortgage.mortgage_variation mv, mortgage.rrr_variation rmv
 WHERE mv.mort_variation_id = rmv.mv_id;

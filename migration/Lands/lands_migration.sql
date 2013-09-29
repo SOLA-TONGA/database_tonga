@@ -85,7 +85,7 @@ WHERE b.name_firstpart = sola_town
 AND b.type_code = 'townUnit'; 
 
 INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user)
-SELECT sola_town_id, sola_town, sola_town, 'Town', 'townUnit', 'current', 'migration'
+SELECT sola_town_id, sola_town, sola_town, island_name, 'townUnit', 'current', 'migration'
 FROM lands.island_township 
 WHERE NOT EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_town_id);
 
@@ -102,11 +102,19 @@ WHERE NOT EXISTS (SELECT from_ba_unit_id FROM administrative.required_relationsh
 
 -- *** Create BA Units for Tax and Town allotments
 -- Attempt to de-duplicate the deed grants as much as possible
-INSERT INTO lands.deed (id, deed_num, town, tax_lot, area_orig, plan_type, plan_num, lot_num)
+INSERT INTO lands.deed (id, deed_num, town, tax_lot, area_orig, plan_type, plan_num, lot_num, parcel_name)
 SELECT MIN(id), d_num, TRIM(LOWER(dg_type)), CASE WHEN dg_apname ~* 'TAX' THEN TRUE ELSE FALSE END, TRIM(LOWER(dg_mpref)),
-CASE WHEN TRIM(dg_pref) = '' THEN NULL ELSE TRIM(UPPER(dg_pref)) END, TRIM(UPPER(dg_mplot)), TRIM(UPPER(dg_island))
+CASE WHEN TRIM(dg_pref) = '' THEN NULL ELSE TRIM(UPPER(dg_pref)) END, TRIM(UPPER(dg_mplot)), TRIM(UPPER(dg_island)), TRIM(dg_area)
 FROM lands.reg_deed_grant
-GROUP BY 2, 3, 4, 5, 6, 7, 8;
+GROUP BY 2, 3, 4, 5, 6, 7, 8, 9;
+
+-- Get the reference number from the registration book
+UPDATE lands.deed
+SET registry_book_ref = (SELECT MAX(bk.bkv_regnum || ' ' || bk.bkv_index)
+                         FROM lands.reg_bookvol bk
+						 WHERE bk.d_num = lands.deed.deed_num)
+WHERE EXISTS (SELECT d_num FROM lands.reg_bookvol
+              WHERE d_num = lands.deed.deed_num);
 
 -- Some records have an area while others don't so remove the duplicates that do not have an area
 DELETE FROM lands.deed WHERE area_orig = '' 
@@ -141,8 +149,9 @@ UPDATE lands.deed SET town = '''atata'
 WHERE town = 'atata'; 
 	
 -- Create the tax and town allotment BA Units. 
-INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, creation_date, status_code, change_user)
-SELECT sola_ba_unit_id, deed_num, part1, part2, CASE WHEN tax_lot THEN 'taxUnit' ELSE 'townAllotmentUnit' END, reg_date, 'current', 'migation' 
+INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, registered_name, type_code, creation_date, status_code, change_user)
+SELECT sola_ba_unit_id, deed_num, part1, part2, parcel_name,
+CASE WHEN tax_lot THEN 'taxUnit' ELSE 'townAllotmentUnit' END, reg_date, 'current', 'migation' 
 FROM lands.deed
 WHERE NOT EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id);
 
@@ -236,12 +245,12 @@ WHERE dup = FALSE;
  
 			  
 -- Create the RRRs representing the registered allotment holders, the heirs and the widows  
-INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary, registration_date, transaction_id, change_user)
+INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary, registration_date, registry_book_ref, transaction_id, change_user)
 SELECT h.sola_rrr_id, d.sola_ba_unit_id, 
  CASE WHEN h.holder_type = 'REG' THEN d.deed_num WHEN h.holder_type = 'WIDOWER' THEN d.deed_num || '-wid' ELSE d.deed_num || '-heir' END, 
  CASE WHEN h.holder_type = 'WIDOWER' THEN 'lifeEstate' ELSE 'ownership' END, 
  CASE WHEN h.status = 'c' THEN 'current' ELSE 'historic' END, 
- CASE WHEN h.holder_type = 'WIDOWER' THEN FALSE ELSE TRUE END, h.reg_date, 'migration', 'migration'
+ CASE WHEN h.holder_type = 'WIDOWER' THEN FALSE ELSE TRUE END, h.reg_date, d.registry_book_ref, 'migration', 'migration'
 FROM lands.deed d, lands.holder h
 WHERE d.deed_num = h.deed_num
 AND h.dup = FALSE
