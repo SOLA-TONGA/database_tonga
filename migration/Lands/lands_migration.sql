@@ -379,7 +379,7 @@ WHERE sola_area IS NULL
 AND (acre IS NOT NULL OR rood IS NOT NULL OR perch IS NOT NULL); 
 
 -- Remove any 0 areas
-UPDATE lease.lease_location
+UPDATE lands.deed
 SET sola_area = NULL
 WHERE sola_area = 0; 
 

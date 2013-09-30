@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS lands.validation;
 CREATE TABLE lands.validation
 (
 	code character varying(40),
-	message character varying(500),
+	message character varying(4000),
 	item_num character varying(1000),
 	id character varying(1000)
 );
@@ -72,10 +72,10 @@ GROUP BY h.deed_num;
 
 -- No date for when the land holder was registered. 
 INSERT INTO lands.validation (code, message, item_num, id)
-SELECT 'NO REG DATE FOR HOLDER', 'There is no date to indicate when the land holder was registered ' h.deed_num, h.id
+SELECT 'NO REG DATE FOR HOLDER', 'There is no date to indicate when the land holder was registered ', h.deed_num, h.id
 FROM lands.holder h
 WHERE h.dup = FALSE AND h.reg_date IS NULL
-GROUP BY h.deed_num;
+GROUP BY h.deed_num, h.id;
 
 -- Checks if the deed area is valid
 INSERT INTO lands.validation (code, message, item_num, id)
@@ -99,7 +99,7 @@ WHERE d.plan_type IN ('-', 'TOWNSHIP');
 
 
 -- Identifies duplicate lot/plans for the allotments
-INSERT INTO lease.validation (code, message, item_num)
+INSERT INTO lands.validation (code, message, item_num)
 SELECT 'DUPLICATE LOT/PLAN DEED', 'The same lot and plan is used for multiple leases and/or allotments. Check the allotments to ensure the lot and plan reference is correct. "' || 
 co.name_firstpart || ' ' || co.name_lastpart || '" duplicated on allotments "' || string_agg(b.name, ', ') || '"', null
 FROM administrative.ba_unit_contains_spatial_unit bas, 
