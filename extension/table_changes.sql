@@ -488,3 +488,30 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
+
+-- Updates the compare string function so that it will not split on <space> if the user has
+-- entered \s as a control character
+CREATE OR REPLACE FUNCTION compare_strings(string1 character varying, string2 character varying)
+  RETURNS boolean AS
+$BODY$
+  DECLARE
+    rec record;
+    result boolean;
+  BEGIN
+      result = false;
+      for rec in select regexp_split_to_table(lower(string1),'[^a-z0-9\\s]') as word loop
+          if rec.word != '' then 
+            if not string2 ~* rec.word then
+                return false;
+            end if;
+            result = true;
+          end if;
+      end loop;
+      return result;
+  END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION compare_strings(character varying, character varying)
+  OWNER TO postgres;
+COMMENT ON FUNCTION compare_strings(character varying, character varying) IS 'Special string compare function. Allows spaces to be recognized as valid search parameters when entered as \s';
