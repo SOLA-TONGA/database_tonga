@@ -130,6 +130,14 @@ AND EXISTS (SELECT id FROM administrative.ba_unit WHERE id = d.sola_ba_unit_id);
 UPDATE lease.lease_detail SET lessor_estate = 'Other' WHERE lessor_estate = 'other';
 UPDATE lease.lease_detail SET lessor_estate = 'Noble' WHERE lessor_estate = 'Nobles';
 
+INSERT INTO party.party (id, type_code, name)
+SELECT sola_lessee_id, 'naturalPerson',lessee_name FROM lease.lease_detail
+WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
+AND NOT EXISTS (SELECT id FROM party.party WHERE id = sola_lessee_id);
+
+/* AM 2 Oct - Rather than create party records for the lessor, set them as the 
+   other_rightholder_name on the lease rrr
+   
 UPDATE lease.lease_detail
 SET sola_lessor_id = p.id
 FROM party.party p
@@ -137,27 +145,22 @@ WHERE lessor_estate IN ('Noble', 'King')
 AND TRIM(LOWER(p.name)) = TRIM(LOWER(lessor_name));
 
 INSERT INTO party.party (id, type_code, name)
-SELECT sola_lessee_id, 'naturalPerson',lessee_name FROM lease.lease_detail
-WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
-AND NOT EXISTS (SELECT id FROM party.party WHERE id = sola_lessee_id);
-
-INSERT INTO party.party (id, type_code, name)
 SELECT d.sola_lessor_id, 
 (CASE d.lessor_estate WHEN 'Government' THEN 'nonNaturalPerson' ELSE 'naturalPerson' END), 
 d.lessor_name FROM lease.lease_detail d
 WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = d.sola_ba_unit_id)
-AND NOT EXISTS (SELECT id FROM party.party WHERE id = d.sola_lessor_id);
+AND NOT EXISTS (SELECT id FROM party.party WHERE id = d.sola_lessor_id); */
 
 
 -- *** Create the RRR for the lease and link this RRR to the lessor
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary,
 transaction_id, registration_date, expiration_date, amount, receipt_reference, 
-receipt_date, due_date, change_user)
+receipt_date, due_date, other_rightholder_name, change_user)
 SELECT sola_rrr_id, sola_ba_unit_id, lease_number, 'lease', 
 CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END, 
 't', 'migration', safe_cast(lease_reg_date, null::date), safe_cast(lease_exp_date, null::date),  
 safe_cast(lease_rental, null::numeric(29,2)), payment_receipt_number, safe_cast(payment_upto_date, null::date), 
-safe_cast(lease_payment_date, null::date), 'migration'
+safe_cast(lease_payment_date, null::date), lessor_name, 'migration'
 FROM lease.lease_detail
 WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
 AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = sola_rrr_id);
@@ -190,6 +193,7 @@ AND EXISTS (SELECT id FROM administrative.rrr r
 				
 -- *** Create the RRR for the owner of the land (i.e. leasee)
 -- ** TODO ** Remove once leases can be linked to the allotment / noble estate
+/*
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary,
 transaction_id, registration_date, expiration_date, change_user)
 SELECT sola_owner_rrr_id, sola_ba_unit_id, lease_number, 'ownership', 
@@ -214,7 +218,7 @@ AND EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
 AND NOT EXISTS (SELECT rrr_id FROM administrative.party_for_rrr 
                 WHERE rrr_id = sola_owner_rrr_id
 				AND party_id = sola_lessor_id);
-
+*/
 				
 				
 
