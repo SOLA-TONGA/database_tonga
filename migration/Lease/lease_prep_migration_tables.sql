@@ -65,5 +65,6 @@ DROP TABLE IF EXISTS lease.town;
 CREATE TABLE lease.town
 (
 	id character varying(40) DEFAULT uuid_generate_v1(),
-	name character varying(255)
+	name character varying(255),
+	island character varying(255)
 );

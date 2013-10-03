@@ -375,6 +375,9 @@ WHERE NOT EXISTS (SELECT code FROM party.party_role_type WHERE code = 'king');
 UPDATE administrative.rrr_type SET status = 'c'
 WHERE code IN ('lifeEstate'); 
 
+UPDATE administrative.rrr_type SET display_value = 'Landholder'
+WHERE code IN ('ownership'); 
+
 
 -- Land Use Codes
 UPDATE cadastre.land_use_type

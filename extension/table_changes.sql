@@ -450,26 +450,34 @@ ALTER TABLE administrative.ba_unit
 ALTER TABLE administrative.rrr
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
+DROP COLUMN IF EXISTS receipt_amount,
 DROP COLUMN IF EXISTS registry_book_ref,
-DROP COLUMN IF EXISTS term;
+DROP COLUMN IF EXISTS term,
+DROP COLUMN IF EXISTS other_rightholder_name;
 
 ALTER TABLE administrative.rrr
 ADD receipt_date timestamp without time zone,
 ADD receipt_reference character varying(255),
+ADD receipt_amount NUMERIC(20,2),
 ADD registry_book_ref character varying(50),
-ADD term NUMERIC(8,2);
+ADD term NUMERIC(8,2),
+ADD other_rightholder_name character varying(255);
 
 ALTER TABLE administrative.rrr_historic
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
+DROP COLUMN IF EXISTS receipt_amount,
 DROP COLUMN IF EXISTS registry_book_ref,
-DROP COLUMN IF EXISTS term;
+DROP COLUMN IF EXISTS term,
+DROP COLUMN IF EXISTS other_rightholder_name;
 
 ALTER TABLE administrative.rrr_historic
 ADD receipt_date timestamp without time zone,
 ADD receipt_reference character varying(255),
+ADD receipt_amount NUMERIC(20,2),
 ADD registry_book_ref character varying(50),
-ADD term NUMERIC(8,2);
+ADD term NUMERIC(8,2),
+ADD other_rightholder_name character varying(255);
 
 
 -- Temporary change to the new cadastre_object trigger
@@ -488,3 +496,85 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
+
+-- Updates the compare string function so that it will not split on <space> if the user has
+-- entered \s as a control character
+CREATE OR REPLACE FUNCTION compare_strings(string1 character varying, string2 character varying)
+  RETURNS boolean AS
+$BODY$
+  DECLARE
+    rec record;
+    result boolean;
+  BEGIN
+      result = false;
+      for rec in select regexp_split_to_table(lower(string1),'[^a-z0-9\\s]') as word loop
+          if rec.word != '' then 
+            if not string2 ~* rec.word then
+                return false;
+            end if;
+            result = true;
+          end if;
+      end loop;
+      return result;
+  END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION compare_strings(character varying, character varying)
+  OWNER TO postgres;
+COMMENT ON FUNCTION compare_strings(character varying, character varying) IS 'Special string compare function. Allows spaces to be recognized as valid search parameters when entered as \s';
+
+
+CREATE OR REPLACE FUNCTION administrative.get_other_rightholder_name(rrr_identifier CHARACTER VARYING)
+  RETURNS CHARACTER VARYING AS
+$BODY$
+  DECLARE
+    result CHARACTER VARYING = NULL;
+	rel_code CHARACTER VARYING = NULL;
+	other_rh_names CHARACTER VARYING = NULL;
+	status CHARACTER VARYING = NULL;
+BEGIN
+
+   -- Determine the relation code to use 
+   SELECT 'allotment',
+		  r.other_rightholder_name,
+		  r.status_code
+   INTO rel_code, result, status
+   FROM administrative.ba_unit b,
+        administrative.rrr r
+   WHERE r.id = rrr_identifier
+   AND b.id = r.ba_unit_id
+   AND b.type_code IN ('leasedUnit');
+   
+   -- Check whether to obtain right holder details from the parent
+   -- ba unit. If the rrr is previous/historic then use the 
+   -- other_rightholder_name on the rrr otherwise try to find the
+   -- current rightholder details from the parent BA Unit
+   IF (rel_code IS NOT NULL AND 
+        (status IN ('current', 'pending') || result IS NULL)) THEN
+      SELECT string_agg(COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, ''), ',')
+	  INTO   other_rh_names
+	  FROM   administrative.rrr r,
+             administrative.required_relationship_baunit rel,
+             administrative.rrr r2,			 
+	         administrative.party_for_rrr pr, 
+			 party.party p
+       WHERE r.id = rrr_identifier
+	   AND   rel.to_ba_unit_id = r.ba_unit_id
+	   AND   rel.relation_code = rel_code
+	   AND   r2.ba_unit_id = rel.from_ba_unit_id
+	   AND   r2.is_primary = TRUE
+	   AND   r2.status_code = 'current'
+	   AND   pr.rrr_id = r2.id
+	   AND   p.id = pr.party_id;
+	   
+	   IF other_rh_names IS NOT NULL THEN
+	      result = other_rh_names;
+	   END IF;
+   END IF;
+   RETURN result;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+COMMENT ON FUNCTION administrative.get_other_rightholder_name(rrr_identifier CHARACTER VARYING) IS 'Determines the other right holder name (such as the lessor name) for certain rights based on ba_unit relationships';
