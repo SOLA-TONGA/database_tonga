@@ -453,7 +453,8 @@ DROP COLUMN IF EXISTS receipt_reference,
 DROP COLUMN IF EXISTS receipt_amount,
 DROP COLUMN IF EXISTS registry_book_ref,
 DROP COLUMN IF EXISTS term,
-DROP COLUMN IF EXISTS other_rightholder_name;
+DROP COLUMN IF EXISTS other_rightholder_name,
+DROP COLUMN IF EXISTS cashier_update;
 
 ALTER TABLE administrative.rrr
 ADD receipt_date timestamp without time zone,
@@ -461,7 +462,8 @@ ADD receipt_reference character varying(255),
 ADD receipt_amount NUMERIC(20,2),
 ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2),
-ADD other_rightholder_name character varying(255);
+ADD other_rightholder_name character varying(255),
+ADD cashier_update BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE administrative.rrr_historic
 DROP COLUMN IF EXISTS receipt_date,
@@ -469,7 +471,8 @@ DROP COLUMN IF EXISTS receipt_reference,
 DROP COLUMN IF EXISTS receipt_amount,
 DROP COLUMN IF EXISTS registry_book_ref,
 DROP COLUMN IF EXISTS term,
-DROP COLUMN IF EXISTS other_rightholder_name;
+DROP COLUMN IF EXISTS other_rightholder_name,
+DROP COLUMN IF EXISTS cashier_update;
 
 ALTER TABLE administrative.rrr_historic
 ADD receipt_date timestamp without time zone,
@@ -477,7 +480,8 @@ ADD receipt_reference character varying(255),
 ADD receipt_amount NUMERIC(20,2),
 ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2),
-ADD other_rightholder_name character varying(255);
+ADD other_rightholder_name character varying(255),
+ADD cashier_update BOOLEAN;
 
 
 -- Temporary change to the new cadastre_object trigger
