@@ -551,7 +551,7 @@ BEGIN
    -- other_rightholder_name on the rrr otherwise try to find the
    -- current rightholder details from the parent BA Unit
    IF (rel_code IS NOT NULL AND 
-        (status IN ('current', 'pending') || result IS NULL)) THEN
+        (status IN ('current', 'pending') OR result IS NULL)) THEN
       SELECT string_agg(COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, ''), ',')
 	  INTO   other_rh_names
 	  FROM   administrative.rrr r,
