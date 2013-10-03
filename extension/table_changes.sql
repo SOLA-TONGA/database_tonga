@@ -450,6 +450,7 @@ ALTER TABLE administrative.ba_unit
 ALTER TABLE administrative.rrr
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
+DROP COLUMN IF EXISTS receipt_amount,
 DROP COLUMN IF EXISTS registry_book_ref,
 DROP COLUMN IF EXISTS term,
 DROP COLUMN IF EXISTS other_rightholder_name;
@@ -457,6 +458,7 @@ DROP COLUMN IF EXISTS other_rightholder_name;
 ALTER TABLE administrative.rrr
 ADD receipt_date timestamp without time zone,
 ADD receipt_reference character varying(255),
+ADD receipt_amount NUMERIC(20,2),
 ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2),
 ADD other_rightholder_name character varying(255);
@@ -464,6 +466,7 @@ ADD other_rightholder_name character varying(255);
 ALTER TABLE administrative.rrr_historic
 DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
+DROP COLUMN IF EXISTS receipt_amount,
 DROP COLUMN IF EXISTS registry_book_ref,
 DROP COLUMN IF EXISTS term,
 DROP COLUMN IF EXISTS other_rightholder_name;
@@ -471,6 +474,7 @@ DROP COLUMN IF EXISTS other_rightholder_name;
 ALTER TABLE administrative.rrr_historic
 ADD receipt_date timestamp without time zone,
 ADD receipt_reference character varying(255),
+ADD receipt_amount NUMERIC(20,2),
 ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2),
 ADD other_rightholder_name character varying(255);
@@ -528,19 +532,26 @@ $BODY$
     result CHARACTER VARYING = NULL;
 	rel_code CHARACTER VARYING = NULL;
 	other_rh_names CHARACTER VARYING = NULL;
+	status CHARACTER VARYING = NULL;
 BEGIN
 
    -- Determine the relation code to use 
    SELECT 'allotment',
-		  r.other_rightholder_name
-   INTO rel_code, result
+		  r.other_rightholder_name,
+		  r.status_code
+   INTO rel_code, result, status
    FROM administrative.ba_unit b,
         administrative.rrr r
    WHERE r.id = rrr_identifier
    AND b.id = r.ba_unit_id
    AND b.type_code IN ('leasedUnit');
    
-   IF (rel_code IS NOT NULL) THEN
+   -- Check whether to obtain right holder details from the parent
+   -- ba unit. If the rrr is previous/historic then use the 
+   -- other_rightholder_name on the rrr otherwise try to find the
+   -- current rightholder details from the parent BA Unit
+   IF (rel_code IS NOT NULL AND 
+        (status IN ('current', 'pending') || result IS NULL)) THEN
       SELECT string_agg(COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, ''), ',')
 	  INTO   other_rh_names
 	  FROM   administrative.rrr r,

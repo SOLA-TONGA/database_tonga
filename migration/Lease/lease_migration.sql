@@ -67,27 +67,30 @@ UPDATE lease.lease_detail SET sola_town = 'Nga''unoho' WHERE sola_town = 'NGa''u
 UPDATE lease.lease_detail SET sola_town = 'Nualei Kolofo''ou' WHERE sola_town = 'Nualei - Kolofo''ou';
  
 -- Load Towns as BA Units
-INSERT INTO lease.town (name) SELECT DISTINCT sola_town FROM lease.lease_detail;
+INSERT INTO lease.town (name, island) 
+SELECT DISTINCT sola_town, sola_island 
+FROM lease.lease_detail;
 
 UPDATE lease.town SET id = b.id
 FROM administrative.ba_unit b
 WHERE b.name_firstpart = lease.town.name
+AND b.name_lastpart = lease.town.island
 AND b.type_code = 'townUnit'; 
 
 INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user)
-SELECT t.id, t.name, t.name, 'Town', 'townUnit', 'current', 'migration'
+SELECT t.id, t.name, t.name, t.island, 'townUnit', 'current', 'migration'
 FROM lease.town t
 WHERE NOT EXISTS (SELECT b.id FROM administrative.ba_unit b
                   WHERE b.id = t.id
                   AND b.type_code = 'townUnit');
 
 INSERT INTO administrative.required_relationship_baunit(from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
-SELECT DISTINCT i.id, t.id, 'island', 'migration' FROM lease.island i, lease.town t, lease.lease_detail d
-WHERE i.name = d.sola_island AND t.name = d.sola_town
+SELECT DISTINCT i.id, t.id, 'island', 'migration' FROM lease.island i, lease.town t
+WHERE i.name = t.island
 AND NOT EXISTS (SELECT from_ba_unit_id FROM administrative.required_relationship_baunit
 				  WHERE from_ba_unit_id = i.id 
 				  AND to_ba_unit_id = t.id
-				  AND relation_code = 'island'); 
+				  AND relation_code = 'island');
 
 				  
 -- Load lease ** To be picked up by validation scripts
@@ -118,7 +121,7 @@ WHERE dup = FALSE;
 -- Create relationship between towns and lease
 INSERT INTO administrative.required_relationship_baunit(from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
 SELECT t.id, d.sola_ba_unit_id, 'town', 'migration' FROM lease.town t, lease.lease_detail d
-WHERE t.name = d.sola_town
+WHERE t.name = d.sola_town AND t.island = d.sola_island
 AND EXISTS (SELECT id FROM administrative.ba_unit WHERE id = d.sola_ba_unit_id);
 
 
