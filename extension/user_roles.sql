@@ -203,6 +203,10 @@ INSERT INTO system.approle (code, display_value, status, description)
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'StartService', 'Service Action - Start', 'c', 'Allows any user to click the Start action. Note that the user must also have the appropraite Service role as well before they can successfully start the service. '
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'StartService');
+   
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'CashierImport', 'Cashier Import', 'c', 'Allows the user to import payment information from the Cashier system. '
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'CashierImport');
  
 
  -- Add all active roles to the super-group-id
