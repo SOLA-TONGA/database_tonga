@@ -545,7 +545,9 @@ BEGIN
 
    -- Determine the relation code to use. For sublease - always use the other_rightholder_name
    -- as the lessee may have defaulted on a mortgage and the bank has decided to sublease the land. 
-   SELECT 'allotment',
+   SELECT CASE b.type_code 
+            WHEN 'leasedUnit' THEN 'allotment' 
+			ELSE NULL END,
 		  r.other_rightholder_name,
 		  r.status_code
    INTO rel_code, result, status
@@ -553,7 +555,7 @@ BEGIN
         administrative.rrr r
    WHERE r.id = rrr_identifier
    AND b.id = r.ba_unit_id
-   AND b.type_code IN ('leasedUnit');
+   AND b.type_code IN ('leasedUnit', 'subleaseUnit');
    
    -- Check whether to obtain right holder details from the parent
    -- ba unit. If the rrr is previous/historic then use the 

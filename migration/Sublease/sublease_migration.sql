@@ -80,6 +80,7 @@ WHERE sl.cleaned = TRUE;
 INSERT INTO administrative.required_relationship_baunit(from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
 SELECT sl.sola_town_id, sl.sola_ba_unit_id, 'town', 'migration' FROM lease.sl_clean sl
 WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sl.sola_ba_unit_id)
+AND sl.sola_town_id IS NOT NULL
 AND sl.cleaned = TRUE;
 
 -- Create relationship between sublease and head lease / allotment
@@ -126,7 +127,7 @@ AND sl.cleaned = TRUE;
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary,
 transaction_id, registration_date, start_date, expiration_date, term, amount, 
  other_rightholder_name, change_user)
-SELECT sola_rrr_id, sola_ba_unit_id, sublease_number, 'lease', 
+SELECT sola_rrr_id, sola_ba_unit_id, sublease_number, 'sublease', 
 CASE WHEN expire_date IS NULL OR now() > expire_date THEN 'historic' ELSE 'current' END, TRUE, 
 'migration', COALESCE(transfer_date, reg_date), start_date, expire_date, duration, 
 safe_cast(rental_per_year, null::numeric(29,2)), sublessor_name, 'migration'
