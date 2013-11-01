@@ -452,6 +452,7 @@ DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
 DROP COLUMN IF EXISTS receipt_amount,
 DROP COLUMN IF EXISTS registry_book_ref,
+DROP COLUMN IF EXISTS start_date,
 DROP COLUMN IF EXISTS term,
 DROP COLUMN IF EXISTS other_rightholder_name,
 DROP COLUMN IF EXISTS cashier_update;
@@ -462,6 +463,7 @@ ADD receipt_reference character varying(255),
 ADD receipt_amount NUMERIC(20,2),
 ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2),
+ADD start_date timestamp without time zone,
 ADD other_rightholder_name character varying(255),
 ADD cashier_update BOOLEAN NOT NULL DEFAULT FALSE;
 
@@ -470,6 +472,7 @@ DROP COLUMN IF EXISTS receipt_date,
 DROP COLUMN IF EXISTS receipt_reference,
 DROP COLUMN IF EXISTS receipt_amount,
 DROP COLUMN IF EXISTS registry_book_ref,
+DROP COLUMN IF EXISTS start_date,
 DROP COLUMN IF EXISTS term,
 DROP COLUMN IF EXISTS other_rightholder_name,
 DROP COLUMN IF EXISTS cashier_update;
@@ -480,6 +483,7 @@ ADD receipt_reference character varying(255),
 ADD receipt_amount NUMERIC(20,2),
 ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2),
+ADD start_date timestamp without time zone,
 ADD other_rightholder_name character varying(255),
 ADD cashier_update BOOLEAN;
 
@@ -539,7 +543,8 @@ $BODY$
 	status CHARACTER VARYING = NULL;
 BEGIN
 
-   -- Determine the relation code to use 
+   -- Determine the relation code to use. For sublease - always use the other_rightholder_name
+   -- as the lessee may have defaulted on a mortgage and the bank has decided to sublease the land. 
    SELECT 'allotment',
 		  r.other_rightholder_name,
 		  r.status_code

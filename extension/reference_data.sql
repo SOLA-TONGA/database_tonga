@@ -330,6 +330,10 @@ INSERT INTO administrative.ba_unit_type(code, display_value, description, status
 SELECT 'townUnit','Town',NULL,'c'
 WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'townUnit');
 
+INSERT INTO administrative.ba_unit_type(code, display_value, description, status)
+SELECT 'subleaseUnit','Sublease',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'subleaseUnit');
+
 
 -- BA Unit Relationship Types
 INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
@@ -351,6 +355,10 @@ WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 
 INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
 SELECT 'lease','Lease',NULL,'c'
 WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'lease');
+
+INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
+SELECT 'sublease','Sublease',NULL,'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'sublease');
 
 
 -- Party Role Types
@@ -378,6 +386,9 @@ WHERE code IN ('lifeEstate');
 UPDATE administrative.rrr_type SET display_value = 'Landholder'
 WHERE code IN ('ownership'); 
 
+INSERT INTO administrative.rrr_type(code, display_value, rrr_group_type_code, is_primary, party_required, share_check, status)
+SELECT 'sublease','Sublease', 'rights', TRUE, TRUE, FALSE, 'c'
+WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'sublease');
 
 -- Land Use Codes
 UPDATE cadastre.land_use_type
