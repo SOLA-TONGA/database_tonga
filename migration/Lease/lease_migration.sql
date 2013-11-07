@@ -1,16 +1,21 @@
-﻿-- Script run time: 120 seconds approx. 
+﻿-- Script run time: 60 seconds approx. 
 
 
 -- Run the migration scripts in the following order...
 -- 1) lands_prep_migration_tables.sql
 -- 2) lands_migration.sql
 -- 3) lands_validate_migration.sql
--- 4) lease_prep_migration_tables.sql
--- 5) lease_migration.sql
--- 6) lease_validate_migration.sql
--- 7) mortgage_prep_migration_tables.sql
--- 8) mortgage_migration.sql
--- 9) mortgage_validate_migration.sql 
+-- 4) nobel_estates.sql
+-- 5) lease_prep_migration_tables.sql
+-- 6) lease_migration.sql
+-- 7) lease_validate_migration.sql
+-- 8) sublease_backup.sql
+-- 9) sublease_prep_migration_tables.sql
+-- 10) sublease_migration.sql
+-- 11) mortgage_prep_migration_tables.sql
+-- 12) mortgage_migration.sql
+-- 13) mortgage_validate_migration.sql
+-- 14) migration_counts
 
 
 -- Function that can be used to return a default value (e.g. null) if it cannot
@@ -80,27 +85,19 @@ AND b.type_code = 'townUnit';
 INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user)
 SELECT t.id, t.name, t.name, t.island, 'townUnit', 'current', 'migration'
 FROM lease.town t
-WHERE NOT EXISTS (SELECT b.id FROM administrative.ba_unit b
+WHERE t.name IS NOT NULL
+AND NOT EXISTS (SELECT b.id FROM administrative.ba_unit b
                   WHERE b.id = t.id
                   AND b.type_code = 'townUnit');
 
 INSERT INTO administrative.required_relationship_baunit(from_ba_unit_id, to_ba_unit_id, relation_code, change_user)
 SELECT DISTINCT i.id, t.id, 'island', 'migration' FROM lease.island i, lease.town t
 WHERE i.name = t.island
+AND t.name IS NOT NULL
 AND NOT EXISTS (SELECT from_ba_unit_id FROM administrative.required_relationship_baunit
 				  WHERE from_ba_unit_id = i.id 
 				  AND to_ba_unit_id = t.id
 				  AND relation_code = 'island');
-
-				  
--- Load lease ** To be picked up by validation scripts
---UPDATE lease.lease_detail SET lease_exp_date = NULL WHERE lease_exp_date = 'dd/mm/yyyy';
---UPDATE lease.lease_detail SET lease_exp_date = '1/03/2058' WHERE lease_exp_date = '29/02/2058';
---UPDATE lease.lease_detail SET lease_exp_date = '20/05/2042' WHERE lease_exp_date = '205/2042';
---UPDATE lease.lease_detail SET lease_exp_date = '16/09/2052' WHERE lease_exp_date = '16/019/2052';
---UPDATE lease.lease_detail SET lease_exp_date = '3/01/2024' WHERE lease_exp_date = '31/4/2024';
---UPDATE lease.lease_detail SET lease_exp_date = '13/10/2031' WHERE lease_exp_date = '13/10/13/1'; --Check with Sione Lease 7656
---UPDATE lease.lease_detail SET lease_exp_date = '30/11/2029' WHERE lease_exp_date = '31/11/2029';
 
 
 
@@ -111,8 +108,8 @@ WHERE lease_number in (
 SELECT lease_number from lease.lease_detail GROUP BY lease_number having count(*) > 1);
 
 -- Compare dates to determine current and expire lease.
-INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, status_code, change_user, registered_name)
-SELECT sola_ba_unit_id, lease_number, lease_number, 'Lease', 'leasedUnit', 
+INSERT INTO administrative.ba_unit (id, name, name_firstpart, name_lastpart, type_code, creation_date, status_code, change_user, registered_name)
+SELECT sola_ba_unit_id, lease_number, lease_number, 'Lease', 'leasedUnit', safe_cast(lease_reg_date, null::date),
 	(SELECT (CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END)), 'migration', NULL
 FROM lease.lease_detail
 WHERE dup = FALSE;
@@ -157,11 +154,11 @@ AND NOT EXISTS (SELECT id FROM party.party WHERE id = d.sola_lessor_id); */
 
 -- *** Create the RRR for the lease and link this RRR to the lessor
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary,
-transaction_id, registration_date, expiration_date, amount, receipt_reference, 
+transaction_id, registration_date, start_date, expiration_date, amount, receipt_reference, 
 receipt_date, due_date, receipt_amount, other_rightholder_name, change_user)
 SELECT sola_rrr_id, sola_ba_unit_id, lease_number, 'lease', 
 CASE WHEN safe_cast(lease_exp_date, null::date) IS NULL OR now() > safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END, 
-'t', 'migration', safe_cast(lease_reg_date, null::date), safe_cast(lease_exp_date, null::date),  
+'t', 'migration', safe_cast(lease_reg_date, null::date), safe_cast(lease_reg_date, null::date), safe_cast(lease_exp_date, null::date),  
 safe_cast(lease_rental, null::numeric(29,2)), payment_receipt_number, safe_cast(lease_payment_date, null::date), 
 safe_cast(payment_upto_date, null::date), safe_cast(lease_rental, null::numeric(29,2)),lessor_name, 'migration'
 FROM lease.lease_detail
@@ -170,8 +167,8 @@ AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = sola_rrr_id);
 
 -- Calculate the term of the lease in years
 UPDATE administrative.rrr 
-SET term = EXTRACT('year' FROM expiration_date) - EXTRACT('year' FROM registration_date) 
-WHERE registration_date IS NOT NULL
+SET term = EXTRACT('year' FROM expiration_date) - EXTRACT('year' FROM start_date) 
+WHERE start_date IS NOT NULL
 AND expiration_date IS NOT NULL
 AND type_code = 'lease';
 
@@ -193,38 +190,8 @@ WHERE NOT EXISTS  (SELECT id FROM administrative.notation
 AND EXISTS (SELECT id FROM administrative.rrr r
             WHERE r.id = l.sola_rrr_id);	
 			
+			
 				
--- *** Create the RRR for the owner of the land (i.e. leasee)
--- ** TODO ** Remove once leases can be linked to the allotment / noble estate
-/*
-INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary,
-transaction_id, registration_date, expiration_date, change_user)
-SELECT sola_owner_rrr_id, sola_ba_unit_id, lease_number, 'ownership', 
-CASE WHEN  safe_cast(lease_exp_date, null::date) IS NULL OR now() >  safe_cast(lease_exp_date, null::date) THEN 'historic' ELSE 'current' END, 
-'f', 'migration', safe_cast(lease_reg_date, null::date), safe_cast(lease_exp_date, null::date), 'migration'
-FROM lease.lease_detail
-WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
-AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = sola_owner_rrr_id);
-
--- Nearly all ownership shares in Tonga are 1/1. 
-INSERT INTO administrative.rrr_share (rrr_id, id, nominator, denominator)
-SELECT sola_owner_rrr_id, uuid_generate_v1(), 1, 1
-FROM lease.lease_detail
-WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
-AND NOT EXISTS (SELECT rrr_id FROM administrative.rrr_share WHERE rrr_id = sola_owner_rrr_id);
-
-INSERT INTO administrative.party_for_rrr(rrr_id, party_id, share_id)
-SELECT sola_owner_rrr_id, sola_lessor_id, s.id
-FROM lease.lease_detail, administrative.rrr_share s
-WHERE s.rrr_id = sola_owner_rrr_id
-AND EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
-AND NOT EXISTS (SELECT rrr_id FROM administrative.party_for_rrr 
-                WHERE rrr_id = sola_owner_rrr_id
-				AND party_id = sola_lessor_id);
-*/
-				
-				
-
 -- *** Create official areas
 -- Cast the msq to metres
 UPDATE lease.lease_location 

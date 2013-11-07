@@ -1,15 +1,20 @@
-﻿-- Script run time: 85 seconds approx.
+﻿-- Script run time: 80 seconds approx.
 
 -- Run the migration scripts in the following order...
 -- 1) lands_prep_migration_tables.sql
 -- 2) lands_migration.sql
 -- 3) lands_validate_migration.sql
--- 4) lease_prep_migration_tables.sql
--- 5) lease_migration.sql
--- 6) lease_validate_migration.sql
--- 7) mortgage_prep_migration_tables.sql
--- 8) mortgage_migration.sql
--- 9) mortgage_validate_migration.sql
+-- 4) nobel_estates.sql
+-- 5) lease_prep_migration_tables.sql
+-- 6) lease_migration.sql
+-- 7) lease_validate_migration.sql
+-- 8) sublease_backup.sql
+-- 9) sublease_prep_migration_tables.sql
+-- 10) sublease_migration.sql
+-- 11) mortgage_prep_migration_tables.sql
+-- 12) mortgage_migration.sql
+-- 13) mortgage_validate_migration.sql
+-- 14) migration_counts
 
 -- Function that can be used to return a default value (e.g. null) if it cannot
 -- be cast to the anyelement type.
@@ -102,6 +107,43 @@ SET term = period::NUMERIC(29,2),
 	                     WHEN TRIM(UPPER(mortgage_bank)) = 'WPOT' THEN 'WBOT' ELSE mortgage_bank END,						 
     receipt_num = CASE WHEN TRIM(UPPER(receipt_num)) = 'NULL' THEN NULL ELSE receipt_num END,
 	stamp_rec = CASE WHEN TRIM(UPPER(stamp_rec)) = 'NULL' THEN NULL ELSE stamp_rec END;
+
+-- *** Clean the sublease number
+-- Remove the folio text from the deed_number for subleases. 
+UPDATE mortgage.mortgage 
+SET sublease_num = TRIM(RIGHT(deed_number, 3))
+WHERE deed_type = 'sublease'
+and deed_number ~* 'folio'; 
+
+-- Copy the last part of any existing numbers
+UPDATE mortgage.mortgage 
+SET sublease_num = TRIM((regexp_split_to_array(deed_number, '/'))[2])
+WHERE deed_type = 'sublease'
+and deed_number ~* '/'; 
+
+-- Remove any non digit characters from the sublease deed_number
+UPDATE mortgage.mortgage 
+SET sublease_num = TRIM(regexp_replace(deed_number, '\D', '', 'g'))
+WHERE deed_type = 'sublease'
+AND sublease_num IS NULL;
+
+-- Set the correct sublease number. 
+UPDATE mortgage.mortgage 
+SET sublease_num = '1/' || sublease_num
+WHERE deed_type = 'sublease'
+AND sublease_num IS NOT NULL;
+
+-- Set the correct sublease number for specific mortgages. 
+UPDATE mortgage.mortgage 
+SET sublease_num = '1/102(1)'
+WHERE deed_type = 'sublease'
+AND mortgage_number = '5624';
+
+UPDATE mortgage.mortgage 
+SET sublease_num = '1/105(1)'
+WHERE deed_type = 'sublease'
+AND mortgage_number = '2664';
+
 	
 -- Flag duplicate mortgage_variation records
 UPDATE mortgage.mortgage_variation SET dup = TRUE
@@ -141,6 +183,26 @@ AND m.dup = FALSE
 AND m.deed_type = 'lease'
 AND COALESCE(mortgagee_bank, 'TDB') IN ('TDB', 'ANZ', 'GOV', 'WBOT', 'MBF', 'NRB')
 AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = m.sola_rrr_id);  
+
+-- *** Create the Mortgage RRRs for the subleases
+INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code,
+transaction_id, registration_date, amount, receipt_reference, receipt_date,
+mortgage_interest_rate, term, registry_book_ref, change_user, expiration_date)
+SELECT m.sola_rrr_id, s.sola_ba_unit_id, m.mortgage_number, 'mortgage', 
+CASE WHEN status = 'h' THEN 'historic' WHEN status = 'p' THEN 'previous' ELSE 'current' END, 
+'migration', m.mortgage_reg_date, mort_amount, 
+COALESCE(m.mortgage_rec_num || ', ' || m.mortgage_disch_rec_num, m.mortgage_rec_num),
+CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge 
+     WHEN m.mortgage_dateof_rec > '01 JAN 1900' THEN  m.mortgage_dateof_rec
+	 ELSE NULL END,
+	 int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , m.mortgage_book || '/' || m.mortgage_page, 'migration',
+CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge ELSE NULL END
+FROM mortgage.mortgage m, lease.sl_clean s
+WHERE m.sublease_num = s.sublease_number
+AND m.dup = FALSE
+AND m.deed_type = 'sublease'
+AND COALESCE(mortgagee_bank, 'TDB') IN ('TDB', 'ANZ', 'GOV', 'WBOT', 'MBF', 'NRB')
+AND NOT EXISTS (SELECT id FROM administrative.rrr WHERE id = m.sola_rrr_id); 
 
 
 -- *** Create the Mortgage RRRs for the deeds
@@ -194,6 +256,16 @@ AND l.dup = FALSE
 AND m.dup = FALSE
 AND mv.dup = FALSE
 AND m.deed_type = 'lease'
+AND COALESCE(mortgage_bank, 'TDB') IN ('TDB', 'ANZ', 'GOV', 'WBOT', 'MBF', 'NRB');
+
+INSERT INTO mortgage.rrr_variation(mv_id, sola_ba_unit_id)
+SELECT  mv.mort_variation_id, s.sola_ba_unit_id
+FROM mortgage.mortgage_variation mv, mortgage.mortgage m, lease.sl_clean s
+WHERE m.sublease_num = s.sublease_number
+AND mv.mortgage_number = m.mortgage_number
+AND m.dup = FALSE
+AND mv.dup = FALSE
+AND m.deed_type = 'sublease'
 AND COALESCE(mortgage_bank, 'TDB') IN ('TDB', 'ANZ', 'GOV', 'WBOT', 'MBF', 'NRB');
 
 INSERT INTO mortgage.rrr_variation(mv_id, sola_ba_unit_id)

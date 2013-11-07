@@ -1,15 +1,21 @@
-﻿-- Script run time <1s
+﻿-- Script run time <5s
 
 -- Run the migration scripts in the following order...
 -- 1) lands_prep_migration_tables.sql
 -- 2) lands_migration.sql
 -- 3) lands_validate_migration.sql
--- 4) lease_prep_migration_tables.sql
--- 5) lease_migration.sql
--- 6) lease_validate_migration.sql
--- 7) mortgage_prep_migration_tables.sql
--- 8) mortgage_migration.sql
--- 9) mortgage_validate_migration.sql
+-- 4) nobel_estates.sql
+-- 5) lease_prep_migration_tables.sql
+-- 6) lease_migration.sql
+-- 7) lease_validate_migration.sql
+-- 8) sublease_backup.sql
+-- 9) sublease_prep_migration_tables.sql
+-- 10) sublease_migration.sql
+-- 11) mortgage_prep_migration_tables.sql
+-- 12) mortgage_migration.sql
+-- 13) mortgage_validate_migration.sql
+-- 14) migration_counts
+
 
 
 -- Create table to hold validation messages
@@ -50,9 +56,9 @@ WHERE l.sola_rrr_id = r.id AND r.expiration_date IS NULL;
 
 -- 6. Verify the next payment date for rental is valid and not significantly in the past
 INSERT INTO lease.validation (code, message, item_num, id)
-SELECT 'INVALID DUE DATE', 'Invalid or missing lease payment date of "' || COALESCE(l.lease_payment_date, '-'), l.lease_number, l."ID"
+SELECT 'INVALID DUE DATE', 'Invalid or missing lease payment date of "' || COALESCE(l.payment_upto_date, '-'), l.lease_number, l."ID"
 FROM lease.lease_detail l, administrative.rrr r
-WHERE l.sola_rrr_id = r.id AND (r.due_date IS NULL OR r.due_date < '1990-01-01');
+WHERE l.sola_rrr_id = r.id AND (r.due_date IS NULL OR r.due_date < '1960-01-01');
 
 -- 7. Checks if the area for the lot is valid
 INSERT INTO lease.validation (code, message, item_num, id)

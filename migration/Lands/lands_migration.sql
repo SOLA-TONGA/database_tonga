@@ -1,15 +1,19 @@
-﻿-- Script run time: 580 seconds (9 mins, 30s) approx.
+﻿-- Script run time: 400 seconds (6 mins, 40s) approx.
 
 -- Run the migration scripts in the following order...
 -- 1) lands_prep_migration_tables.sql
 -- 2) lands_migration.sql
 -- 3) lands_validate_migration.sql
--- 4) lease_prep_migration_tables.sql
--- 5) lease_migration.sql
--- 6) lease_validate_migration.sql
--- 7) mortgage_prep_migration_tables.sql
--- 8) mortgage_migration.sql
--- 9) mortgage_validate_migration.sql
+-- 4) nobel_estates.sql
+-- 5) lease_prep_migration_tables.sql
+-- 6) lease_migration.sql
+-- 7) lease_validate_migration.sql
+-- 8) sublease_backup.sql
+-- 9) sublease_prep_migration_tables.sql
+-- 10) sublease_migration.sql
+-- 11) mortgage_prep_migration_tables.sql
+-- 12) mortgage_migration.sql
+-- 13) mortgage_validate_migration.sql
 
 -- Function that can be used to return a default value (e.g. null) if it cannot
 -- be cast to the anyelement type.

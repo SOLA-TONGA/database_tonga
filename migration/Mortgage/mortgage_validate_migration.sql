@@ -4,12 +4,17 @@
 -- 1) lands_prep_migration_tables.sql
 -- 2) lands_migration.sql
 -- 3) lands_validate_migration.sql
--- 4) lease_prep_migration_tables.sql
--- 5) lease_migration.sql
--- 6) lease_validate_migration.sql
--- 7) mortgage_prep_migration_tables.sql
--- 8) mortgage_migration.sql
--- 9) mortgage_validate_migration.sql
+-- 4) nobel_estates.sql
+-- 5) lease_prep_migration_tables.sql
+-- 6) lease_migration.sql
+-- 7) lease_validate_migration.sql
+-- 8) sublease_backup.sql
+-- 9) sublease_prep_migration_tables.sql
+-- 10) sublease_migration.sql
+-- 11) mortgage_prep_migration_tables.sql
+-- 12) mortgage_migration.sql
+-- 13) mortgage_validate_migration.sql
+-- 14) migration_counts
 
 -- Create table to hold validation messages
 DROP TABLE IF EXISTS mortgage.validation;
@@ -37,6 +42,14 @@ FROM mortgage.mortgage m
 WHERE m.dup = FALSE
 AND m.deed_type = 'deed'
 AND NOT EXISTS (SELECT d_num FROM lands.reg_deed_grant WHERE d_num = m.deed_number); 
+
+-- 2a. Check if there is a Sublease for this mortgage
+INSERT INTO mortgage.validation (code, message, item_num, id)
+SELECT 'NO SUBLEASE FOR MORTGAGE', 'Sublease ' || COALESCE(m.sublease_num, '-') || ' is missing for mortgage', m.mortgage_number, m.mortgage_id
+FROM mortgage.mortgage m
+WHERE m.dup = FALSE
+AND m.deed_type = 'sublease'
+AND NOT EXISTS (SELECT sublease_number FROM lease.sl_clean WHERE sublease_number = m.sublease_num); 
 
 -- 3. Check the variation has a matching mortgage record
 INSERT INTO mortgage.validation (code, message, item_num, id)
