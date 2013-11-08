@@ -174,7 +174,8 @@ COALESCE(m.mortgage_rec_num || ', ' || m.mortgage_disch_rec_num, m.mortgage_rec_
 CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge 
      WHEN m.mortgage_dateof_rec > '01 JAN 1900' THEN  m.mortgage_dateof_rec
 	 ELSE NULL END,
-	 int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , m.mortgage_book || '/' || m.mortgage_page, 'migration',
+	 int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , 
+	 m.mortgage_book || '/' || m.mortgage_page || ' ' || m.mortgage_number, 'migration',
 CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge ELSE NULL END
 FROM mortgage.mortgage m, lease.lease_detail l
 WHERE m.deed_number = l.lease_number
@@ -195,7 +196,8 @@ COALESCE(m.mortgage_rec_num || ', ' || m.mortgage_disch_rec_num, m.mortgage_rec_
 CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge 
      WHEN m.mortgage_dateof_rec > '01 JAN 1900' THEN  m.mortgage_dateof_rec
 	 ELSE NULL END,
-	 int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , m.mortgage_book || '/' || m.mortgage_page, 'migration',
+	 int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , 
+	 m.mortgage_book || '/' || m.mortgage_page || ' ' || m.mortgage_number, 'migration',
 CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge ELSE NULL END
 FROM mortgage.mortgage m, lease.sl_clean s
 WHERE m.sublease_num = s.sublease_number
@@ -216,7 +218,8 @@ COALESCE(m.mortgage_rec_num || ', ' || m.mortgage_disch_rec_num, m.mortgage_rec_
 CASE WHEN status = 'h' THEN m.mortgage_dateof_discharge 
      WHEN m.mortgage_dateof_rec > '01 JAN 1900' THEN  m.mortgage_dateof_rec
 	 ELSE NULL END,
-int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , m.mortgage_book || '/' || m.mortgage_page, 'migration',
+int_rate, CASE WHEN m.term > 0 AND m.term <= 100 THEN m.term ELSE NULL END , 
+m.mortgage_book || '/' || m.mortgage_page || ' ' || m.mortgage_number, 'migration',
 CASE WHEN m.status = 'h' THEN m.mortgage_dateof_discharge ELSE NULL END
 FROM mortgage.mortgage m, lands.deed d
 WHERE m.deed_number = d.deed_num

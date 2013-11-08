@@ -128,11 +128,11 @@ AND sl.cleaned = TRUE;
 
 -- *** Create the RRR for the sublease and link this RRR to the lessee
 INSERT INTO administrative.rrr (id, ba_unit_id, nr, type_code, status_code, is_primary,
-transaction_id, registration_date, start_date, expiration_date, term, amount, 
+transaction_id, registration_date, registry_book_ref, start_date, expiration_date, term, amount, 
  other_rightholder_name, change_user)
 SELECT sola_rrr_id, sola_ba_unit_id, sublease_number, 'sublease', 
 CASE WHEN expire_date IS NULL OR now() > expire_date THEN 'historic' ELSE 'current' END, TRUE, 
-'migration', COALESCE(transfer_date, reg_date), start_date, expire_date, duration, 
+'migration', COALESCE(transfer_date, reg_date), sublease_number, start_date, expire_date, duration, 
 safe_cast(rental_per_year, null::numeric(29,2)), sublessor_name, 'migration'
 FROM lease.sl_clean
 WHERE EXISTS (SELECT id FROM administrative.ba_unit WHERE id = sola_ba_unit_id)
