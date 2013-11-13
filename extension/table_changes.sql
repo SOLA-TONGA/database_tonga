@@ -218,7 +218,10 @@ DROP COLUMN IF EXISTS description,
 DROP COLUMN IF EXISTS town_id,
 DROP COLUMN IF EXISTS lease_ba_unit_id,
 DROP COLUMN IF EXISTS lessee_name,
-DROP COLUMN IF EXISTS lease_linked;
+DROP COLUMN IF EXISTS lease_linked,
+DROP COLUMN IF EXISTS sublease_number,
+DROP COLUMN IF EXISTS sublease_ba_unit_id,
+DROP COLUMN IF EXISTS sublease_linked;
 
 ALTER TABLE application.application_property
 ALTER COLUMN name_firstpart  DROP NOT NULL,
@@ -240,7 +243,10 @@ ADD description VARCHAR(1000),
 ADD town_id VARCHAR(40),
 ADD lease_ba_unit_id VARCHAR(40),
 ADD lessee_name VARCHAR(255),
-ADD lease_linked BOOLEAN NOT NULL DEFAULT FALSE;
+ADD lease_linked BOOLEAN NOT NULL DEFAULT FALSE,
+ADD sublease_number VARCHAR(40),
+ADD sublease_ba_unit_id VARCHAR(40),
+ADD sublease_linked BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE application.application_property_historic
 DROP COLUMN IF EXISTS lease_number,
@@ -255,7 +261,10 @@ DROP COLUMN IF EXISTS description,
 DROP COLUMN IF EXISTS town_id,
 DROP COLUMN IF EXISTS lease_ba_unit_id,
 DROP COLUMN IF EXISTS lessee_name,
-DROP COLUMN IF EXISTS lease_linked;
+DROP COLUMN IF EXISTS lease_linked,
+DROP COLUMN IF EXISTS sublease_number,
+DROP COLUMN IF EXISTS sublease_ba_unit_id,
+DROP COLUMN IF EXISTS sublease_linked;
 
 ALTER TABLE application.application_property_historic
 ALTER COLUMN name_firstpart TYPE VARCHAR(50),
@@ -272,7 +281,10 @@ ADD description VARCHAR(1000),
 ADD town_id VARCHAR(40),
 ADD lease_ba_unit_id VARCHAR(40),
 ADD lessee_name VARCHAR(255),
-ADD lease_linked BOOLEAN;
+ADD lease_linked BOOLEAN,
+ADD sublease_number VARCHAR(40),
+ADD sublease_ba_unit_id VARCHAR(40),
+ADD sublease_linked BOOLEAN NOT NULL DEFAULT FALSE;
 
 
 -- Replace the application.get_concatenated_name function as this does not work properly. It lists the
