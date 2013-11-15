@@ -380,15 +380,39 @@ WHERE NOT EXISTS (SELECT code FROM party.party_role_type WHERE code = 'king');
 
 
 -- RRR Types
+-- Disable all types by default
+UPDATE administrative.rrr_type SET status = 'x';
+
+-- Enable types for SOLA Tonga
 UPDATE administrative.rrr_type SET status = 'c'
-WHERE code IN ('lifeEstate'); 
+WHERE code IN ('lease', 'lifeEstate', 'ownership', 'mortgage'); 
+
+UPDATE administrative.rrr_type SET is_primary = TRUE
+WHERE code IN ('lease', 'ownership'); 
+
+UPDATE administrative.rrr_type SET is_primary = FALSE
+WHERE code IN ('lifeEstate');
 
 UPDATE administrative.rrr_type SET display_value = 'Landholder'
 WHERE code IN ('ownership'); 
 
-INSERT INTO administrative.rrr_type(code, display_value, rrr_group_type_code, is_primary, party_required, share_check, status)
-SELECT 'sublease','Sublease', 'rights', TRUE, TRUE, FALSE, 'c'
+INSERT INTO administrative.rrr_type(code, display_value, rrr_group_type_code, is_primary, party_required, share_check, status, description)
+SELECT 'sublease','Sublease', 'rights', TRUE, TRUE, FALSE, 'c', 'Indicates the property is subject to sublease'
 WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'sublease');
+
+INSERT INTO administrative.rrr_type(code, rrr_group_type_code, display_value, is_primary, share_check, party_required, status, description)
+    SELECT 'servitude', 'restrictions', 'Servient Tenement', FALSE, FALSE, FALSE, 'c', 'Indicates the property is subject to an easement as the servient tenement.'
+    WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'servitude');	
+	
+INSERT INTO administrative.rrr_type(code, rrr_group_type_code, display_value, is_primary, share_check, party_required, status, description)
+    SELECT 'dominant', 'rights', 'Dominant Tenement', FALSE, FALSE, FALSE, 'c', 'Indicates the property has been granted rights to an easement over another property as the dominant tenement.'
+	WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'dominant');
+
+INSERT INTO administrative.rrr_type(code, rrr_group_type_code, display_value, is_primary, share_check, party_required, status, description)
+    SELECT 'permit', 'rights', 'Permit', FALSE, FALSE, FALSE, 'c', 'Indicates the holder(s) of the permit have been granted the rights described by the permit. e.g. Occupation by alien(s)'
+	WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'permit');	
+
+
 
 -- Land Use Codes
 UPDATE cadastre.land_use_type
