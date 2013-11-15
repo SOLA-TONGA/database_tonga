@@ -221,6 +221,8 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('deedOfLease','Deed of Lease','c','FALSE', 'A scanned copy of the Deed of Lease' );
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('deedOfGrant','Deed of Grant','c','FALSE', 'A scanned copy of a Deed of Grant for an allotment' );
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('deedOfSublease','Deed of Sublease','c','FALSE', 'A scanned copy of a Deed of Sublease' );
 
 -- *** Load Checklist Group
 INSERT INTO application.checklist_group(code, display_value, description, status)
@@ -409,7 +411,7 @@ INSERT INTO administrative.rrr_type(code, rrr_group_type_code, display_value, is
 	WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'dominant');
 
 INSERT INTO administrative.rrr_type(code, rrr_group_type_code, display_value, is_primary, share_check, party_required, status, description)
-    SELECT 'permit', 'rights', 'Permit', FALSE, FALSE, FALSE, 'c', 'Indicates the holder(s) of the permit have been granted the rights described by the permit. e.g. Occupation by alien(s)'
+    SELECT 'permit', 'rights', 'Permit', FALSE, FALSE, FALSE, 'c', 'Indicates the holder(s) of the permit have been granted the rights described by the permit. e.g. Occupation by alien(s), Removal of Sand'
 	WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'permit');	
 
 
