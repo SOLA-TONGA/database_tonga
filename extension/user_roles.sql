@@ -204,11 +204,99 @@ INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'StartService', 'Service Action - Start', 'c', 'Allows any user to click the Start action. Note that the user must also have the appropraite Service role as well before they can successfully start the service. '
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'StartService');
    
-INSERT INTO system.approle (code, display_value, status, description)
-   SELECT 'CashierImport', 'Cashier Import', 'c', 'Allows the user to import payment information from the Cashier system. '
-   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'CashierImport');
- 
 
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'taxapi', 'Service - Register Tax Allotment', 'c', 'Registration Service. Allows the Register Tax Allotment service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'taxapi');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'townapi', 'Service - Register Town Allotment', 'c', 'Registration Service. Allows the Register Town Allotment service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'townapi');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'caveat', 'Service - Register Caveat', 'c', 'Registration Service. Allows the Register Caveat service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'caveat');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'varyCaveat', 'Service - Variation to Caveat', 'c', 'Registration Service. Allows the Variation to Caveat service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'varyCaveat');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'removeCaveat', 'Service - Remove Caveat', 'c', 'Registration Service. Allows the Remove Caveat service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'removeCaveat');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'lifeEstate', 'Service - Register Life Estate', 'c', 'Registration Service. Allows the Register Life Estate service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'lifeEstate');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'apiSurrender', 'Service - Transfer Allotment - Surrender', 'c', 'Registration Service. Allows the Transfer Allotment - Surrender service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'apiSurrender');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'apiExchange', 'Service - Transfer Allotment - Exchange', 'c', 'Registration Service. Allows the Transfer Allotment - Exchange service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'apiExchange');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'apiEjectment', 'Service - Transfer Allotment - Ejectment', 'c', 'Registration Service. Allows the Transfer Allotment - Ejectment service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'apiEjectment');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'cancelApi', 'Service - Cancel Allotment', 'c', 'Registration Service. Allows the Cancel Allotment service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'cancelApi');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'leaseInPossession', 'Service - Transfer Lease - Mortgagee in Possession', 'c', 'Registration Service. Allows the Transfer Lease - Mortgagee in Possession service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'leaseInPossession');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'leaseProbate', 'Service - Transfer Lease - Probate', 'c', 'Registration Service. Allows the Transfer Lease - Probate service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'leaseProbate');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'renewLease', 'Service - Renew Lease', 'c', 'Registration Service. Allows the Renew Lease service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'renewLease');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'surrenderLease', 'Service - Surrender Lease', 'c', 'Registration Service. Allows the Surrender Lease service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'surrenderLease');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'terminateLease', 'Service - Terminate Lease', 'c', 'Registration Service. Allows the Terminate Lease service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'terminateLease');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'subleaseInPossession', 'Service - Transfer Sublease - Mortgagee in Possession', 'c', 'Registration Service. Allows the Transfer Sublease - Mortgagee in Possession service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'subleaseInPossession');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'subleaseProbate', 'Service - Transfer Sublease - Probate', 'c', 'Registration Service. Allows the Transfer Sublease - Probate service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'subleaseProbate');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'surrenderSublease', 'Service - Surrender Sublease', 'c', 'Registration Service. Allows the Surrender Sublease service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'surrenderSublease');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'terminateSublease', 'Service - Terminate Sublease', 'c', 'Registration Service. Allows the Terminate Sublease service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'terminateSublease');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'assignMortgage', 'Service - Assign Mortgage', 'c', 'Registration Service. Allows the Assign Mortgage service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'assignMortgage');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'varyLifeEstate', 'Service - Variation of Life Estate', 'c', 'Registration Service. Allows the Variation of Life Estate service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'varyLifeEstate');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'removeLifeEstate', 'Service - Remove Life Estate', 'c', 'Registration Service. Allows the Remove Life Estate service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'removeLifeEstate');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'easement', 'Service - Register Easement', 'c', 'Registration Service. Allows the Register Easement service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'easement');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'varyEasement', 'Service - Variation of Easement', 'c', 'Registration Service. Allows the Variation of Easement service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'varyEasement');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'removeEasement', 'Service - Cancel Easement', 'c', 'Registration Service. Allows the Cancel Easement service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'removeEasement');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'trustee', 'Service - Register Trustee', 'c', 'Registration Service. Allows the Register Trustee service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'trustee');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'varyTrustee', 'Service - Variation to Trustee', 'c', 'Registration Service. Allows the Variation to Trustee service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'varyTrustee');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'removeTrustee', 'Service - Cancel Trustee', 'c', 'Registration Service. Allows the Cancel Trustee service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'removeTrustee');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'permit', 'Service - Register Permit', 'c', 'Registration Service. Allows the Register Permit service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'permit');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'cancelPermit', 'Service - Cancel Permit', 'c', 'Registration Service. Allows the Cancel Permit service to be started.' 
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'cancelPermit');
+
+   
  -- Add all active roles to the super-group-id
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) 
 (SELECT r.code, 'super-group-id' 
