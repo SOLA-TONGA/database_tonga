@@ -110,37 +110,37 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description)
-    VALUES ('taxapi','registrationServices','Register Tax ''Api::::TONGAN','c',5,7.00,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new tax ''api.');
+    VALUES ('taxapi','registrationServices','Register Tax Alloment::::TONGAN','c',5,7.00,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new tax ''api.');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description)
-    VALUES ('townapi','registrationServices','Register Town ''Api::::TONGAN','c',5,3.50,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new town ''api.');
+    VALUES ('townapi','registrationServices','Register Town Allotment::::TONGAN','c',5,3.50,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new town ''api.');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description)
-    VALUES ('apiSurrender','registrationServices','Transfer ''Api - Surrender::::TONGAN','c',5,0,0.00,0.00,0, 'Surrender ''api to <name>','ownership','vary','Used to transfer an ''api to another person or the crown when surrendered by the land holder');
+    VALUES ('apiSurrender','registrationServices','Transfer Allotment - Surrender::::TONGAN','c',5,0,0.00,0.00,0, 'Surrender ''api to <name>','ownership','vary','Used to transfer an ''api to another person or the crown when surrendered by the land holder');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description)
-    VALUES ('apiExchange','registrationServices','Transfer ''Api - Exchange::::TONGAN','c',5,0,0.00,0.00,0, 'Exchange ''api with <name>','ownership','vary','Used to transfer an ''api to another person due to an exchange of land');
+    VALUES ('apiExchange','registrationServices','Transfer Allotment - Exchange::::TONGAN','c',5,0,0.00,0.00,0, 'Exchange ''api with <name>','ownership','vary','Used to transfer an ''api to another person due to an exchange of land');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description)
-    VALUES ('apiEjectment','registrationServices','Transfer ''Api - Ejectment::::TONGAN','c',5,0,0.00,0.00,0, 'Transfered because of ejectment','ownership','vary','Used to transfer an ''api to the estate holder as a result of ejectment');
+    VALUES ('apiEjectment','registrationServices','Transfer Allotment - Ejectment::::TONGAN','c',5,0,0.00,0.00,0, 'Transfered because of ejectment','ownership','vary','Used to transfer an ''api to the estate holder as a result of ejectment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description)
-    VALUES ('cancelApi','registrationServices','Cancel ''Api::::TONGAN','c',5,0,0.00,0.00,0, 'Cancelled','ownership','cancel','Used to cancel an ''Api. Used when an ''Api is subdivided or destroyed');
+    VALUES ('cancelApi','registrationServices','Cancel Allotment::::TONGAN','c',5,0,0.00,0.00,0, 'Cancelled','ownership','cancel','Used to cancel an ''Api. Used when an ''Api is subdivided or destroyed');
 
 -- Leases
 UPDATE 	application.request_type 
