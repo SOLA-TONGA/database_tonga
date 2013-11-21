@@ -55,92 +55,92 @@ UPDATE application.request_type SET status = 'x';
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('checklist','applicationServices','Checklist::::TONGAN','c',5,0.00,0.00,0.00,0,
-	null,null,null,'Checklist Service applicable for different types of applications');
+	null,null,null,'Checklist Service applicable for different types of applications', 5, 'Workflow');
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('siteInspection','applicationServices','Site Inspection::::TONGAN','c',5,0.00,0.00,0.00,0,
-	null,null,null,'Indicates the application will require a site inspection');
+	null,null,null,'Indicates the application will require a site inspection', 10, 'Workflow');
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('ministerBriefing','applicationServices','Ministerial Briefing::::TONGAN','c',5,0.00,0.00,0.00,0,
-	null,null,null,'Briefing for the Minister of Lands to gain approval for the application');
+	null,null,null,'Briefing for the Minister of Lands to gain approval for the application', 15, 'Workflow');
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('cabinetSubmission','applicationServices','Cabinet Submission::::TONGAN','c',5,0.00,0.00,0.00,0,
 	null,null,null,'Submission to cabinet for thier approval of the application. Includes notifying application
-	of the cabinet decision');	
+	of the cabinet decision', 20, 'Workflow');	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('itemNumber','applicationServices','Issue Item Number::::TONGAN','c',2,0.00,0.00,0.00,0,
 	null,null,null,'Issues an item number to track teh application as is progresses through the Mapping and Survey 
-	department.');	
+	department.', 25, 'Workflow');	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('survey','applicationServices','Survey::::TONGAN','c',90,0.00,0.00,0.00,0,
-	null,null,null,'Ministry to conduct survey of the lease or allotment area');
+	null,null,null,'Ministry to conduct survey of the lease or allotment area', 30, 'Workflow');
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('draftDeed','applicationServices','Draft Deed::::TONGAN','c',5,0.00,0.00,0.00,0,
-	null,null,null,'Draft Deed of Grant or Deed of Lease including a diagram of the allotment or lease');
+	null,null,null,'Draft Deed of Grant or Deed of Lease including a diagram of the allotment or lease', 35);
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('signDeed','applicationServices','Sign Deed::::TONGAN','c',5,0.00,0.00,0.00,0,
 	null,null,null,'Organise individuals to attend and sign the lease with the minister and initial payment
-	of registration fee and annual rental');
+	of registration fee and annual rental', 40, 'Workflow');
 	
 -- *** Registration Services ***
 -- Allotments
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('taxapi','registrationServices','Register Tax Alloment::::TONGAN','c',5,7.00,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new tax ''api.');
+            description, display_order, display_group_name)
+    VALUES ('taxapi','registrationServices','Register Tax Alloment::::TONGAN','c',5,7.00,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new tax ''api.', 300, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('townapi','registrationServices','Register Town Allotment::::TONGAN','c',5,3.50,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new town ''api.');
+            description, display_order, display_group_name)
+    VALUES ('townapi','registrationServices','Register Town Allotment::::TONGAN','c',5,3.50,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new town ''api.', 305, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('apiSurrender','registrationServices','Transfer Allotment - Surrender::::TONGAN','c',5,0,0.00,0.00,0, 'Surrender ''api to <name>','ownership','vary','Used to transfer an ''api to another person or the crown when surrendered by the land holder');
+            description, display_order, display_group_name)
+    VALUES ('apiSurrender','registrationServices','Transfer Allotment - Surrender::::TONGAN','c',5,0,0.00,0.00,0, 'Surrender ''api to <name>','ownership','vary','Used to transfer an ''api to another person or the crown when surrendered by the land holder', 310, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('apiExchange','registrationServices','Transfer Allotment - Exchange::::TONGAN','c',5,0,0.00,0.00,0, 'Exchange ''api with <name>','ownership','vary','Used to transfer an ''api to another person due to an exchange of land');
+            description, display_order, display_group_name)
+    VALUES ('apiExchange','registrationServices','Transfer Allotment - Exchange::::TONGAN','c',5,0,0.00,0.00,0, 'Exchange ''api with <name>','ownership','vary','Used to transfer an ''api to another person due to an exchange of land', 315, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('apiEjectment','registrationServices','Transfer Allotment - Ejectment::::TONGAN','c',5,0,0.00,0.00,0, 'Transfered because of ejectment','ownership','vary','Used to transfer an ''api to the estate holder as a result of ejectment');
+            description, display_order, display_group_name)
+    VALUES ('apiEjectment','registrationServices','Transfer Allotment - Ejectment::::TONGAN','c',5,0,0.00,0.00,0, 'Transfered because of ejectment','ownership','vary','Used to transfer an ''api to the estate holder as a result of ejectment', 320, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('cancelApi','registrationServices','Cancel Allotment::::TONGAN','c',5,0,0.00,0.00,0, 'Cancelled','ownership','cancel','Used to cancel an ''Api. Used when an ''Api is subdivided or destroyed');
+            description, display_order, display_group_name)
+    VALUES ('cancelApi','registrationServices','Cancel Allotment::::TONGAN','c',5,0,0.00,0.00,0, 'Cancelled','ownership','cancel','Used to cancel an ''Api. Used when an ''Api is subdivided or destroyed', 325, 'Allotment');
 
 -- Leases
 UPDATE 	application.request_type 
@@ -152,7 +152,9 @@ SET 	display_value = 'Register Lease::::TONGAN',
 		area_base_fee = 0.00, 
 		nr_days_to_complete = 5,
 		rrr_type_code = null,
-		type_action_code = null
+		type_action_code = null,
+		display_order = 100,
+		display_group_name = 'Lease'
 WHERE   code = 'registerLease';
 
 UPDATE 	application.request_type 
@@ -163,89 +165,91 @@ SET 	display_value = 'Transfer Lease::::TONGAN',
 		base_fee = 14.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 105,
+		display_group_name = 'Lease'
 WHERE   code = 'varyLease';
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('leaseInPossession','registrationServices','Transfer Lease - Mortgagee in Possession::::TONGAN','c',5,14.00,0.00,0.00,0, 'Mortgagee in possession','lease','vary','Used to to transfer a lease to the bank or a new mortgagor in the case where the original mortgagor is in default');
+            description, display_order, display_group_name)
+    VALUES ('leaseInPossession','registrationServices','Transfer Lease - Mortgagee in Possession::::TONGAN','c',5,14.00,0.00,0.00,0, 'Mortgagee in possession','lease','vary','Used to to transfer a lease to the bank or a new mortgagor in the case where the original mortgagor is in default', 110, 'Lease');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('leaseProbate','registrationServices','Transfer Lease - Probate::::TONGAN','c',5,14.00,0.00,0.00,0, 'Probate','lease','vary','Used to to transfer a lease to new lessee(s) under probate.');
+            description, display_order, display_group_name)
+    VALUES ('leaseProbate','registrationServices','Transfer Lease - Probate::::TONGAN','c',5,14.00,0.00,0.00,0, 'Probate','lease','vary','Used to to transfer a lease to new lessee(s) under probate.', 115, 'Lease');
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('leaseDocument','registrationServices','Register Document Affecting Leasehold Title::::TONGAN','c',5,1.80,0.00,0.00,0,
-	'Register document','lease','vary','Used to register a document affecting a Lease');
+	'Register document','lease','vary','Used to register a document affecting a Lease', 120, 'Lease');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('renewLease','registrationServices','Renew Lease::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Renew','lease','vary','Renew or extend lease period');
+	'Renew','lease','vary','Renew or extend lease period', 125, 'Lease');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('surrenderLease','registrationServices','Surrender Lease::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Surrender','lease','cancel','Surrender lease');
+	'Surrender','lease','cancel','Surrender lease', 130, 'Lease');
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('terminateLease','registrationServices','Terminate Lease::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Termination','lease','cancel','Terminate lease');
+	'Termination','lease','cancel','Terminate lease', 135, 'Lease');
 
 	
 -- Sublease
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('registerSublease','registrationServices','Register Sublease::::TONGAN','c',5,10.50,0.00,0.00,0,
-	'Sublease of nn years to <name>','sublease','new','Register new sublease details');
+	'Sublease of nn years to <name>','sublease','new','Register new sublease details', 150, 'Sublease');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('varySublease','registrationServices','Transfer Sublease::::TONGAN','c',5,7.00,0.00,0.00,0,
-	'Transfer sublease of nn years to <name>','sublease','vary','Transfer sublease');
+	'Transfer sublease of nn years to <name>','sublease','vary','Transfer sublease', 155, 'Sublease');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('subleaseInPossession','registrationServices','Transfer Sublease - Mortgagee in Possession::::TONGAN','c',5,7.00,0.00,0.00,0, 'Mortgagee in possession','sublease','vary','Used to to transfer a sublease to the bank or a new mortgagor in the case where the original mortgagor is in default');
+            description, display_order, display_group_name)
+    VALUES ('subleaseInPossession','registrationServices','Transfer Sublease - Mortgagee in Possession::::TONGAN','c',5,7.00,0.00,0.00,0, 'Mortgagee in possession','sublease','vary','Used to to transfer a sublease to the bank or a new mortgagor in the case where the original mortgagor is in default', 160, 'Sublease');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('subleaseProbate','registrationServices','Transfer Sublease - Probate::::TONGAN','c',5,7.00,0.00,0.00,0, 'Probate','sublease','vary','Used to to transfer a sublease to new lessee(s) under probate.');
+            description, display_order, display_group_name)
+    VALUES ('subleaseProbate','registrationServices','Transfer Sublease - Probate::::TONGAN','c',5,7.00,0.00,0.00,0, 'Probate','sublease','vary','Used to to transfer a sublease to new lessee(s) under probate.', 165, 'Sublease');
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('surrenderSublease','registrationServices','Surrender Sublease::::TONGAN','c',5,0.00,0.00,0.00,0,'Surrender','sublease','cancel','Surrender sublease');
+            description, display_order, display_group_name)
+    VALUES ('surrenderSublease','registrationServices','Surrender Sublease::::TONGAN','c',5,0.00,0.00,0.00,0,'Surrender','sublease','cancel','Surrender sublease', 170, 'Sublease');
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('terminateSublease','registrationServices','Terminate Sublease::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Termination','sublease','cancel','Terminate sublease');
+	'Termination','sublease','cancel','Terminate sublease', 175, 'Sublease');
 
 -- Mortgages
 UPDATE 	application.request_type 
@@ -255,7 +259,9 @@ SET 	display_value = 'Register Mortgage::::TONGAN',
 		base_fee = 23.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 200,
+		display_group_name = 'Mortgage'
 WHERE   code = 'mortgage';
 
 UPDATE 	application.request_type 
@@ -266,7 +272,9 @@ SET 	display_value = 'Variation of Mortgage::::TONGAN',
 		base_fee = 23.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+	    display_order = 205,
+		display_group_name = 'Mortgage'
 WHERE   code = 'varyMortgage';	
 
 UPDATE 	application.request_type 
@@ -279,22 +287,24 @@ SET 	display_value = 'Discharge of Mortgage::::TONGAN',
 		base_fee = 10.50,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 210,
+		display_group_name = 'Mortgage'
 WHERE   code = 'removeRestriction';	
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('assignMortgage','registrationServices','Assign Mortgage::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Assign mortgage to <lender>','mortgage','vary','Can be used to assign (i.e. transfer) the mortgage to a new mortgagee.');
+	'Assign mortgage to <lender>','mortgage','vary','Can be used to assign (i.e. transfer) the mortgage to a new mortgagee.', 215, 'Mortgage');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('mortgageDocument','registrationServices','Register Document Affecting a Mortgage::::TONGAN','c',5,2.00,0.00,0.00,0,
-	'Register document','mortgage','vary','Used to register a document affecting a Mortgage');
+	'Register document','mortgage','vary','Used to register a document affecting a Mortgage', 220, 'Mortgage');
 
 -- Caveat
 UPDATE 	application.request_type 
@@ -304,7 +314,9 @@ SET 	display_value = 'Register Caveat',
 		base_fee = 0.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 400,
+		display_group_name = 'Other'
 WHERE   code = 'caveat';
 
 UPDATE 	application.request_type 
@@ -314,7 +326,9 @@ SET 	display_value = 'Variation to Caveat',
 		base_fee = 0.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 405,
+		display_group_name = 'Other'
 WHERE   code = 'varyCaveat';
 
 UPDATE 	application.request_type 
@@ -324,7 +338,9 @@ SET 	display_value = 'Remove Caveat',
 		base_fee = 0.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 410,
+		display_group_name = 'Other'
 WHERE   code = 'removeCaveat';
 
 -- Life Estate
@@ -335,66 +351,68 @@ SET 	display_value = 'Register Life Estate',
 		base_fee = 0.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 415,
+		display_group_name = 'Other'
 WHERE   code = 'lifeEstate';
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('varyLifeEstate','registrationServices','Variation of Life Estate::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Life estate','lifeEstate','vary','Used to change the details of a life estate');
+	'Life estate','lifeEstate','vary','Used to change the details of a life estate', 420, 'Other');
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
-    VALUES ('removeLifeEstate','registrationServices','Remove Life Estate::::TONGAN','c',5,0.00,0.00,0.00,0,'Life estate','lifeEstate','cancel','Used to remove a life estate from an allotment');
+            description, display_order, display_group_name)
+    VALUES ('removeLifeEstate','registrationServices','Remove Life Estate::::TONGAN','c',5,0.00,0.00,0.00,0,'Life estate','lifeEstate','cancel','Used to remove a life estate from an allotment', 425, 'Other');
 
 -- Easements
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('easement','registrationServices','Register Easement::::TONGAN','c',5,0.00,0.00,0.00,1,
 	'Servient <easement type> over <parcel1> in favour of <parcel2> / Dominant <easement type>
-	in favour of <parcel1> over <parcel2>','easement','new','Register easement');
+	in favour of <parcel1> over <parcel2>','easement','new','Register easement', 430, 'Other');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('varyEasement','registrationServices','Variation of Easement::::TONGAN','c',5,0.00,0.00,0.00,1,
-	'Easement <reference> changed','easement','vary','Change easement');
+	'Easement <reference> changed','easement','vary','Change easement', 432, 'Other');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('removeEasement','registrationServices','Cancel Easement::::TONGAN','c',5,0.00,0.00,0.00,1,
-	'Easement <reference> cancelled','easement','cancel','Cancel easement');
+	'Easement <reference> cancelled','easement','cancel','Cancel easement', 435, 'Other');
 
 -- Trustee
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('trustee','registrationServices','Register Trustee::::TONGAN','c',5,0.00,0.00,0.00,1,
-	'Trustee <name>','trustee','new','Register trustee');
+	'Trustee <name>','trustee','new','Register trustee', 440, 'Other');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('varyTrustee','registrationServices','Variation to Trustee::::TONGAN','c',5,0.00,0.00,0.00,1,
-	'Trustee <name> changed','trustee','vary','Change trustee');
+	'Trustee <name> changed','trustee','vary','Change trustee', 445, 'Other');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('removeTrustee','registrationServices','Cancel Trustee::::TONGAN','c',5,0.00,0.00,0.00,1,
-	'Trustee <name> cancelled','trustee','cancel','Cancel/remove trustee from property');
+	'Trustee <name> cancelled','trustee','cancel','Cancel/remove trustee from property', 450, 'Other');
 	
 -- Permits & Power of Attorney
 UPDATE 	application.request_type 
@@ -405,7 +423,9 @@ SET 	display_value = 'Register Power of Attorney',
 		base_fee = 0.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 500,
+		display_group_name = 'Permits and Power of Attorney'
 WHERE   code = 'regnPowerOfAttorney';
 
 UPDATE 	application.request_type 
@@ -416,40 +436,40 @@ SET 	display_value = 'Cancel Power of Attorney',
 		base_fee = 0.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
-		nr_days_to_complete = 5
+		nr_days_to_complete = 5,
+		display_order = 505,
+		display_group_name = 'Permits and Power of Attorney'
 WHERE   code = 'cnclPowerOfAttorney';
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('permit','docRegServices','Register Permit::::TONGAN','c',5,21.00,0.00,0.00,0,
-	NULL,NULL,NULL,'Registration of permit for occupation by alien(s), removal of Sand, etc.');
+	NULL,NULL,NULL,'Registration of permit for occupation by alien(s), removal of Sand, etc.', 510, 'Permits and Power of Attorney');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('cancelPermit','docRegServices','Cancel Permit::::TONGAN','c',5,0.00,0.00,0.00,0,
-	NULL,NULL,NULL,'Cancellation of permit for occupation by alien(s), removal of Sand, etc.');
+	NULL,NULL,NULL,'Cancellation of permit for occupation by alien(s), removal of Sand, etc.', 515, 'Permits and Power of Attorney');
 
 -- Registry Correction Services	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('correctRegistry','registrationServices','Correct Registry::::TONGAN','c',1,2.00,0.00,0.00,0,
-	'Registry Correction', null, null, 'Allows corrections to the registered information to be made.');
+	'Registry Correction', null, null, 'Allows corrections to the registered information to be made.', 600, 'Corrections');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
-            description)
+            description, display_order, display_group_name)
     VALUES ('correctRegistryRem','registrationServices','Correct Registry (Remove Right)::::TONGAN','c',1,2.00,0.00,0.00,0,
-	'Registry Correction', null, null, 'Allows corrections to the registered information to be made by removing rights.');
+	'Registry Correction', null, null, 'Allows corrections to the registered information to be made by removing rights.', 605, 'Corrections');
 	
-
-
 	
 -- Revise the list of document types for SOLA Tonga
 DELETE FROM application.request_type_requires_source_type;

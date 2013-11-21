@@ -601,3 +601,13 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 COMMENT ON FUNCTION administrative.get_other_rightholder_name(rrr_identifier CHARACTER VARYING) IS 'Determines the other right holder name (such as the lessor name) for certain rights based on ba_unit relationships';
+
+
+-- Add display order column to request type to control the order of the types for display
+ALTER TABLE application.request_type
+DROP COLUMN IF EXISTS display_group_name,
+DROP COLUMN IF EXISTS display_order;
+
+ALTER TABLE application.request_type
+ADD display_group_name VARCHAR(200),
+ADD display_order int;
