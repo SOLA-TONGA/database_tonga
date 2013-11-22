@@ -95,7 +95,7 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
     VALUES ('draftDeed','applicationServices','Draft Deed::::TONGAN','c',5,0.00,0.00,0.00,0,
-	null,null,null,'Draft Deed of Grant or Deed of Lease including a diagram of the allotment or lease', 35);
+	null,null,null,'Draft Deed of Grant or Deed of Lease including a diagram of the allotment or lease', 35, 'Workflow');
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
@@ -424,7 +424,7 @@ SET 	display_value = 'Register Power of Attorney',
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
 		nr_days_to_complete = 5,
-		display_order = 500,
+		display_order = 520,
 		display_group_name = 'Permits and Power of Attorney'
 WHERE   code = 'regnPowerOfAttorney';
 
@@ -437,7 +437,7 @@ SET 	display_value = 'Cancel Power of Attorney',
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
 		nr_days_to_complete = 5,
-		display_order = 505,
+		display_order = 525,
 		display_group_name = 'Permits and Power of Attorney'
 WHERE   code = 'cnclPowerOfAttorney';
 

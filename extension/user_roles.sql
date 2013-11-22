@@ -309,6 +309,10 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id)
 ALTER TABLE system.approle ENABLE TRIGGER ALL;
 ALTER TABLE system.approle_appgroup ENABLE TRIGGER ALL;
 
+-- Create Security Groups for Tonga
+INSERT INTO appgroup (id, name, description) VALUES ('admin-id', 'Administrator', 'This group is required for SOLA Administrators.');
+INSERT INTO appgroup (id, name, description) VALUES ('read-only-id', 'Read Only', 'This group allows read only access to SOLA .details');
+
 
 -- Add Staff Users...
 INSERT INTO system.appuser(
