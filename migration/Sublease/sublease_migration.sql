@@ -205,7 +205,7 @@ AND sola_co_id IS NULL;
 -- Lot number appears to be incorrect on this sublease. 
 UPDATE lease.sl_clean
 SET lot_number = '11'
-WHERE sublease_number = '1/95'
+WHERE sublease_number = '1/95';
 
 INSERT INTO cadastre.spatial_unit (id, level_id)
 SELECT sola_co_id, 'sublease' FROM lease.sl_clean
