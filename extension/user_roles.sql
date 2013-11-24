@@ -186,7 +186,7 @@ INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'varyLease', 'Service - Transfer Lease', 'c', 'Registration Service. Allows the Transfer Lease service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'varyLease');
 INSERT INTO system.approle (code, display_value, status, description)
-   SELECT 'varySublease', 'Service - Transfer Sublease', 'c', 'Registration Service. Allows the Transfer Sublease service to be started.'
+   SELECT 'varySublease', 'Service - Variation of Sublease', 'c', 'Registration Service. Allows the Variation of Sublease service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'varySublease');
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'varyMortgage', 'Service - Variation of Mortgage', 'c', 'Registration Service. Allows the Variation of Mortgage service to be started.'
@@ -203,6 +203,9 @@ INSERT INTO system.approle (code, display_value, status, description)
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'StartService', 'Service Action - Start', 'c', 'Allows any user to click the Start action. Note that the user must also have the appropraite Service role as well before they can successfully start the service. '
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'StartService');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'CashierImport', 'Import - Cashier Import', 'c', 'Allows user to open the Cashier Import form '
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'CashierImport');
    
 
 INSERT INTO system.approle (code, display_value, status, description)
@@ -295,96 +298,241 @@ INSERT INTO system.approle (code, display_value, status, description)
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'cancelPermit', 'Service - Cancel Permit', 'c', 'Registration Service. Allows the Cancel Permit service to be started.' 
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'cancelPermit');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'transferSublease', 'Service - Transfer Sublease', 'c', 'Registration Service. Allows the Transfer Sublease service to be started.'
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'transferSublease');
 
    
  -- Add all active roles to the super-group-id
-INSERT INTO system.approle_appgroup (approle_code, appgroup_id) 
+/* INSERT INTO system.approle_appgroup (approle_code, appgroup_id) 
 (SELECT r.code, 'super-group-id' 
  FROM   system.approle r
  WHERE  r.status = 'c'
  AND    NOT EXISTS (SELECT approle_code FROM system.approle_appgroup rg
                     WHERE  rg.approle_code = r.code
-				    AND    rg.appgroup_id = 'super-group-id'));
+				    AND    rg.appgroup_id = 'super-group-id')); */
  
 ALTER TABLE system.approle ENABLE TRIGGER ALL;
 ALTER TABLE system.approle_appgroup ENABLE TRIGGER ALL;
 
 -- Create Security Groups for Tonga
-INSERT INTO appgroup (id, name, description) VALUES ('admin-id', 'Administrator', 'This group is required for SOLA Administrators.');
-INSERT INTO appgroup (id, name, description) VALUES ('read-only-id', 'Read Only', 'This group allows read only access to SOLA .details');
+INSERT INTO system.appgroup (id, name, description) VALUES ('admin-id', 'Administrator', 'This group is required for SOLA Administrators.');
+INSERT INTO system.appgroup (id, name, description) VALUES ('read-only-id', 'Read Only', 'This group allows read only access to SOLA .details');
+INSERT INTO system.appgroup (id, name, description) VALUES ('registration-id', 'Registration', 'This group allows registration staff to register and process transactions');
+
+DELETE FROM system.approle_appgroup;
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ManageBR','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('NoPasswordExpiry','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ManageRefdata','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ManageSettings','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ManageSecurity','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnView','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BulkApplication','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewAssign','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewUnassign','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSearch','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('PartySearch','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSearch','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ReportGenerate','admin-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('CashierImport','admin-id');
+
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSearch','read-only-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSearch','read-only-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','read-only-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnView','read-only-id');
+
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSearch','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSearch','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('mortgage','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('permit','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('registerSublease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('taxapi','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('townapi','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('trustee','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('regnPowerOfAttorney','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('removeCaveat','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('removeLifeEstate','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('renewLease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('signDeed','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('siteInspection','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('surrenderLease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('surrenderSublease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('survey','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('terminateLease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('terminateSublease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('apiEjectment','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('apiExchange','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('apiSurrender','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('varyLease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('leaseInPossession','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('leaseProbate','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('transferSublease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('subleaseInPossession','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('subleaseProbate','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('varyEasement','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('varyLifeEstate','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('varyMortgage','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('varySublease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('varyCaveat','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('varyTrustee','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('CancelService','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('CompleteService','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RevertService','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('StartService','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnApprove','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnUnassignOthers','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RHSave','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnView','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignSelf','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnEdit','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnCreate','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnStatus','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnUnassignSelf','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnArchive','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnReject','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnDispatch','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnRequisition','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnResubmit','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnValidate','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnWithdraw','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewAssign','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewUnassign','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('TransactionCommit','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSave','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ParcelSave','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('PartySave','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('PartySearch','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSave','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitCertificate','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('assignMortgage','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('cabinetSubmission','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('cancelApi','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('removeEasement','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('cancelPermit','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('cnclPowerOfAttorney','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('removeTrustee','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('checklist','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('correctRegistry','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('correctRegistryRem','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('removeRestriction','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('draftDeed','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('itemNumber','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ministerBriefing','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('caveat','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('leaseDocument','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('mortgageDocument','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('easement','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('registerLease','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('lifeEstate','registration-id');
+
 
 
 -- Add Staff Users...
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT 'test-id', 'test', 'Test', 'The BOSS', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 1, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'test-id');
+    SELECT 'test-id', 'test', 'Test', 'The BOSS', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', false, 1, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'test-id');
+	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '24e16f88-9769-40aa-aedb-b8ff34bfed07', 'semisi', 'Semisi', 'Taufa', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'semisi' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '24e16f88-9769-40aa-aedb-b8ff34bfed07');
+    SELECT '24e16f88-9769-40aa-aedb-b8ff34bfed07', 'semisi', 'Semisi', 'Taufa', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test-id' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '24e16f88-9769-40aa-aedb-b8ff34bfed07');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'semisi';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'semisi';
+
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '6669d58c-daca-4b2e-a9f3-272481be5d7e', 'sione', 'Sione', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'sione' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '6669d58c-daca-4b2e-a9f3-272481be5d7e');
+    SELECT '6669d58c-daca-4b2e-a9f3-272481be5d7e', 'sione', 'Sione', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '6669d58c-daca-4b2e-a9f3-272481be5d7e');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'sione';
+	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT 'd34cf379-cc57-4f32-b4df-18cae6a47d11', 'rosamond', 'Rosamond', 'Bing', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'rosamond' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'd34cf379-cc57-4f32-b4df-18cae6a47d11');
+    SELECT 'd34cf379-cc57-4f32-b4df-18cae6a47d11', 'rosamond', 'Rosamond', 'Bing', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'd34cf379-cc57-4f32-b4df-18cae6a47d11');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'read-only-id' FROM system.appuser WHERE username = 'rosamond';
+	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '7106cecd-8f64-4f4a-a52f-2534bf76f3a3', 'warrick', 'Warrick', 'Vea', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'warrick' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '7106cecd-8f64-4f4a-a52f-2534bf76f3a3');
+    SELECT '7106cecd-8f64-4f4a-a52f-2534bf76f3a3', 'warrick', 'Warrick', 'Vea', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '7106cecd-8f64-4f4a-a52f-2534bf76f3a3');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'warrick';
+	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '7e6856ac-41ff-4c39-aa29-7b29540f4ef4', 'savelina', 'Savelina', 'Pale', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'savelina' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '7e6856ac-41ff-4c39-aa29-7b29540f4ef4');
+    SELECT '7e6856ac-41ff-4c39-aa29-7b29540f4ef4', 'savelina', 'Savelina', 'Pale', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '7e6856ac-41ff-4c39-aa29-7b29540f4ef4');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'savelina';
+
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '3ea44318-887e-4dbc-bb63-3cf18e471324', 'michelle', 'Michelle', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'michelle' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '3ea44318-887e-4dbc-bb63-3cf18e471324');
+    SELECT '3ea44318-887e-4dbc-bb63-3cf18e471324', 'michelle', 'Michelle', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '3ea44318-887e-4dbc-bb63-3cf18e471324');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'michelle';
+	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '2f7c44db-c04f-4d7e-82b1-02d191261874', 'emina', 'Emina', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'emina' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '2f7c44db-c04f-4d7e-82b1-02d191261874');
+    SELECT '2f7c44db-c04f-4d7e-82b1-02d191261874', 'emina', 'Emina', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '2f7c44db-c04f-4d7e-82b1-02d191261874');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'emina';
+
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
     SELECT '03dcb308-443e-42ad-bddc-3d3a8092f87e', 'andrew', 'Andrew', 'McDowell', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'andrew' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '03dcb308-443e-42ad-bddc-3d3a8092f87e');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'andrew';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'andrew';
+
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '4c518a4c-5774-4036-b271-eb5b122a75f8', 'tafolosa', 'Tafolosa', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'tafolosa' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '4c518a4c-5774-4036-b271-eb5b122a75f8');
-INSERT INTO system.appuser(
-            id, username, first_name, last_name, passwd, active, 
-            rowversion, change_user)
-    SELECT 'b017a158-cb01-4694-a1f6-6ddfcacadd4b', 'silia', 'Silia', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'silia' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'b017a158-cb01-4694-a1f6-6ddfcacadd4b');
-INSERT INTO system.appuser(
-            id, username, first_name, last_name, passwd, active, 
-            rowversion, change_user)
-    SELECT '79a3c03f-9bea-44c6-bf6f-dccee4e76ccd', 'ono', 'Ono', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'ono' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '79a3c03f-9bea-44c6-bf6f-dccee4e76ccd');
-INSERT INTO system.appuser(
-            id, username, first_name, last_name, passwd, active, 
-            rowversion, change_user)
-    SELECT '5bee66f8-a015-4c6a-b589-73b3302feca5', 'siueli', 'Siueli', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'siueli' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '5bee66f8-a015-4c6a-b589-73b3302feca5');
-INSERT INTO system.appuser(
-            id, username, first_name, last_name, passwd, active, 
-            rowversion, change_user)
-    SELECT '35db9e40-e293-4552-8c83-c1647b4cfd30', 'polotu', 'Polotu', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 4, 'polotu' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '35db9e40-e293-4552-8c83-c1647b4cfd30');
-INSERT INTO system.appuser(
-            id, username, first_name, last_name, passwd, active, 
-            rowversion, change_user)
-    SELECT '9d2a6029-8781-4b36-aa7f-6eb00105d6e5', 'lousa', 'Lousa', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'lousa' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '9d2a6029-8781-4b36-aa7f-6eb00105d6e5');
-INSERT INTO system.appuser(
-            id, username, first_name, last_name, passwd, active, 
-            rowversion, change_user)
-    SELECT 'f38f8409-9f31-4f5a-94f5-e92a196f1833', 'asipeli', '''Asipeli', 'Palaki', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'asipeli' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'f38f8409-9f31-4f5a-94f5-e92a196f1833');
+    SELECT '4c518a4c-5774-4036-b271-eb5b122a75f8', 'tafolosa', 'Tafolosa', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '4c518a4c-5774-4036-b271-eb5b122a75f8');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'tafolosa';
 	
-INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id)
+INSERT INTO system.appuser(
+            id, username, first_name, last_name, passwd, active, 
+            rowversion, change_user)
+    SELECT 'b017a158-cb01-4694-a1f6-6ddfcacadd4b', 'silia', 'Silia', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'b017a158-cb01-4694-a1f6-6ddfcacadd4b');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'silia';	
+	
+INSERT INTO system.appuser(
+            id, username, first_name, last_name, passwd, active, 
+            rowversion, change_user)
+    SELECT '79a3c03f-9bea-44c6-bf6f-dccee4e76ccd', 'ono', 'Ono', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '79a3c03f-9bea-44c6-bf6f-dccee4e76ccd');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'ono';
+	
+INSERT INTO system.appuser(
+            id, username, first_name, last_name, passwd, active, 
+            rowversion, change_user)
+    SELECT '5bee66f8-a015-4c6a-b589-73b3302feca5', 'siueli', 'Siueli', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '5bee66f8-a015-4c6a-b589-73b3302feca5');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'siueli';
+	
+INSERT INTO system.appuser(
+            id, username, first_name, last_name, passwd, active, 
+            rowversion, change_user)
+    SELECT '35db9e40-e293-4552-8c83-c1647b4cfd30', 'polotu', 'Polotu', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 4, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '35db9e40-e293-4552-8c83-c1647b4cfd30');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'polotu';
+	
+INSERT INTO system.appuser(
+            id, username, first_name, last_name, passwd, active, 
+            rowversion, change_user)
+    SELECT '9d2a6029-8781-4b36-aa7f-6eb00105d6e5', 'lousa', 'Lousa', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '9d2a6029-8781-4b36-aa7f-6eb00105d6e5');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'lousa';
+	
+INSERT INTO system.appuser(
+            id, username, first_name, last_name, passwd, active, 
+            rowversion, change_user)
+    SELECT 'f38f8409-9f31-4f5a-94f5-e92a196f1833', 'asipeli', '''Asipeli', 'Palaki', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'f38f8409-9f31-4f5a-94f5-e92a196f1833');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'read-only-id' FROM system.appuser WHERE username = 'asipeli';
+	
+/* INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id)
 (SELECT u.id, 'super-group-id' 
  FROM   system.appuser u
  WHERE  u.active = true
  AND    NOT EXISTS (SELECT ug.appuser_id FROM system.appuser_appgroup ug
                     WHERE  ug.appuser_id = u.id
-				    AND    ug.appgroup_id = 'super-group-id'));
+				    AND    ug.appgroup_id = 'super-group-id')); */
 
