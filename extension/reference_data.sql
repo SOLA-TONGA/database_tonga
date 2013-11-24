@@ -140,7 +140,7 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('cancelApi','registrationServices','Cancel Allotment::::TONGAN','c',5,0,0.00,0.00,0, 'Cancelled','ownership','cancel','Used to cancel an ''Api. Used when an ''Api is subdivided or destroyed', 325, 'Allotment');
+    VALUES ('cancelApi','registrationServices','Cancel Allotment::::TONGAN','c',5,0,0.00,0.00,0, 'Cancelled', NULL,'cancel','Used to cancel an ''Api. Used when an ''Api is subdivided or destroyed', 325, 'Allotment');
 
 -- Leases
 UPDATE 	application.request_type 
@@ -193,22 +193,22 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('renewLease','registrationServices','Renew Lease::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Renew','lease','vary','Renew or extend lease period', 125, 'Lease');
+    VALUES ('renewLease','registrationServices','Variation of Lease::::TONGAN','c',5,0.00,0.00,0.00,0,
+	'Renew or vary','lease','vary','Renew or vary lease', 125, 'Lease');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
     VALUES ('surrenderLease','registrationServices','Surrender Lease::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Surrender','lease','cancel','Surrender lease', 130, 'Lease');
+	'Surrender',NULL,'cancel','Surrender lease', 130, 'Lease');
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
     VALUES ('terminateLease','registrationServices','Terminate Lease::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Termination','lease','cancel','Terminate lease', 135, 'Lease');
+	'Termination',NULL,'cancel','Terminate lease', 135, 'Lease');
 
 	
 -- Sublease
@@ -223,7 +223,14 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('varySublease','registrationServices','Transfer Sublease::::TONGAN','c',5,7.00,0.00,0.00,0,
+    VALUES ('varySublease','registrationServices','Variation of Sublease::::TONGAN','c',5,7.00,0.00,0.00,0,
+	'Variation','sublease','vary','Variation of sublease', 153, 'Sublease');
+	
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description, display_order, display_group_name)
+    VALUES ('transferSublease','registrationServices','Transfer Sublease::::TONGAN','c',5,7.00,0.00,0.00,0,
 	'Transfer sublease of nn years to <name>','sublease','vary','Transfer sublease', 155, 'Sublease');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
@@ -242,14 +249,14 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('surrenderSublease','registrationServices','Surrender Sublease::::TONGAN','c',5,0.00,0.00,0.00,0,'Surrender','sublease','cancel','Surrender sublease', 170, 'Sublease');
+    VALUES ('surrenderSublease','registrationServices','Surrender Sublease::::TONGAN','c',5,0.00,0.00,0.00,0,'Surrender',NULL,'cancel','Surrender sublease', 170, 'Sublease');
 
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
     VALUES ('terminateSublease','registrationServices','Terminate Sublease::::TONGAN','c',5,0.00,0.00,0.00,0,
-	'Termination','sublease','cancel','Terminate sublease', 175, 'Sublease');
+	'Termination',NULL,'cancel','Terminate sublease', 175, 'Sublease');
 
 -- Mortgages
 UPDATE 	application.request_type 
@@ -335,6 +342,8 @@ UPDATE 	application.request_type
 SET 	display_value = 'Remove Caveat',
 		status = 'c',
 		description = 'Remove a caveat.',
+		rrr_type_code = 'caveat',
+		type_action_code = 'cancel',
 		base_fee = 0.00,
 		value_base_fee = 0.00, 
 		area_base_fee = 0.00, 
@@ -468,7 +477,7 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
     VALUES ('correctRegistryRem','registrationServices','Correct Registry (Remove Right)::::TONGAN','c',1,2.00,0.00,0.00,0,
-	'Registry Correction', null, null, 'Allows corrections to the registered information to be made by removing rights.', 605, 'Corrections');
+	'Registry Correction', null, 'cancel', 'Allows corrections to the registered information to be made by removing rights.', 605, 'Corrections');
 	
 	
 -- Revise the list of document types for SOLA Tonga

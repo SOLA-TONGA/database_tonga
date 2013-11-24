@@ -186,7 +186,7 @@ INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'varyLease', 'Service - Transfer Lease', 'c', 'Registration Service. Allows the Transfer Lease service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'varyLease');
 INSERT INTO system.approle (code, display_value, status, description)
-   SELECT 'varySublease', 'Service - Transfer Sublease', 'c', 'Registration Service. Allows the Transfer Sublease service to be started.'
+   SELECT 'varySublease', 'Service - Variation of Sublease', 'c', 'Registration Service. Allows the Variation of Sublease service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'varySublease');
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'varyMortgage', 'Service - Variation of Mortgage', 'c', 'Registration Service. Allows the Variation of Mortgage service to be started.'
@@ -295,6 +295,9 @@ INSERT INTO system.approle (code, display_value, status, description)
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'cancelPermit', 'Service - Cancel Permit', 'c', 'Registration Service. Allows the Cancel Permit service to be started.' 
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'cancelPermit');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'transferSublease', 'Service - Transfer Sublease', 'c', 'Registration Service. Allows the Transfer Sublease service to be started.'
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'transferSublease');
 
    
  -- Add all active roles to the super-group-id
