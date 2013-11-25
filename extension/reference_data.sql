@@ -487,6 +487,8 @@ DELETE FROM source.administrative_source_type;
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('leaseApplication','Lease Application','c','FALSE', 'Application for lease of a tax or town allotment'); 
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('subleaseApp','Sublease Application','c','FALSE', 'Application for sublease of a tax or town allotment');
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('cabinetSubmission','Cabinet Submission','c','FALSE', 'Submission to cabinet for thier approval of a lease or related land transaction');  
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('cabinetDecision','Cabinet Decision','c','FALSE', 'Document summarising the decision by cabinet for a lease or related land transaction');  
@@ -692,3 +694,8 @@ WHERE NOT EXISTS (SELECT code FROM party.party_role_type WHERE code = 'king');
 UPDATE cadastre.land_use_type
 SET display_value = 'Residential::::''Api Kolo'
 WHERE code = 'residential';
+
+-- Parcel Types
+UPDATE cadastre.cadastre_object_type
+SET status = 'x'
+WHERE code != 'parcel';
