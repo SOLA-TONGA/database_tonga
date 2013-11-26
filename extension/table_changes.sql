@@ -611,3 +611,9 @@ DROP COLUMN IF EXISTS display_order;
 ALTER TABLE application.request_type
 ADD display_group_name VARCHAR(200),
 ADD display_order int;
+
+-- Add fields to capture text entered into Land Matter and Recommendation in the Ministerial Briefing service
+ALTER TABLE application.service ADD report_text_one character varying(4000);
+ALTER TABLE application.service ADD report_text_two character varying(4000);
+ALTER TABLE application.service_historic ADD report_text_one character varying(4000);
+ALTER TABLE application.service_historic ADD report_text_two character varying(4000);
