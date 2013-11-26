@@ -319,6 +319,7 @@ ALTER TABLE system.approle_appgroup ENABLE TRIGGER ALL;
 INSERT INTO system.appgroup (id, name, description) VALUES ('admin-id', 'Administrator', 'This group is required for SOLA Administrators.');
 INSERT INTO system.appgroup (id, name, description) VALUES ('read-only-id', 'Read Only', 'This group allows read only access to SOLA .details');
 INSERT INTO system.appgroup (id, name, description) VALUES ('registration-id', 'Registration', 'This group allows registration staff to register and process transactions');
+INSERT INTO system.appgroup (id, name, description) VALUES ('team-leader-id', 'Team Leader', 'This group allows senior registration staff to assign applications and produce lodgement reports');
 
 DELETE FROM system.approle_appgroup;
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ManageBR','admin-id');
@@ -381,9 +382,6 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('Complet
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RevertService','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('StartService','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnApprove','registration-id');
-INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnUnassignOthers','registration-id');
-INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','registration-id');
-INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RHSave','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnView','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignSelf','registration-id');
@@ -428,7 +426,12 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('easemen
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('registerLease','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('lifeEstate','registration-id');
 
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnUnassignOthers','team-leader-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','team-leader-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RHSave','team-leader-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ReportGenerate','team-leader-id');
 
+DELETE FROM system.appuser_appgroup;
 
 -- Add Staff Users...
 INSERT INTO system.appuser(
@@ -439,14 +442,15 @@ INSERT INTO system.appuser(
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '24e16f88-9769-40aa-aedb-b8ff34bfed07', 'semisi', 'Semisi', 'Taufa', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test-id' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '24e16f88-9769-40aa-aedb-b8ff34bfed07');
+    SELECT '24e16f88-9769-40aa-aedb-b8ff34bfed07', 'semisi', 'Semisi', 'Taufa', '95f99609bde369a0bae117830f00f9477367853f5f25ad3504f2dc7315c6a38b', true, 2, 'semisi' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '24e16f88-9769-40aa-aedb-b8ff34bfed07');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'semisi';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'semisi';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'team-leader-id' FROM system.appuser WHERE username = 'semisi';
 
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '6669d58c-daca-4b2e-a9f3-272481be5d7e', 'sione', 'Sione', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '6669d58c-daca-4b2e-a9f3-272481be5d7e');
+    SELECT '6669d58c-daca-4b2e-a9f3-272481be5d7e', 'sione', 'Sione', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'sione' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '6669d58c-daca-4b2e-a9f3-272481be5d7e');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'sione';
 	
 INSERT INTO system.appuser(
@@ -458,25 +462,27 @@ INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'read-o
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '7106cecd-8f64-4f4a-a52f-2534bf76f3a3', 'warrick', 'Warrick', 'Vea', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '7106cecd-8f64-4f4a-a52f-2534bf76f3a3');
+    SELECT '7106cecd-8f64-4f4a-a52f-2534bf76f3a3', 'warrick', 'Warrick', 'Vea', '8e368f19623e2d7390ddbd8c40d637a9fb6746ba3b21a6e2ca417f89d857e695', true, 2, 'warrick' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '7106cecd-8f64-4f4a-a52f-2534bf76f3a3');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'warrick';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'team-leader-id' FROM system.appuser WHERE username = 'warrick';
 	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '7e6856ac-41ff-4c39-aa29-7b29540f4ef4', 'savelina', 'Savelina', 'Pale', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '7e6856ac-41ff-4c39-aa29-7b29540f4ef4');
+    SELECT '7e6856ac-41ff-4c39-aa29-7b29540f4ef4', 'savelina', 'Savelina', 'Pale', '8fd9006d4a187522263a91771e357bbfc951a2cc8529246abd757102391fe81e', true, 2, 'savelina' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '7e6856ac-41ff-4c39-aa29-7b29540f4ef4');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'savelina';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'team-leader-id' FROM system.appuser WHERE username = 'savelina';
 
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '3ea44318-887e-4dbc-bb63-3cf18e471324', 'michelle', 'Michelle', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '3ea44318-887e-4dbc-bb63-3cf18e471324');
+    SELECT '3ea44318-887e-4dbc-bb63-3cf18e471324', 'michelle', 'Michelle', ' ', '9ae8cfe46fdcdb8e51c56a8ef8cd5319e62b846f49de1370111f3fb34b7045c4', true, 2, 'michelle' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '3ea44318-887e-4dbc-bb63-3cf18e471324');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'michelle';
 	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '2f7c44db-c04f-4d7e-82b1-02d191261874', 'emina', 'Emina', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '2f7c44db-c04f-4d7e-82b1-02d191261874');
+    SELECT '2f7c44db-c04f-4d7e-82b1-02d191261874', 'emina', 'Emina', ' ', 'd6a79254007d0f2cc3115fc445cc6e563925aba6008b73f9c332d62403ff3d4b', true, 3, 'emina' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '2f7c44db-c04f-4d7e-82b1-02d191261874');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'emina';
 
 INSERT INTO system.appuser(
@@ -485,17 +491,18 @@ INSERT INTO system.appuser(
     SELECT '03dcb308-443e-42ad-bddc-3d3a8092f87e', 'andrew', 'Andrew', 'McDowell', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'andrew' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '03dcb308-443e-42ad-bddc-3d3a8092f87e');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'andrew';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'andrew';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'team-leader-id' FROM system.appuser WHERE username = 'andrew';
 
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '4c518a4c-5774-4036-b271-eb5b122a75f8', 'tafolosa', 'Tafolosa', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '4c518a4c-5774-4036-b271-eb5b122a75f8');
+    SELECT '4c518a4c-5774-4036-b271-eb5b122a75f8', 'tafolosa', 'Tafolosa', ' ', '73f79bd110acd47d5161d74956fe3b7223154b9b99819b2307b74ec7a8e64fff', true, 1, 'tafolosa' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '4c518a4c-5774-4036-b271-eb5b122a75f8');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'tafolosa';
 	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT 'b017a158-cb01-4694-a1f6-6ddfcacadd4b', 'silia', 'Silia', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'b017a158-cb01-4694-a1f6-6ddfcacadd4b');
+    SELECT 'b017a158-cb01-4694-a1f6-6ddfcacadd4b', 'silia', 'Silia', ' ', '9b2637a7066ceac51d3e69a7a4968243875b44506780c3faab1d25c06c89636a', true, 3, 'silia' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'b017a158-cb01-4694-a1f6-6ddfcacadd4b');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'silia';	
 	
 INSERT INTO system.appuser(
@@ -507,19 +514,19 @@ INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'regist
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '5bee66f8-a015-4c6a-b589-73b3302feca5', 'siueli', 'Siueli', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '5bee66f8-a015-4c6a-b589-73b3302feca5');
+    SELECT '5bee66f8-a015-4c6a-b589-73b3302feca5', 'siueli', 'Siueli', ' ', 'd4ad4deeaf14ec8a2bc8f6c6ec21bb213873023c90680f2c2bac5043989ba212', true, 3, 'siueli' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '5bee66f8-a015-4c6a-b589-73b3302feca5');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'siueli';
 	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '35db9e40-e293-4552-8c83-c1647b4cfd30', 'polotu', 'Polotu', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 4, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '35db9e40-e293-4552-8c83-c1647b4cfd30');
+    SELECT '35db9e40-e293-4552-8c83-c1647b4cfd30', 'polotu', 'Polotu', ' ', '81878aa09a186069a2bcb71d9d9059cab49c7b12b7bb602cfff4d2bdd7888358', true, 4, 'polotu' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '35db9e40-e293-4552-8c83-c1647b4cfd30');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'polotu';
 	
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
             rowversion, change_user)
-    SELECT '9d2a6029-8781-4b36-aa7f-6eb00105d6e5', 'lousa', 'Lousa', ' ', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 3, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '9d2a6029-8781-4b36-aa7f-6eb00105d6e5');
+    SELECT '9d2a6029-8781-4b36-aa7f-6eb00105d6e5', 'lousa', 'Lousa', ' ', 'c3e587adfbeb60d7628beb0bbcb62f58a47f63209e20e81e39029336ecf23d72', true, 3, 'lousa' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '9d2a6029-8781-4b36-aa7f-6eb00105d6e5');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'lousa';
 	
 INSERT INTO system.appuser(
@@ -528,11 +535,6 @@ INSERT INTO system.appuser(
     SELECT 'f38f8409-9f31-4f5a-94f5-e92a196f1833', 'asipeli', '''Asipeli', 'Palaki', '1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014', true, 2, 'test' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = 'f38f8409-9f31-4f5a-94f5-e92a196f1833');
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'read-only-id' FROM system.appuser WHERE username = 'asipeli';
 	
-/* INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id)
-(SELECT u.id, 'super-group-id' 
- FROM   system.appuser u
- WHERE  u.active = true
- AND    NOT EXISTS (SELECT ug.appuser_id FROM system.appuser_appgroup ug
-                    WHERE  ug.appuser_id = u.id
-				    AND    ug.appgroup_id = 'super-group-id')); */
+INSERT INTO system.appuser(id, username, first_name, last_name, passwd, active, change_user) SELECT '6d18b50b-c8c1-4fc6-974a-91bc26aa807a','salesi','Salesi','Fotu','cbedb4d13e797800669c5bbff9e72833baa546af27a34d93b9ff95b1a7bb5139',true,'salesi' WHERE  NOT EXISTS (SELECT id FROM system.appuser WHERE id = '6d18b50b-c8c1-4fc6-974a-91bc26aa807a');
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'read-only-id' FROM system.appuser WHERE username = 'salesi';
 
