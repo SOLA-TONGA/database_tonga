@@ -532,6 +532,8 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('will','Probated Will','c','FALSE', 'A legal declaration that names the benefactors of a deceased person’s estate along with those responsible for administering the estate. The Will must be probated and legally enforceable by the executor.'); 
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('permit','Permit','c','TRUE', 'Document type that can be registered to indicates the holder(s) of the permit have been granted the rights described by the permit. e.g. Occupation by alien(s), Removal of Sand, etc.');
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('clientRequest','Client Request','c','FALSE', 'Document or cover letter provided by client describing the reasons for a registration transaction');
 
 -- *** Load Checklist Group
 INSERT INTO application.checklist_group(code, display_value, description, status)
@@ -699,3 +701,8 @@ WHERE code = 'residential';
 UPDATE cadastre.cadastre_object_type
 SET status = 'x'
 WHERE code != 'parcel';
+
+-- Requisitioned Status Type
+UPDATE application.application_status_type
+SET display_value = 'On Hold'
+WHERE code = 'requisitioned';

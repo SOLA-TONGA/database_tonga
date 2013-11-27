@@ -182,26 +182,34 @@ ALTER TABLE application.service
 DROP COLUMN IF EXISTS action_date, 
 DROP COLUMN IF EXISTS action_completed,
 DROP COLUMN IF EXISTS approval_date, 
-DROP COLUMN IF EXISTS approval_number;
+DROP COLUMN IF EXISTS approval_number,
+DROP COLUMN IF EXISTS report_text_one,
+DROP COLUMN IF EXISTS report_text_two;
 
 ALTER TABLE application.service
 ADD action_date timestamp without time zone, 
 ADD action_completed boolean NOT NULL DEFAULT FALSE,
 ADD approval_date timestamp without time zone, 
 ADD approval_number VARCHAR(40),
+ADD report_text_one VARCHAR(4000),
+ADD report_text_two VARCHAR(4000),
 ALTER COLUMN action_notes TYPE VARCHAR(4000);
 
 ALTER TABLE application.service_historic
 DROP COLUMN IF EXISTS action_date, 
 DROP COLUMN IF EXISTS action_completed,
 DROP COLUMN IF EXISTS approval_date, 
-DROP COLUMN IF EXISTS approval_number;
+DROP COLUMN IF EXISTS approval_number,
+DROP COLUMN IF EXISTS report_text_one,
+DROP COLUMN IF EXISTS report_text_two;
 
 ALTER TABLE application.service_historic
 ADD action_date timestamp without time zone, 
 ADD action_completed boolean NOT NULL DEFAULT FALSE,
 ADD approval_date timestamp without time zone, 
 ADD approval_number VARCHAR(40),
+ADD report_text_one VARCHAR(4000),
+ADD report_text_two VARCHAR(4000),
 ALTER COLUMN action_notes TYPE VARCHAR(4000);
 
 -- Add columns to capture new lease application details

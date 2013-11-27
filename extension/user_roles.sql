@@ -320,6 +320,7 @@ INSERT INTO system.appgroup (id, name, description) VALUES ('admin-id', 'Adminis
 INSERT INTO system.appgroup (id, name, description) VALUES ('read-only-id', 'Read Only', 'This group allows read only access to SOLA .details');
 INSERT INTO system.appgroup (id, name, description) VALUES ('registration-id', 'Registration', 'This group allows registration staff to register and process transactions');
 INSERT INTO system.appgroup (id, name, description) VALUES ('team-leader-id', 'Team Leader', 'This group allows senior registration staff to assign applications and produce lodgement reports');
+INSERT INTO system.appgroup (id, name, description) VALUES ('drafting-id', 'Drafting', 'This group allows drafting staff to process the survey and sign deed workflow tasks');
 
 DELETE FROM system.approle_appgroup;
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ManageBR','admin-id');
@@ -430,6 +431,23 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnUn
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','team-leader-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RHSave','team-leader-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ReportGenerate','team-leader-id');
+
+-- Drafting
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSearch','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSearch','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnView','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignSelf','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnUnassignSelf','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewAssign','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewUnassign','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('draftDeed','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('survey','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('CompleteService','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RevertService','drafting-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('StartService','drafting-id');
+
 
 DELETE FROM system.appuser_appgroup;
 

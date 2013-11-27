@@ -1,0 +1,2 @@
+-- 27 Nov 2013 Ticket #??
+-- Add additional fields to support Reporting
