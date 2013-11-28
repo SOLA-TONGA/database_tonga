@@ -35,7 +35,9 @@ INSERT INTO administrative.rrr_type(code, rrr_group_type_code, display_value, is
     SELECT 'trustee', 'responsibilities', 'Trustee', FALSE, FALSE, TRUE, 'c', 'Trustee(s) appointed by the King to act for the lawful successor of an allotment where the successor is a minor (i.e. has not attained the age of 21).'
     WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'trustee');	
 
-	
+INSERT INTO administrative.rrr_type(code, rrr_group_type_code, display_value, is_primary, share_check, party_required, status, description)
+    SELECT 'surrender', 'restrictions', 'Surrender', FALSE, FALSE, TRUE, 'c', 'Identifies that an allotment has been surrendered in part or whole. The surrendered part of the allotment can only be claimed after it has been surrendered for 12 months.'
+    WHERE NOT EXISTS (SELECT code FROM administrative.rrr_type WHERE code = 'surrender');		
 	
 
 -- Service types for SOLA Tonga
@@ -110,25 +112,25 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('taxapi','registrationServices','Register Tax Alloment::::TONGAN','c',5,7.00,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new tax ''api.', 300, 'Allotment');
+    VALUES ('taxapi','registrationServices','Register Tax Alloment::::TONGAN','c',5,7.00,0.00,0.00,0, 'Register allotment to <name>','ownership','new','Used to register a new tax ''api.', 300, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('townapi','registrationServices','Register Town Allotment::::TONGAN','c',5,3.50,0.00,0.00,0, 'Register ''api to <name>','ownership','new','Used to register a new town ''api.', 305, 'Allotment');
+    VALUES ('townapi','registrationServices','Register Town Allotment::::TONGAN','c',5,3.50,0.00,0.00,0, 'Register allotment to <name>','ownership','new','Used to register a new town ''api.', 305, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('apiSurrender','registrationServices','Transfer Allotment - Surrender::::TONGAN','c',5,0,0.00,0.00,0, 'Surrender ''api to <name>','ownership','vary','Used to transfer an ''api to another person or the crown when surrendered by the land holder', 310, 'Allotment');
+    VALUES ('apiSurrender','registrationServices','Surrender Allotment::::TONGAN','c',5,0,0.00,0.00,0, 'Surrender allotment to <name>','surrender','new','Used to surrender all or part of an allotment', 310, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('apiExchange','registrationServices','Transfer Allotment - Exchange::::TONGAN','c',5,0,0.00,0.00,0, 'Exchange ''api with <name>','ownership','vary','Used to transfer an ''api to another person due to an exchange of land', 315, 'Allotment');
+    VALUES ('apiExchange','registrationServices','Transfer Allotment - Exchange::::TONGAN','c',5,0,0.00,0.00,0, 'Exchange allotment with <name>','ownership','vary','Used to transfer an ''api to another person due to an exchange of land', 315, 'Allotment');
 	
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
@@ -534,6 +536,8 @@ INSERT INTO source.administrative_source_type (code,display_value,status,is_for_
 VALUES ('permit','Permit','c','TRUE', 'Document type that can be registered to indicates the holder(s) of the permit have been granted the rights described by the permit. e.g. Occupation by alien(s), Removal of Sand, etc.');
 INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
 VALUES ('clientRequest','Client Request','c','FALSE', 'Document or cover letter provided by client describing the reasons for a registration transaction');
+INSERT INTO source.administrative_source_type (code,display_value,status,is_for_registration, description)
+VALUES ('surrenderDocs','Surrender Documents','c','FALSE', 'Documents supporting surrender of an allotment');
 
 -- *** Load Checklist Group
 INSERT INTO application.checklist_group(code, display_value, description, status)
@@ -672,6 +676,10 @@ WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 
 INSERT INTO administrative.ba_unit_rel_type(code, display_value, description, status)
 SELECT 'sublease','Sublease',NULL,'c'
 WHERE NOT EXISTS (SELECT code FROM administrative.ba_unit_rel_type WHERE code = 'sublease');
+
+UPDATE administrative.ba_unit_rel_type
+SET status = 'x'
+WHERE code IN ('priorTitle', 'rootTitle', 'island');
 
 
 -- Party Role Types

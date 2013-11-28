@@ -567,7 +567,7 @@ BEGIN
    -- as the lessee may have defaulted on a mortgage and the bank has decided to sublease the land. 
    SELECT CASE b.type_code 
             WHEN 'leasedUnit' THEN 'allotment' 
-			ELSE NULL END,
+			ELSE NULL END, -- Only retrieve parent details for leases. 
 		  r.other_rightholder_name,
 		  r.status_code
    INTO rel_code, result, status
