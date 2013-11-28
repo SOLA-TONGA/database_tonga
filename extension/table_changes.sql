@@ -475,7 +475,8 @@ DROP COLUMN IF EXISTS registry_book_ref,
 DROP COLUMN IF EXISTS start_date,
 DROP COLUMN IF EXISTS term,
 DROP COLUMN IF EXISTS other_rightholder_name,
-DROP COLUMN IF EXISTS cashier_update;
+DROP COLUMN IF EXISTS cashier_update,
+DROP COLUMN IF EXISTS rrr_ref;
 
 ALTER TABLE administrative.rrr
 ADD receipt_date timestamp without time zone,
@@ -485,7 +486,8 @@ ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2),
 ADD start_date timestamp without time zone,
 ADD other_rightholder_name character varying(255),
-ADD cashier_update BOOLEAN NOT NULL DEFAULT FALSE;
+ADD cashier_update BOOLEAN NOT NULL DEFAULT FALSE,
+ADD rrr_ref character varying(255);
 
 ALTER TABLE administrative.rrr_historic
 DROP COLUMN IF EXISTS receipt_date,
@@ -495,7 +497,8 @@ DROP COLUMN IF EXISTS registry_book_ref,
 DROP COLUMN IF EXISTS start_date,
 DROP COLUMN IF EXISTS term,
 DROP COLUMN IF EXISTS other_rightholder_name,
-DROP COLUMN IF EXISTS cashier_update;
+DROP COLUMN IF EXISTS cashier_update,
+DROP COLUMN IF EXISTS rrr_ref;
 
 ALTER TABLE administrative.rrr_historic
 ADD receipt_date timestamp without time zone,
@@ -505,7 +508,8 @@ ADD registry_book_ref character varying(50),
 ADD term NUMERIC(8,2),
 ADD start_date timestamp without time zone,
 ADD other_rightholder_name character varying(255),
-ADD cashier_update BOOLEAN;
+ADD cashier_update BOOLEAN,
+ADD rrr_ref character varying(255);
 
 
 -- Temporary change to the new cadastre_object trigger

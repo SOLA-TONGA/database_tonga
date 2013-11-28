@@ -49,3 +49,18 @@ INSERT INTO system.approle (code, display_value, status, description)
    
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ministerDecision','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('hodReview','registration-id');
+
+
+ALTER TABLE administrative.rrr
+ADD rrr_ref character varying(255);
+
+ALTER TABLE administrative.rrr_historic
+ADD rrr_ref character varying(255);
+
+-- Add the mortgage number as the rrr_ref
+ALTER TABLE administrative.rrr DISABLE TRIGGER ALL;
+UPDATE administrative.rrr
+SET rrr_ref = nr
+WHERE type_code = 'mortgage'
+AND transaction_id = 'migration';
+ALTER TABLE administrative.rrr ENABLE TRIGGER ALL;
