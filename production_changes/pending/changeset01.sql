@@ -22,3 +22,30 @@ VALUES ('surrenderDocs','Surrender Documents','c','FALSE', 'Documents supporting
 UPDATE administrative.ba_unit_rel_type
 SET status = 'x'
 WHERE code IN ('priorTitle', 'rootTitle', 'island');
+
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description, display_order, display_group_name)
+    VALUES ('hodReview','applicationServices','Head of Division Review::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Review of the documentation prepared for the Ministerial Briefing', 17, 'Workflow');
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description, display_order, display_group_name)
+    VALUES ('ministerDecision','applicationServices','Ministerial Decision::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Captures the decision by the minister as to whether to proceed with the transaction or not.', 18, 'Workflow');
+UPDATE application.request_type
+SET display_value = 'Ministerial Briefing Preparation::::TONGAN',
+    description = 'Preparing the briefing for the Minister of Lands to gain approval for the application'
+WHERE code = 'ministerBriefing';
+
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'ministerDecision', 'Service - Ministerial Decision', 'c', 'Application Service. Allows the Ministerial Decision service to be started.'
+WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'ministerDecision');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'hodReview', 'Service - Head of Division Review', 'c', 'Application Service. Allows the Head of Division Review service to be started.'
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'hodReview');
+   
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ministerDecision','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('hodReview','registration-id');

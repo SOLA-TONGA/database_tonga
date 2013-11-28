@@ -153,8 +153,14 @@ INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'itemNumber', 'Service - Issue Item Number', 'c', 'Application Service. Allows the Issue Item Number service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'itemNumber'); 
 INSERT INTO system.approle (code, display_value, status, description)
-   SELECT 'ministerBriefing', 'Service - Ministerial Briefing', 'c', 'Application Service. Allows the Ministerial Briefing service to be started.'
+   SELECT 'ministerBriefing', 'Service - Ministerial Briefing Prepartion', 'c', 'Application Service. Allows the Ministerial Briefing service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'ministerBriefing'); 
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'ministerDecision', 'Service - Ministerial Decision', 'c', 'Application Service. Allows the Ministerial Decision service to be started.'
+WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'ministerDecision');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'hodReview', 'Service - Head of Division Review', 'c', 'Application Service. Allows the Head of Division Review service to be started.'
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'hodReview');
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'mortgageDocument', 'Service - Register Document Affecting a Mortgage', 'c', 'Registration Service. Allows the Register Document Affecting a Mortgage service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'mortgageDocument');   
@@ -420,6 +426,8 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('removeR
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('draftDeed','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('itemNumber','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ministerBriefing','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ministerDecision','registration-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('hodReview','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('caveat','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('leaseDocument','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('mortgageDocument','registration-id');

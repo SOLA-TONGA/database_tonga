@@ -70,8 +70,20 @@ INSERT INTO application.request_type(code, request_category_code, display_value,
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
             description, display_order, display_group_name)
-    VALUES ('ministerBriefing','applicationServices','Ministerial Briefing::::TONGAN','c',5,0.00,0.00,0.00,0,
-	null,null,null,'Briefing for the Minister of Lands to gain approval for the application', 15, 'Workflow');
+    VALUES ('ministerBriefing','applicationServices','Ministerial Briefing Preparation::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Preparing the briefing for the Minister of Lands to gain approval for the application', 15, 'Workflow');
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description, display_order, display_group_name)
+    VALUES ('hodReview','applicationServices','Head of Division Review::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Review of the documentation prepared for the Ministerial Briefing', 17, 'Workflow');
+INSERT INTO application.request_type(code, request_category_code, display_value, 
+            status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
+            nr_properties_required, notation_template, rrr_type_code, type_action_code, 
+            description, display_order, display_group_name)
+    VALUES ('ministerDecision','applicationServices','Ministerial Decision::::TONGAN','c',5,0.00,0.00,0.00,0,
+	null,null,null,'Captures the decision by the minister as to whether to proceed with the transaction or not.', 18, 'Workflow');
 INSERT INTO application.request_type(code, request_category_code, display_value, 
             status, nr_days_to_complete, base_fee, area_base_fee, value_base_fee, 
             nr_properties_required, notation_template, rrr_type_code, type_action_code, 
