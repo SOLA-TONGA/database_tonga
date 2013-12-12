@@ -307,6 +307,9 @@ INSERT INTO system.approle (code, display_value, status, description)
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'transferSublease', 'Service - Transfer Sublease', 'c', 'Registration Service. Allows the Transfer Sublease service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'transferSublease');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'ViewProtectedFields', 'Property - View Protected Fields', 'c', 'Allows user to view details of protected fields such as the mortgage amount.'
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'ViewProtectedFields');
 
    
  -- Add all active roles to the super-group-id
@@ -329,6 +332,7 @@ INSERT INTO system.appgroup (id, name, description) VALUES ('team-leader-id', 'T
 INSERT INTO system.appgroup (id, name, description) VALUES ('drafting-id', 'Drafting', 'This group allows drafting staff to process the survey and sign deed workflow tasks');
 INSERT INTO system.appgroup (id, name, description) VALUES ('hod-id', 'Head of Division', 'This group allows the head of division to review applications before they proceed to the minister.');
 INSERT INTO system.appgroup (id, name, description) VALUES ('csr-id', 'Customer Services', 'This group allows the minister''s secretaries to lodge new applications as they are received.');
+INSERT INTO system.appgroup (id, name, description) VALUES ('protected-id', 'View Protected Fields', 'This group allows selected users to view protected fields ush as the mortgage amount.');
 
 DELETE FROM system.approle_appgroup;
 -- Admin
@@ -487,6 +491,9 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('Dashbrd
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('hodReview','hod-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','hod-id');
 
+-- Protected Fields
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ViewProtectedFields','protected-id');
+
 
 DELETE FROM system.appuser_appgroup;
 
@@ -503,6 +510,7 @@ INSERT INTO system.appuser(
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'semisi';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'semisi';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'team-leader-id' FROM system.appuser WHERE username = 'semisi';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'protected-id' FROM system.appuser WHERE username = 'semisi';
 
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
@@ -549,6 +557,7 @@ INSERT INTO system.appuser(
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'andrew';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'andrew';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'team-leader-id' FROM system.appuser WHERE username = 'andrew';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'protected-id' FROM system.appuser WHERE username = 'andrew';
 
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
