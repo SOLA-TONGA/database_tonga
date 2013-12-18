@@ -722,6 +722,10 @@ UPDATE cadastre.cadastre_object_type
 SET status = 'x'
 WHERE code != 'parcel';
 
+INSERT INTO cadastre.cadastre_object_type (code, status, display_value)
+SELECT 'estate','c','Estate::::TONGAN'
+WHERE NOT EXISTS (SELECT code FROM cadastre.cadastre_object_type  WHERE code = 'estate');
+
 -- Requisitioned Status Type
 UPDATE application.application_status_type
 SET display_value = 'On Hold'
