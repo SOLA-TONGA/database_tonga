@@ -307,6 +307,9 @@ INSERT INTO system.approle (code, display_value, status, description)
 INSERT INTO system.approle (code, display_value, status, description)
    SELECT 'transferSublease', 'Service - Transfer Sublease', 'c', 'Registration Service. Allows the Transfer Sublease service to be started.'
    WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'transferSublease');
+INSERT INTO system.approle (code, display_value, status, description)
+   SELECT 'ViewProtectedFields', 'Property - View Protected Fields', 'c', 'Allows user to view details of protected fields such as the mortgage amount.'
+   WHERE NOT EXISTS (SELECT code FROM system.approle WHERE code = 'ViewProtectedFields');
 
    
  -- Add all active roles to the super-group-id
@@ -327,8 +330,12 @@ INSERT INTO system.appgroup (id, name, description) VALUES ('read-only-id', 'Rea
 INSERT INTO system.appgroup (id, name, description) VALUES ('registration-id', 'Registration', 'This group allows registration staff to register and process transactions');
 INSERT INTO system.appgroup (id, name, description) VALUES ('team-leader-id', 'Team Leader', 'This group allows senior registration staff to assign applications and produce lodgement reports');
 INSERT INTO system.appgroup (id, name, description) VALUES ('drafting-id', 'Drafting', 'This group allows drafting staff to process the survey and sign deed workflow tasks');
+INSERT INTO system.appgroup (id, name, description) VALUES ('hod-id', 'Head of Division', 'This group allows the head of division to review applications before they proceed to the minister.');
+INSERT INTO system.appgroup (id, name, description) VALUES ('csr-id', 'Customer Services', 'This group allows the minister''s secretaries to lodge new applications as they are received.');
+INSERT INTO system.appgroup (id, name, description) VALUES ('protected-id', 'View Protected Fields', 'This group allows selected users to view protected fields ush as the mortgage amount.');
 
 DELETE FROM system.approle_appgroup;
+-- Admin
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ManageBR','admin-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','admin-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('NoPasswordExpiry','admin-id');
@@ -345,11 +352,13 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitS
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ReportGenerate','admin-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('CashierImport','admin-id');
 
+-- Read Only
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSearch','read-only-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSearch','read-only-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','read-only-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnView','read-only-id');
 
+-- Registration
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSearch','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSearch','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('mortgage','registration-id');
@@ -427,7 +436,6 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('draftDe
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('itemNumber','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ministerBriefing','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ministerDecision','registration-id');
-INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('hodReview','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('caveat','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('leaseDocument','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('mortgageDocument','registration-id');
@@ -435,10 +443,12 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('easemen
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('registerLease','registration-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('lifeEstate','registration-id');
 
+-- Team Leader
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnUnassignOthers','team-leader-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','team-leader-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RHSave','team-leader-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ReportGenerate','team-leader-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('hodReview','team-leader-id');
 
 -- Drafting
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','drafting-id');
@@ -456,6 +466,34 @@ INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('Complet
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('RevertService','drafting-id');
 INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('StartService','drafting-id');
 
+-- Customer Service Rep
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSearch','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSearch','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnView','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnEdit','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnCreate','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnValidate','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewAssign','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewUnassign','csr-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','hod-id');
+
+-- Head of Division
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('SourceSearch','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('BaunitSearch','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ChangePassword','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnView','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnEdit','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnCreate','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnValidate','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewAssign','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('DashbrdViewUnassign','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('hodReview','hod-id');
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ApplnAssignOthers','hod-id');
+
+-- Protected Fields
+INSERT INTO system.approle_appgroup (approle_code, appgroup_id) VALUES ('ViewProtectedFields','protected-id');
+
 
 DELETE FROM system.appuser_appgroup;
 
@@ -472,6 +510,7 @@ INSERT INTO system.appuser(
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'semisi';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'semisi';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'team-leader-id' FROM system.appuser WHERE username = 'semisi';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'protected-id' FROM system.appuser WHERE username = 'semisi';
 
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
@@ -518,6 +557,7 @@ INSERT INTO system.appuser(
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'registration-id' FROM system.appuser WHERE username = 'andrew';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'admin-id' FROM system.appuser WHERE username = 'andrew';
 INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'team-leader-id' FROM system.appuser WHERE username = 'andrew';
+INSERT INTO system.appuser_appgroup (appuser_id, appgroup_id) SELECT id, 'protected-id' FROM system.appuser WHERE username = 'andrew';
 
 INSERT INTO system.appuser(
             id, username, first_name, last_name, passwd, active, 
